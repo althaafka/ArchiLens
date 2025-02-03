@@ -8,8 +8,7 @@ import style from "./cy-style.json"
 // import data from "./assets/jhotdraw_detailedinput.json";
 // import data from "./assets/jpacman.json";
 // import data from "./assets/jhotdraw_abstract.json";
-import data from "./assets/strategy_detailedinput.json";
-
+import rawGraph from "./assets/strategy_detailedinput.json";
 
 import { setupGraph } from "./setupGraph";
 
@@ -17,13 +16,15 @@ cytoscape.use(cytoscapeCola);
 
 function App() {
   const cyRef = useRef(null);
-  const [graph, setGraph] = useState(data)
+  const [graph, setGraph] = useState(rawGraph)
   const [cyInstance, setCyInstance] = useState(null)
   const [showPrimitives, setShowPrimitives] = useState(false)
 
   const edgeTypes = [
     "contains", "calls", "constructs", "holds", "accepts", "specializes", "returns", "accesses"
   ];
+
+
 
   useEffect(() => {
     if (!cyRef.current) return;
@@ -39,7 +40,7 @@ function App() {
     return () => {
       cy.destroy();
     };
-  }, []);
+  }, [graph]);
 
     // Function to toggle primitives visibility
     const handleShowPrimitives = (e) => {
@@ -62,6 +63,22 @@ function App() {
         }
       });
     }, [showPrimitives, cyInstance]);
+
+    const handleFileUpload = (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+  
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const jsonData = JSON.parse(e.target.result);
+          setGraph(jsonData);
+        } catch (error) {
+          console.error('Error parsing JSON file:', error);
+        }
+      };
+      reader.readAsText(file);
+    };
   
   return (
     <div className="app-container">
@@ -72,6 +89,18 @@ function App() {
 
       {/* Menu Bar */}
       <div className="menu-bar">
+        <h1>ArchiLens</h1>
+        <hr></hr>
+        <input type="file" accept=".json" onChange={handleFileUpload} />
+        <label>
+          <input
+              type="checkbox"
+              checked={showPrimitives}
+              onChange={handleShowPrimitives}
+          />
+          Show Primitive
+        </label>
+        <hr></hr>
         <h2>Relationships</h2>
         <ul>
           {edgeTypes.map((type) => (
@@ -85,15 +114,6 @@ function App() {
             </li>
           ))}
         </ul>
-        <hr></hr>
-        <label>
-          <input
-              type="checkbox"
-              checked={showPrimitives}
-              onChange={handleShowPrimitives}
-          />
-          Show Primitive
-        </label>
       </div>
     </div>
   )
