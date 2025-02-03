@@ -1,0 +1,22 @@
+.app-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+  }
+  
+  .canvas {
+    flex: 7;
+    background-color: #f4f4f4;
+    padding: 20px;
+    border-right: 2px solid #ddd;
+  }
+  
+  .menu-bar {
+    flex: 2;
+    background-color: #fff;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    border-left: 2px solid #ddd;
+  }
