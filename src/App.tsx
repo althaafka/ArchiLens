@@ -3,8 +3,14 @@ import { useRef, useState, useEffect } from 'react'
 import './App.css'
 import cytoscape from "cytoscape";
 import cytoscapeCola from "cytoscape-cola";
+import style from "./cy-style.json"
+
 // import data from "./assets/jhotdraw_detailedinput.json";
-import data from "./assets/jpacman.json";
+// import data from "./assets/jpacman.json";
+import data from "./assets/jhotdraw_abstract.json";
+
+
+import { setupGraph } from "./setupGraph";
 
 cytoscape.use(cytoscapeCola);
 
@@ -21,7 +27,8 @@ function App() {
 
     const cy = cytoscape({
       container: cyRef.current,
-      elements: graph.elements
+      elements: setupGraph(graph.elements),
+      style: style
     });
 
     return () => {
