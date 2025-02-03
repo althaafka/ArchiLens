@@ -7,8 +7,8 @@ import style from "./cy-style.json"
 
 // import rawGraph from "./assets/jhotdraw_detailedinput.json";
 // import rawGraph from "./assets/jpacman.json";
-import rawGraph from "./assets/jhotdraw_abstract.json";
-// import rawGraph from "./assets/strategy_detailedinput.json";
+// import rawGraph from "./assets/jhotdraw_abstract.json";
+import rawGraph from "./assets/strategy_detailedinput.json";
 
 import { setupGraph } from "./setupGraph";
 
@@ -122,7 +122,6 @@ function App() {
           ))}
         </select>
         <button onClick={applyLayout}>Relayout</button>
-        <hr></hr>
         <hr></hr>
         <h2>Relationships</h2>
         <ul>
