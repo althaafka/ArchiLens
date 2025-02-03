@@ -83,25 +83,60 @@ export function createAbstractGraph(nodes, edges) {
         hasVariableMap.get(edge.data.target)?.add(edge.data.source)
     })
 
+    const typeMap = new Map<string, Set<string>>(); // <source, targets[]>
+    edgesMap.get("type")?.forEach((edge) => {
+        if (!typeMap.has(edge.data.source)) {
+            typeMap.set(edge.data.source, new Set());
+          }
+          typeMap.get(edge.data.source)?.add(edge.data.target);
+    })
+    console.log("typesMap:", typeMap)
 
-    function mergeEdges(edges1Map, edges2, newLabel) {
+    function mergeEdges(edgesMap1, edges2, newLabel) {
         let newEdges = []
-        edges2.forEach((edge) => {
-            const newTarget = edge.data.target
-            const newSources = edges1Map.get(edge.data.source)
+        edges2?.forEach((edge) => {
+            let newTarget = edge.data.target
+            const newSources = edgesMap1.get(edge.data.source)
     
             if (!newSources) return;
-    
+
             newSources.forEach((newSource) => {
                 if (newSource == newTarget) return
                 newEdges.push({
                     data: {
+                    id: `${newSource}-${newTarget}-${newLabel}`,
+                    source: newSource,
+                    target: newTarget,
+                    labels: [`${newLabel}`],
+                    },
+                });
+            })
+
+        })
+
+        return newEdges
+    }
+
+    function mergeEdgesType2(edgesMap1, edges2, newLabel, edgesMap2= undefined) {
+        let newEdges = []
+        edges2?.forEach((edge) => {
+            const newSources = edgesMap1.get(edge.data.source)
+    
+            if (!newSources) return;
+
+            newSources.forEach((newSource) => {
+                const newTargets = edgesMap2?.get(edge.data.target) ?? edgesMap1.get(edge.data.target);
+                newTargets?.forEach((newTarget) => {
+                  if (newSource == newTarget) return;
+                  newEdges.push({
+                    data: {
                       id: `${newSource}-${newTarget}-${newLabel}`,
                       source: newSource,
                       target: newTarget,
-                      labels: [`${newLabel}`],
+                      labels: newLabel,
                     },
-                 });
+                  });
+                })
             })
         })
 
@@ -113,13 +148,17 @@ export function createAbstractGraph(nodes, edges) {
     const constructs = mergeEdges(hasScriptMap, edgesMap.get("instantiates"), "constructs")
     const returns = mergeEdges(hasScriptMap, edgesMap.get("returnType"), "returns")
     const holds = mergeEdges(hasVariableMap, edgesMap.get("type"), "holds")
+    const calls = mergeEdgesType2(hasScriptMap, edgesMap.get("invokes"), "calls")
+    const accepts = mergeEdgesType2(hasScriptMap, edgesMap.get("hasParameter"), "accepts", typeMap)
 
     let abstractEdges = [
 		...(edgesMap.get("specializes") || []),
 	    ...(constructs || []),
         ...(edgesMap.get("contains") || []),
         ...(returns || []),
-        ...(holds || [])
+        ...(holds || []),
+        ...(calls || []),
+        ...(accepts || [])
     ]
 
     return { nodes: abstractNodes, edges: removeInvalidEdges(abstractNodes, abstractEdges) }
