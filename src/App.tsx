@@ -5,10 +5,10 @@ import cytoscape from "cytoscape";
 import cytoscapeCola from "cytoscape-cola";
 import style from "./cy-style.json"
 
-// import data from "./assets/jhotdraw_detailedinput.json";
-// import data from "./assets/jpacman.json";
-// import data from "./assets/jhotdraw_abstract.json";
-import rawGraph from "./assets/strategy_detailedinput.json";
+// import rawGraph from "./assets/jhotdraw_detailedinput.json";
+// import rawGraph from "./assets/jpacman.json";
+import rawGraph from "./assets/jhotdraw_abstract.json";
+// import rawGraph from "./assets/strategy_detailedinput.json";
 
 import { setupGraph } from "./setupGraph";
 
@@ -19,12 +19,14 @@ function App() {
   const [graph, setGraph] = useState(rawGraph)
   const [cyInstance, setCyInstance] = useState(null)
   const [showPrimitives, setShowPrimitives] = useState(false)
+  const [layout, setLayout] = useState("grid")
 
   const edgeTypes = [
     "contains", "calls", "constructs", "holds", "accepts", "specializes", "returns", "accesses"
   ];
-
-
+  const layoutTypes = [
+    "grid", "cola"
+  ]
 
   useEffect(() => {
     if (!cyRef.current) return;
@@ -64,6 +66,7 @@ function App() {
       });
     }, [showPrimitives, cyInstance]);
 
+    // Function to upload file
     const handleFileUpload = (event) => {
       const file = event.target.files[0];
       if (!file) return;
@@ -79,6 +82,17 @@ function App() {
       };
       reader.readAsText(file);
     };
+
+    // Function to relayout
+    const handleLayoutChange = (event) => {
+      setLayout(event.target.value);
+    };
+  
+    const applyLayout = () => {
+      if (!cyInstance) return;
+      cyInstance.layout({ name: layout === "cola" ? "cola" : "grid" }).run();
+    };
+  
   
   return (
     <div className="app-container">
@@ -100,6 +114,15 @@ function App() {
           />
           Show Primitive
         </label>
+        <hr></hr>
+        <h2>Layout</h2>
+        <select value={layout} onChange={handleLayoutChange}>
+          {layoutTypes.map((layout) => (
+            <option value={layout}>{layout == "grid"? "default": layout}</option>
+          ))}
+        </select>
+        <button onClick={applyLayout}>Relayout</button>
+        <hr></hr>
         <hr></hr>
         <h2>Relationships</h2>
         <ul>
