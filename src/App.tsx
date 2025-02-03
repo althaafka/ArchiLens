@@ -1,13 +1,33 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 
 import './App.css'
+import cytoscape from "cytoscape";
+import cytoscapeCola from "cytoscape-cola";
+// import data from "./assets/jhotdraw_detailedinput.json";
+import data from "./assets/jpacman.json";
+
+cytoscape.use(cytoscapeCola);
 
 function App() {
   const cyRef = useRef(null);
+  const [graph, setGraph] = useState(data)
 
   const edgeTypes = [
     "contains", "calls", "constructs", "holds", "accepts", "specializes", "returns", "accesses"
   ];
+
+  useEffect(() => {
+    if (!cyRef.current) return;
+
+    const cy = cytoscape({
+      container: cyRef.current,
+      elements: graph.elements
+    });
+
+    return () => {
+      cy.destroy();
+    };
+  }, []);
 
   return (
     <div className="app-container">
