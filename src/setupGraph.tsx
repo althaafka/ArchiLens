@@ -11,7 +11,7 @@ export function setupGraph(graph: Graph) {
     });
 
     if (isDetailedGraph) {
-        const {nodes: abstractNodes, edges: abstractEdges} = abstractize(nodes,edges)
+        const {nodes: abstractNodes, edges: abstractEdges} = createAbstractGraph(nodes,edges)
         nodes = abstractNodes;
         edges = abstractEdges;
     }
@@ -51,7 +51,7 @@ export function setupGraph(graph: Graph) {
     };
 }
 
-export function abstractize(nodes, edges) {
+export function createAbstractGraph(nodes, edges) {
     
     const abstractNodes = nodes.filter((node) => 
         (node.data.labels?.some(label => !abstractLabels.includes(label)) || 
@@ -67,15 +67,24 @@ export function abstractize(nodes, edges) {
         edgesMap.get(label)?.add(edge);
     });
 
-    const hasScriptMap = new Map<string, Set<string>>();
+    const hasScriptMap = new Map<string, Set<string>>()
     edgesMap.get("hasScript")?.forEach((edge) => {
         if (!hasScriptMap.has(edge.data.target)) {
-            hasScriptMap.set(edge.data.target, new Set());
+            hasScriptMap.set(edge.data.target, new Set())
         }
         hasScriptMap.get(edge.data.target)?.add(edge.data.source)
     })
 
-    function compose(edges1Map, edges2, newLabel) {
+    const hasVariableMap = new Map<string, Set<string>>()
+    edgesMap.get("hasVariable")?.forEach((edge) => {
+        if (!hasVariableMap.has(edge.data.target)) {
+            hasVariableMap.set(edge.data.target, new Set())
+        }
+        hasVariableMap.get(edge.data.target)?.add(edge.data.source)
+    })
+
+
+    function mergeEdges(edges1Map, edges2, newLabel) {
         let newEdges = []
         edges2.forEach((edge) => {
             const newTarget = edge.data.target
@@ -101,24 +110,22 @@ export function abstractize(nodes, edges) {
 
 
     // Handle detailed graph's relationship
-    const constructs = compose(hasScriptMap, edgesMap.get("instantiates"), "constructs")
-    const returns = compose(hasScriptMap, edgesMap.get("returnType"), "returns")
+    const constructs = mergeEdges(hasScriptMap, edgesMap.get("instantiates"), "constructs")
+    const returns = mergeEdges(hasScriptMap, edgesMap.get("returnType"), "returns")
+    const holds = mergeEdges(hasVariableMap, edgesMap.get("type"), "holds")
 
     let abstractEdges = [
 		...(edgesMap.get("specializes") || []),
 	    ...(constructs || []),
         ...(edgesMap.get("contains") || []),
         ...(returns || []),
+        ...(holds || [])
     ]
 
-    console.log(abstractEdges)
-    abstractEdges = cleanEdges(abstractNodes, abstractEdges)
-
-
-    return { nodes: abstractNodes, edges: abstractEdges }
+    return { nodes: abstractNodes, edges: removeInvalidEdges(abstractNodes, abstractEdges) }
 }
 
-function cleanEdges(nodes, edges) {
+function removeInvalidEdges(nodes, edges) {
     const nodeIds = new Set(nodes.map((node) => node.data.id));
     return edges.filter(({ data: { source, target } }) => nodeIds.has(source) && nodeIds.has(target));
 }
