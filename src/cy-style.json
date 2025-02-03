@@ -23,7 +23,6 @@
     {
       "selector": "node[hidden]",
       "style": {
-        "visibility": "hidden",
         "display": "none"
       }
     },

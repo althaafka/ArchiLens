@@ -7,7 +7,8 @@ import style from "./cy-style.json"
 
 // import data from "./assets/jhotdraw_detailedinput.json";
 // import data from "./assets/jpacman.json";
-import data from "./assets/jhotdraw_abstract.json";
+// import data from "./assets/jhotdraw_abstract.json";
+import data from "./assets/strategy_detailedinput.json";
 
 
 import { setupGraph } from "./setupGraph";
@@ -17,6 +18,8 @@ cytoscape.use(cytoscapeCola);
 function App() {
   const cyRef = useRef(null);
   const [graph, setGraph] = useState(data)
+  const [cyInstance, setCyInstance] = useState(null)
+  const [showPrimitives, setShowPrimitives] = useState(false)
 
   const edgeTypes = [
     "contains", "calls", "constructs", "holds", "accepts", "specializes", "returns", "accesses"
@@ -31,11 +34,35 @@ function App() {
       style: style
     });
 
+    setCyInstance(cy);
+
     return () => {
       cy.destroy();
     };
   }, []);
 
+    // Function to toggle primitives visibility
+    const handleShowPrimitives = (e) => {
+      console.log("toggle primitives")
+      setShowPrimitives(e.target.checked);
+    };
+  
+    useEffect(() => {
+      if (!cyInstance) return;
+  
+      cyInstance.nodes().forEach((node) => {
+        const nodeLabels = node.data("labels") || [];
+        const shouldHide =
+          nodeLabels.includes("Primitive") || node.data("id") === "java.lang.String";
+  
+        if (shouldHide) {
+          node.style({
+            display: showPrimitives ? "element" : "none",
+          });
+        }
+      });
+    }, [showPrimitives, cyInstance]);
+  
   return (
     <div className="app-container">
       {/* Cytoscape */}
@@ -58,6 +85,15 @@ function App() {
             </li>
           ))}
         </ul>
+        <hr></hr>
+        <label>
+          <input
+              type="checkbox"
+              checked={showPrimitives}
+              onChange={handleShowPrimitives}
+          />
+          Show Primitive
+        </label>
       </div>
     </div>
   )
