@@ -20,6 +20,16 @@ function App() {
   const [cyInstance, setCyInstance] = useState(null)
   const [showPrimitives, setShowPrimitives] = useState(false)
   const [layout, setLayout] = useState("grid")
+  const [selectedEdges, setSelectedEdges] = useState({
+    calls: true,
+    contains: false,
+    constructs: false,
+    holds: false,
+    accepts: false,
+    specializes: false,
+    returns: false,
+    accesses: false,
+  });
 
   const edgeTypes = [
     "contains", "calls", "constructs", "holds", "accepts", "specializes", "returns", "accesses"
@@ -28,6 +38,7 @@ function App() {
     "grid", "cola"
   ]
 
+  // Init cytoscape
   useEffect(() => {
     if (!cyRef.current) return;
 
@@ -66,6 +77,7 @@ function App() {
       });
     }, [showPrimitives, cyInstance]);
 
+
     // Function to upload file
     const handleFileUpload = (event) => {
       const file = event.target.files[0];
@@ -83,6 +95,29 @@ function App() {
       reader.readAsText(file);
     };
 
+    // Function to filter edge types
+  const handleEdgeFilterChange = (event) => {
+    const { name, checked } = event.target;
+    setSelectedEdges((prev) => ({
+      ...prev,
+      [name]: checked,
+    }));
+  };
+
+  useEffect(() => {
+    if (!cyInstance) return;
+
+    cyInstance.edges().forEach((edge) => {
+      const edgeType = edge._private.data.labels || edge._private.data.label
+
+      edge.style({
+        display: selectedEdges[edgeType] ? "element" : "none",
+      });
+    });
+  }, [selectedEdges, cyInstance]);
+
+  
+
     // Function to relayout
     const handleLayoutChange = (event) => {
       setLayout(event.target.value);
@@ -90,7 +125,12 @@ function App() {
   
     const applyLayout = () => {
       if (!cyInstance) return;
-      cyInstance.layout({ name: layout === "cola" ? "cola" : "grid" }).run();
+      cyInstance.layout({
+         name: layout === "cola" ? "cola" : "grid",
+         animated: false,
+         avoidOverlap: true, // Pastikan node tidak tumpang tindih
+         nodeSpacing: 10,
+      }).run();
     };
   
   
@@ -130,6 +170,9 @@ function App() {
               <label>
                 <input
                   type="checkbox"
+                  name={type}
+                  checked={selectedEdges[type]}
+                  onChange={handleEdgeFilterChange}
                 />
                 {type}
               </label>
