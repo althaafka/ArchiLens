@@ -3,7 +3,10 @@ import { useRef, useState, useEffect } from 'react'
 import './App.css'
 import cytoscape from "cytoscape";
 import cytoscapeCola from "cytoscape-cola";
-import style from "./cy-style.json"
+import { Stylesheet } from "cytoscape";
+import styleData from "./cy-style.json";
+
+const style: Stylesheet[] = styleData as Stylesheet[];
 
 // import rawGraph from "./assets/jhotdraw_detailedinput.json";
 // import rawGraph from "./assets/jpacman.json";
@@ -86,7 +89,7 @@ function App() {
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
-          const jsonData = JSON.parse(e.target.result);
+          const jsonData = JSON.parse(e.target.result as string)
           setGraph(jsonData);
         } catch (error) {
           console.error('Error parsing JSON file:', error);
@@ -128,7 +131,7 @@ function App() {
       cyInstance.layout({
          name: layout === "cola" ? "cola" : "grid",
          animated: false,
-         avoidOverlap: true, // Pastikan node tidak tumpang tindih
+         avoidOverlap: true,
          nodeSpacing: 10,
       }).run();
     };
