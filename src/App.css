@@ -5,14 +5,14 @@
   }
   
   .canvas {
-    flex: 7;
+    flex: 1;
     background-color: #f4f4f4;
     padding: 20px;
     border-right: 2px solid #ddd;
   }
   
   .menu-bar {
-    flex: 2;
+    width: 300px;
     background-color: #fff;
     padding: 20px;
     display: flex;
