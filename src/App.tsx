@@ -35,6 +35,22 @@ function App() {
     };
   }, [graph]);
 
+  useEffect(() => {
+    if (!cyInstance) return;
+  
+    const handleClick = (event: cytoscape.EventObject) => {
+      console.log("Clicked element:", event.target.data());
+    };
+  
+    cyInstance.on("tap", "node", handleClick);
+    cyInstance.on("tap", "edge", handleClick);
+  
+    return () => {
+      cyInstance.off("tap", "node", handleClick);
+      cyInstance.off("tap", "edge", handleClick);
+    };
+  }, [cyInstance]);
+
   return (
     <div className="app-container">
       {/* Cytoscape */}

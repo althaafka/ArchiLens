@@ -1,44 +1,37 @@
 import { useEffect } from 'react';
+import { stereoTypesColors, stereoTypesBorder } from '../utils/constants';
 
-const stereoTypesColors = {
-  "Controller": "#FFE8E2",
-  "Information Holder": "#FFF2DD",
-  "Interfacer": "#E7F5E9",
-  "User Interfacer": "#E7F5E9",
-  "Internal Interfacer": "#E7F5E9",
-  "Eksternal Interfacer": "#E7F5E9",
-  "Service Provider": "#E2EFFC",
-  "Structurer": "#EFE6FF",
-  "Coordinator": "#FFD9DF",
-};
-
-const borderColors = {
-  "Controller": "#FFC7B8",
-  "Information Holder": "#FEBA4C",
-  "Interfacer": "#81C880",
-  "User Interfacer": "#B2E2C7",
-  "Internal Interfacer": "#B2E2C7",
-  "Eksternal Interfacer": "#B2E2C7",
-  "Service Provider": "#5EAAED",
-  "Structurer": "#D9B2FF",
-  "Coordinator": "#FFB2C7",
-};
 
 const useNodeColoring = (cyInstance, coloring) => {
   useEffect(() => {
-    if (!cyInstance || coloring !== "role stereotypes") return;
+    if (!cyInstance) return;
+    console.log(coloring)
 
-    cyInstance.nodes().forEach((node) => {
-      const roleStereotypes = node._private.data.properties?.roleStereotype;
+    if (coloring == "role stereotypes") {
+      cyInstance.nodes().forEach((node) => {
+        const roleStereotypes = node._private.data.properties?.roleStereotype;
+  
+        if (roleStereotypes && stereoTypesColors[roleStereotypes]) {
+          node.style({
+            'background-color': stereoTypesColors[roleStereotypes],
+            'border-width': 3,
+            'border-color': stereoTypesBorder[roleStereotypes],
+          });
+        }
+      });
+    }  else if (coloring == "none") {
+      const hasColoredNodes = cyInstance.nodes().some(node => node.style('background-color') !== stereoTypesColors['-']);
 
-      if (roleStereotypes && stereoTypesColors[roleStereotypes]) {
-        node.style({
-          'background-color': stereoTypesColors[roleStereotypes],
-          'border-width': 3,
-          'border-color': borderColors[roleStereotypes],
+      if (hasColoredNodes) {
+        cyInstance.nodes().forEach((node) => {
+          node.style({
+            'background-color': stereoTypesColors['-'],
+            "border-width": "3",
+            "border-color": "#5E5E5E"
+          });
         });
       }
-    });
+    }
   }, [coloring, cyInstance]);
 };
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { edgesLabel } from '../utils/constants';
 import useNodeColoring from '../hooks/useNodeColoring';
+import ColoringLegend from './ColoringLegend';
 
 const Menu = ({
   cyInstance,
@@ -119,6 +120,7 @@ const Menu = ({
           <option key={coloring} value={coloring}>{coloring}</option>
         ))}
       </select>
+      {coloring === "role stereotypes" && <ColoringLegend />}
       <hr />
       <h2>Relationships</h2>
       <ul>

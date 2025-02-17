@@ -20,3 +20,31 @@
     gap: 5px;
     border-left: 2px solid #ddd;
   }
+
+  .legend-container {
+    margin-top: 5px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: white;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .legend-container h4 {
+    margin: 0 0 5px;
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    margin-bottom: 5px;
+  }
+  
+  .legend-box {
+    width: 20px;
+    height: 15px;
+    display: inline-block;
+    border-radius: 3px;
+  }  
