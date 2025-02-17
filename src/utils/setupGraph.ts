@@ -1,6 +1,6 @@
 import { abstractizeGraph } from "./abstractizeGraph";
-import { Graph } from "./types";
-import { nodesLabel } from "./constants/label";
+import { Graph } from "../types";
+import { nodesLabel } from "./constants";
 
 
 export function setupGraph(graph: Graph) {

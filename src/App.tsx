@@ -1,45 +1,21 @@
-import { useRef, useState, useEffect } from 'react'
-
-import './App.css'
+import { useRef, useState, useEffect } from 'react';
+import './App.css';
 import cytoscape from "cytoscape";
 import cytoscapeCola from "cytoscape-cola";
 import { Stylesheet } from "cytoscape";
 import styleData from "./cy-style.json";
+import rawGraph from "./assets/jhotdraw-trc-sum-rs.json";
+import { setupGraph } from "./utils/setupGraph";
+import Menu from './components/menu';
 
 const style: Stylesheet[] = styleData as Stylesheet[];
-
-// import rawGraph from "./assets/jhotdraw_detailedinput.json";
-// import rawGraph from "./assets/jpacman.json";
-// import rawGraph from "./assets/jhotdraw_abstract.json";
-import rawGraph from "./assets/strategy_detailedinput.json";
-
-import { setupGraph } from "./setupGraph";
 
 cytoscape.use(cytoscapeCola);
 
 function App() {
-  const cyRef = useRef(null);
-  const [graph, setGraph] = useState(rawGraph)
-  const [cyInstance, setCyInstance] = useState(null)
-  const [showPrimitives, setShowPrimitives] = useState(false)
-  const [layout, setLayout] = useState("grid")
-  const [selectedEdges, setSelectedEdges] = useState({
-    calls: true,
-    contains: false,
-    constructs: false,
-    holds: false,
-    accepts: false,
-    specializes: false,
-    returns: false,
-    accesses: false,
-  });
-
-  const edgeTypes = [
-    "contains", "calls", "constructs", "holds", "accepts", "specializes", "returns", "accesses"
-  ];
-  const layoutTypes = [
-    "grid", "cola"
-  ]
+  const cyRef = useRef<HTMLDivElement>(null);
+  const [graph, setGraph] = useState(rawGraph);
+  const [cyInstance, setCyInstance] = useState(null);
 
   // Init cytoscape
   useEffect(() => {
@@ -48,7 +24,8 @@ function App() {
     const cy = cytoscape({
       container: cyRef.current,
       elements: setupGraph(graph.elements),
-      style: style
+      style: style,
+      pixelRatio: 1
     });
 
     setCyInstance(cy);
@@ -58,85 +35,6 @@ function App() {
     };
   }, [graph]);
 
-    // Function to toggle primitives visibility
-    const handleShowPrimitives = (e) => {
-      console.log("toggle primitives")
-      setShowPrimitives(e.target.checked);
-    };
-  
-    useEffect(() => {
-      if (!cyInstance) return;
-  
-      cyInstance.nodes().forEach((node) => {
-        const nodeLabels = node.data("labels") || [];
-        const shouldHide =
-          nodeLabels.includes("Primitive") || node.data("id") === "java.lang.String";
-  
-        if (shouldHide) {
-          node.style({
-            display: showPrimitives ? "element" : "none",
-          });
-        }
-      });
-    }, [showPrimitives, cyInstance]);
-
-
-    // Function to upload file
-    const handleFileUpload = (event) => {
-      const file = event.target.files[0];
-      if (!file) return;
-  
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const jsonData = JSON.parse(e.target.result as string)
-          setGraph(jsonData);
-        } catch (error) {
-          console.error('Error parsing JSON file:', error);
-        }
-      };
-      reader.readAsText(file);
-    };
-
-    // Function to filter edge types
-  const handleEdgeFilterChange = (event) => {
-    const { name, checked } = event.target;
-    setSelectedEdges((prev) => ({
-      ...prev,
-      [name]: checked,
-    }));
-  };
-
-  useEffect(() => {
-    if (!cyInstance) return;
-
-    cyInstance.edges().forEach((edge) => {
-      const edgeType = edge._private.data.labels || edge._private.data.label
-
-      edge.style({
-        display: selectedEdges[edgeType] ? "element" : "none",
-      });
-    });
-  }, [selectedEdges, cyInstance]);
-
-  
-
-    // Function to relayout
-    const handleLayoutChange = (event) => {
-      setLayout(event.target.value);
-    };
-  
-    const applyLayout = () => {
-      if (!cyInstance) return;
-      cyInstance.layout({
-         name: layout === "cola" ? "cola" : "grid",
-         animated: false,
-         avoidOverlap: true,
-         nodeSpacing: 10,
-      }).run();
-    };
-  
-  
   return (
     <div className="app-container">
       {/* Cytoscape */}
@@ -145,46 +43,9 @@ function App() {
       </div>
 
       {/* Menu Bar */}
-      <div className="menu-bar">
-        <h1>ArchiLens</h1>
-        <hr></hr>
-        <input type="file" accept=".json" onChange={handleFileUpload} />
-        <label>
-          <input
-              type="checkbox"
-              checked={showPrimitives}
-              onChange={handleShowPrimitives}
-          />
-          Show Primitive
-        </label>
-        <hr></hr>
-        <h2>Layout</h2>
-        <select value={layout} onChange={handleLayoutChange}>
-          {layoutTypes.map((layout) => (
-            <option value={layout}>{layout == "grid"? "default": layout}</option>
-          ))}
-        </select>
-        <button onClick={applyLayout}>Relayout</button>
-        <hr></hr>
-        <h2>Relationships</h2>
-        <ul>
-          {edgeTypes.map((type) => (
-            <li key={type}>
-              <label>
-                <input
-                  type="checkbox"
-                  name={type}
-                  checked={selectedEdges[type]}
-                  onChange={handleEdgeFilterChange}
-                />
-                {type}
-              </label>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <Menu cyInstance={cyInstance} setGraph={setGraph} />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
