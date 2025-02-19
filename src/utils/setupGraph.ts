@@ -1,6 +1,6 @@
 import { abstractizeGraph } from "./abstractizeGraph";
 import { Graph } from "../types";
-import { nodesLabel } from "./constants";
+import { detailedNodesLabel } from "./constants";
 
 
 export function setupGraph(graph: Graph) {
@@ -8,7 +8,7 @@ export function setupGraph(graph: Graph) {
 
     const isDetailedGraph=  nodes.some((node) => {
         const labels = node.data.labels || [node.data.label]
-        return labels.some((label) => Object.values(nodesLabel).includes(label))
+        return labels.some((label) => Object.values(detailedNodesLabel).includes(label))
     });
 
     if (isDetailedGraph) {
@@ -17,7 +17,7 @@ export function setupGraph(graph: Graph) {
         edges = abstractEdges;
     }
 
-    // Handle Contains relationship
+    // Handle Contains and Features
     const containsMap = new Map<string, string>();
     edges = edges.filter((edge) => {
         if (edge.data.labels?.includes("contains") || edge.data.label === "contains") {
@@ -27,16 +27,28 @@ export function setupGraph(graph: Graph) {
         return true;
     });
 
-    nodes = nodes.map((node) => ({
-        ...node,
-        data: {
-            ...node.data,
-            parent: containsMap.get(node.data.id) || node.data.parent, // Add parent if exists
+    const { features, filteredNodes } = nodes.reduce(
+        (acc, node) => {
+            const nodeLabels = node.data.labels || [node.data.label];
+            if (nodeLabels.includes("Feature")) {
+                acc.features.push(node);
+            } else {
+                acc.filteredNodes.push({
+                    ...node,
+                    data: {
+                        ...node.data,
+                        parent: containsMap.get(node.data.id) || node.data.parent,
+                    },
+                });
+            }
+            return acc;
         },
-    }));
+        { features: [] as typeof nodes, filteredNodes: [] as typeof nodes }
+    );
+
 
     // Handle node label and hide primitive node
-    nodes.forEach((node) => {
+    filteredNodes.forEach((node) => {
         const nodeLabels = node.data.labels || [node.data.label];
         if (nodeLabels.includes("Primitive") || node.data.id.includes("java.lang.String")) {
             node.data.hidden = true;
@@ -46,8 +58,12 @@ export function setupGraph(graph: Graph) {
         node.data.label = name || shortname || simpleName;
     });
 
+    edges.forEach((edge) => {
+        edge.data.label = edge.data.label || (Array.isArray(edge.data.labels) ? edge.data.labels.join() : edge.data.labels);
+    });
+
     return {
-        nodes: nodes,
-        edges: edges,
+        graph: {nodes: filteredNodes, edges: edges},
+        feature: features
     };
 }

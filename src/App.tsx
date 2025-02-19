@@ -4,7 +4,7 @@ import cytoscape from "cytoscape";
 import cytoscapeCola from "cytoscape-cola";
 import { Stylesheet } from "cytoscape";
 import styleData from "./cy-style.json";
-import rawGraph from "./assets/jhotdraw-trc-sum-rs.json";
+import rawGraph from "./assets/jhotdraw-features.json";
 import { setupGraph } from "./utils/setupGraph";
 import Menu from './components/menu';
 
@@ -16,19 +16,28 @@ function App() {
   const cyRef = useRef<HTMLDivElement>(null);
   const [graph, setGraph] = useState(rawGraph);
   const [cyInstance, setCyInstance] = useState(null);
+  const [features, setFeatures] = useState(null);
 
   // Init cytoscape
   useEffect(() => {
     if (!cyRef.current) return;
 
+    const startTime = performance.now();
+    const processedGraph = setupGraph(graph.elements);
     const cy = cytoscape({
       container: cyRef.current,
-      elements: setupGraph(graph.elements),
-      style: style,
-      pixelRatio: 1
+      elements: processedGraph.graph,
+      style: style
+    });
+
+    cy.on('layoutstop', () => {
+      const endTime = performance.now();
+      const renderTime = endTime - startTime;
+      console.log(`Graph rendered in ${renderTime.toFixed(2)} milliseconds`);
     });
 
     setCyInstance(cy);
+    setFeatures(processedGraph.feature)
 
     return () => {
       cy.destroy();
@@ -51,6 +60,7 @@ function App() {
     };
   }, [cyInstance]);
 
+
   return (
     <div className="app-container">
       {/* Cytoscape */}
@@ -59,7 +69,7 @@ function App() {
       </div>
 
       {/* Menu Bar */}
-      <Menu cyInstance={cyInstance} setGraph={setGraph} />
+      <Menu cyInstance={cyInstance} setGraph={setGraph} features={features}/>
     </div>
   );
 }

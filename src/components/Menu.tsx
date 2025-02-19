@@ -2,13 +2,15 @@ import { useState, useEffect } from 'react'
 import { edgesLabel } from '../utils/constants';
 import useNodeColoring from '../hooks/useNodeColoring';
 import ColoringLegend from './ColoringLegend';
+import FeaturesColoringLegend from './FeaturesColoringLegend';
 
 const Menu = ({
   cyInstance,
-  setGraph
+  setGraph,
+  features
 }) => {
   const layoutTypes = ["grid", "cola"];
-  const coloringTypes = ["none", "role stereotypes"];
+  const coloringTypes = ["none", "role stereotypes", "features"];
 
   const [layout, setLayout] = useState("grid");
   const [showPrimitives, setShowPrimitives] = useState(false);
@@ -64,11 +66,12 @@ const Menu = ({
         });
       }
     });
+    console.log("features:",features)
   }, [showPrimitives, cyInstance]);
 
 
   // Nodes Coloring
-  useNodeColoring(cyInstance, coloring);
+  const { featureColors } = useNodeColoring(cyInstance, coloring, features);
 
   // Filter Edges
   const handleEdgeFilterChange = (event) => {
@@ -121,6 +124,7 @@ const Menu = ({
         ))}
       </select>
       {coloring === "role stereotypes" && <ColoringLegend />}
+      {coloring === "features" && <FeaturesColoringLegend featureColors={featureColors} />}
       <hr />
       <h2>Relationships</h2>
       <ul>

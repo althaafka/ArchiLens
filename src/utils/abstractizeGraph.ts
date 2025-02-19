@@ -1,10 +1,10 @@
-import { nodesLabel } from "./constants";
+import { detailedNodesLabel } from "./constants";
 
 export function abstractizeGraph(nodes, edges) {
     
     const abstractNodes = nodes.filter((node) => 
-        (node.data.labels?.some(label => !Object.values(nodesLabel).includes(label)) || 
-        Object.values(nodesLabel).includes(node.data.label))
+        (node.data.labels?.some(label => !Object.values(detailedNodesLabel).includes(label)) || 
+        Object.values(detailedNodesLabel).includes(node.data.label))
     );
 
     const edgesMap = new Map<string, Set<any>>();
@@ -100,7 +100,6 @@ export function abstractizeGraph(nodes, edges) {
     const calls = mergeEdgesType2(hasScriptMap, edgesMap.get("invokes"), "calls")
     const accepts = mergeEdgesType2(hasScriptMap, edgesMap.get("hasParameter"), "accepts", typeMap)
 
-    console.log("calls:",calls)
 
     let abstractEdges = [
         ...(edgesMap.get("specializes") || []),
