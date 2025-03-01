@@ -6,7 +6,7 @@ import { Stylesheet } from "cytoscape";
 import styleData from "./cy-style.json";
 import rawGraph from "./assets/jhotdraw-features.json";
 import { setupGraph } from "./utils/setupGraph";
-import Menu from './components/menu';
+import Menu from './components/Menu/Menu';
 
 const style: Stylesheet[] = styleData as Stylesheet[];
 
@@ -16,31 +16,44 @@ function App() {
   const cyRef = useRef<HTMLDivElement>(null);
   const [graph, setGraph] = useState(rawGraph);
   const [cyInstance, setCyInstance] = useState(null);
+  const [hcyInstance, setHcyInstance] = useState(null);
   const [features, setFeatures] = useState(null);
 
   // Init cytoscape
   useEffect(() => {
     if (!cyRef.current) return;
 
-    const startTime = performance.now();
     const processedGraph = setupGraph(graph.elements);
-    const cy = cytoscape({
-      container: cyRef.current,
+    const hcy = cytoscape({
+      headless: true,
       elements: processedGraph.graph,
-      style: style
+      ready: (event) => {
+        const hcyInstance = event.cy
+
+        hcyInstance.startBatch();
+        // Headless processing
+        hcyInstance.endBatch();
+
+        setHcyInstance(hcyInstance);
+        setFeatures(processedGraph.feature);
+
+        if (cyRef.current) {
+          const cy = cytoscape({
+            container: cyRef.current,
+            elements: hcyInstance.json().elements,
+            style: style,
+            wheelSensitivity: 0.25,
+            ready: (cyEvent) => {
+              setCyInstance(cyEvent.cy);
+              initNodeColoring()
+            },
+          });
+        }
+      }
     });
-
-    cy.on('layoutstop', () => {
-      const endTime = performance.now();
-      const renderTime = endTime - startTime;
-      console.log(`Graph rendered in ${renderTime.toFixed(2)} milliseconds`);
-    });
-
-    setCyInstance(cy);
-    setFeatures(processedGraph.feature)
-
+    
     return () => {
-      cy.destroy();
+      hcy.destroy();
     };
   }, [graph]);
 
@@ -59,6 +72,10 @@ function App() {
       cyInstance.off("tap", "edge", handleClick);
     };
   }, [cyInstance]);
+
+  function initNodeColoring() {
+
+  }
 
 
   return (
