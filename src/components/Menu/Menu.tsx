@@ -1,18 +1,17 @@
 import { useState, useEffect } from 'react'
-import { edgesLabel } from '../utils/constants';
-import useNodeColoring from '../hooks/useNodeColoring';
-import ColoringLegend from './ColoringLegend';
-import FeaturesColoringLegend from './FeaturesColoringLegend';
+import { edgesLabel } from '../../utils/constants';
+import useNodeColoring from '../../hooks/useNodeColoring';
+import ColoringLegend from '../ColoringLegend';
+import FeaturesColoringLegend from '../FeaturesColoringLegend';
+import Layout from './Layout';
 
 const Menu = ({
   cyInstance,
   setGraph,
   features
 }) => {
-  const layoutTypes = ["grid", "cola"];
   const coloringTypes = ["none", "role stereotypes", "features"];
 
-  const [layout, setLayout] = useState("grid");
   const [showPrimitives, setShowPrimitives] = useState(false);
   const [selectedEdges, setSelectedEdges] = useState(() => {
     return Object.values(edgesLabel).reduce((acc, edge) => {
@@ -40,16 +39,6 @@ const Menu = ({
     reader.readAsText(file);
   };
 
-  // Layout
-  const relayout = () => {
-    if (!cyInstance) return;
-    cyInstance.layout({
-       name: layout === "cola" ? "cola" : "grid",
-       animated: false,
-       avoidOverlap: true,
-       nodeSpacing: 10,
-    }).run();
-  };
 
   // Show Primitives
   useEffect(() => {
@@ -100,13 +89,7 @@ const Menu = ({
       <hr />
       <input type="file" accept=".json" onChange={handleFileUpload} />
       <hr />
-      <h2>Layout</h2>
-      <select value={layout} onChange={(e) => setLayout(e.target.value)}>
-        {layoutTypes.map((layout) => (
-          <option key={layout} value={layout}>{layout === "grid" ? "default" : layout}</option>
-        ))}
-      </select>
-      <button onClick={() => relayout()}>Relayout</button>
+      <Layout cyInstance={cyInstance}/>
       <hr />
       <h2>Nodes</h2>
       <label>
