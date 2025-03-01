@@ -45,7 +45,6 @@ function App() {
             wheelSensitivity: 0.25,
             ready: (cyEvent) => {
               setCyInstance(cyEvent.cy);
-              initNodeColoring()
             },
           });
         }
@@ -73,9 +72,6 @@ function App() {
     };
   }, [cyInstance]);
 
-  function initNodeColoring() {
-
-  }
 
 
   return (

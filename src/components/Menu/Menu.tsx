@@ -4,6 +4,7 @@ import useNodeColoring from '../../hooks/useNodeColoring';
 import ColoringLegend from '../ColoringLegend';
 import FeaturesColoringLegend from '../FeaturesColoringLegend';
 import Layout from './Layout';
+import FileUpload from './FileUpload'
 
 const Menu = ({
   cyInstance,
@@ -20,24 +21,6 @@ const Menu = ({
     }, {});
   });
   const [coloring, setColoring] = useState("none")
-
-
-  // File upload
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const jsonData = JSON.parse(e.target.result as string)
-        setGraph(jsonData);
-      } catch (error) {
-        console.error('Error parsing JSON file:', error);
-      }
-    };
-    reader.readAsText(file);
-  };
 
 
   // Show Primitives
@@ -87,7 +70,7 @@ const Menu = ({
     <div className="menu-bar">
       <h1>ArchiLens</h1>
       <hr />
-      <input type="file" accept=".json" onChange={handleFileUpload} />
+      <FileUpload setGraph={setGraph}/>
       <hr />
       <Layout cyInstance={cyInstance}/>
       <hr />
