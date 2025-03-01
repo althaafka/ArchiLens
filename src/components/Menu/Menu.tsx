@@ -5,6 +5,7 @@ import ColoringLegend from '../ColoringLegend';
 import FeaturesColoringLegend from '../FeaturesColoringLegend';
 import Layout from './Layout';
 import FileUpload from './FileUpload'
+import ShowPrimitives from './ShowPrimitives'
 
 const Menu = ({
   cyInstance,
@@ -13,7 +14,6 @@ const Menu = ({
 }) => {
   const coloringTypes = ["none", "role stereotypes", "features"];
 
-  const [showPrimitives, setShowPrimitives] = useState(false);
   const [selectedEdges, setSelectedEdges] = useState(() => {
     return Object.values(edgesLabel).reduce((acc, edge) => {
       edge != "calls"? acc[edge] = false: acc[edge] = true;
@@ -21,26 +21,6 @@ const Menu = ({
     }, {});
   });
   const [coloring, setColoring] = useState("none")
-
-
-  // Show Primitives
-  useEffect(() => {
-    if (!cyInstance) return;
-
-    cyInstance.nodes().forEach((node) => {
-      const nodeLabels = node.data("labels") || [];
-      const shouldHide =
-        nodeLabels.includes("Primitive") || node.data("id") === "java.lang.String";
-
-      if (shouldHide) {
-        node.style({
-          display: showPrimitives ? "element" : "none",
-        });
-      }
-    });
-    console.log("features:",features)
-  }, [showPrimitives, cyInstance]);
-
 
   // Nodes Coloring
   const { featureColors } = useNodeColoring(cyInstance, coloring, features);
@@ -75,14 +55,7 @@ const Menu = ({
       <Layout cyInstance={cyInstance}/>
       <hr />
       <h2>Nodes</h2>
-      <label>
-        <input
-          type="checkbox"
-          checked={showPrimitives}
-          onChange={(e) => setShowPrimitives(e.target.checked)}
-        />
-        Show Primitive
-      </label>
+      <ShowPrimitives cyInstance={cyInstance}/>
       <h3>Coloring</h3>
       <select value={coloring} onChange={(e) => setColoring(e.target.value)}>
         {coloringTypes.map((coloring) => (
