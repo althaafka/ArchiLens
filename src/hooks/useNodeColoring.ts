@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { stereoTypesColors, stereoTypesBorder } from '../utils/constants';
+import { stereoTypesColors, stereoTypesBorder } from '../constants/constants';
 
 const generateColor = (index, total) => {
   const hue = (index * (360 / total)) % 360;

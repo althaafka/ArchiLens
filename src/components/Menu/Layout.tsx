@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { layoutTypes } from '../../constants/layoutTypes'
+import { layoutTypes } from '../../constants/layoutData'
 
 const Layout = ({ cyInstance }) => {
   const [layout, setLayout] = useState(layoutTypes.grid);

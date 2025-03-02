@@ -1,6 +1,6 @@
 import { abstractizeGraph } from "./abstractizeGraph";
 import { Graph } from "../types";
-import { detailedNodesLabel } from "./constants";
+import { detailedNodesLabel } from "../constants/constants";
 
 
 export function setupGraph(graph: Graph) {
@@ -62,8 +62,11 @@ export function setupGraph(graph: Graph) {
         edge.data.label = edge.data.label || (Array.isArray(edge.data.labels) ? edge.data.labels.join() : edge.data.labels);
     });
 
+    let layers = []
+
     return {
         graph: {nodes: filteredNodes, edges: edges},
-        feature: features
+        feature: features,
+        layer: layers
     };
 }

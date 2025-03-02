@@ -1,18 +1,19 @@
 import { useState, useEffect } from 'react'
-import { edgesLabel } from '../../utils/constants';
+import { edgesLabel } from '../../constants/constants';
 import useNodeColoring from '../../hooks/useNodeColoring';
 import ColoringLegend from '../ColoringLegend';
 import FeaturesColoringLegend from '../FeaturesColoringLegend';
 import Layout from './Layout';
 import FileUpload from './FileUpload'
 import ShowPrimitives from './ShowPrimitives'
+import NodeColoring from './NodeColoring/NodeColoring';
 
 const Menu = ({
   cyInstance,
   setGraph,
-  features
+  colorMap,
+
 }) => {
-  const coloringTypes = ["none", "role stereotypes", "features"];
 
   const [selectedEdges, setSelectedEdges] = useState(() => {
     return Object.values(edgesLabel).reduce((acc, edge) => {
@@ -20,10 +21,6 @@ const Menu = ({
       return acc;
     }, {});
   });
-  const [coloring, setColoring] = useState("none")
-
-  // Nodes Coloring
-  const { featureColors } = useNodeColoring(cyInstance, coloring, features);
 
   // Filter Edges
   const handleEdgeFilterChange = (event) => {
@@ -57,13 +54,7 @@ const Menu = ({
       <h2>Nodes</h2>
       <ShowPrimitives cyInstance={cyInstance}/>
       <h3>Coloring</h3>
-      <select value={coloring} onChange={(e) => setColoring(e.target.value)}>
-        {coloringTypes.map((coloring) => (
-          <option key={coloring} value={coloring}>{coloring}</option>
-        ))}
-      </select>
-      {coloring === "role stereotypes" && <ColoringLegend />}
-      {coloring === "features" && <FeaturesColoringLegend featureColors={featureColors} />}
+      <NodeColoring cyInstance={cyInstance} colorMap={colorMap}/>
       <hr />
       <h2>Relationships</h2>
       <ul>
