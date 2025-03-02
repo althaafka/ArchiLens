@@ -2,7 +2,6 @@ import { abstractizeGraph } from "./abstractizeGraph";
 import { Graph } from "../types";
 import { detailedNodesLabel } from "../constants/constants";
 
-
 export function setupGraph(graph: Graph) {
     let { nodes, edges } = graph;
 
@@ -17,7 +16,7 @@ export function setupGraph(graph: Graph) {
         edges = abstractEdges;
     }
 
-    // Handle Contains and Features
+    // Handle Contains
     const containsMap = new Map<string, string>();
     edges = edges.filter((edge) => {
         if (edge.data.labels?.includes("contains") || edge.data.label === "contains") {
@@ -27,10 +26,15 @@ export function setupGraph(graph: Graph) {
         return true;
     });
 
+    // Handle Features & Parent Relationship 
+    const featuresMap = new Map<string, { members: string[] }>();
     const { features, filteredNodes } = nodes.reduce(
         (acc, node) => {
             const nodeLabels = node.data.labels || [node.data.label];
             if (nodeLabels.includes("Feature")) {
+                featuresMap.set(node.data.id, { members: [] });
+
+                node.data.properties = node.data.properties || {};
                 acc.features.push(node);
             } else {
                 acc.filteredNodes.push({
@@ -46,6 +50,17 @@ export function setupGraph(graph: Graph) {
         { features: [] as typeof nodes, filteredNodes: [] as typeof nodes }
     );
 
+    edges = edges.filter((edge) => {
+        if (edge.data.label === "inFeature" && featuresMap.has(edge.data.target)) {
+            featuresMap.get(edge.data.target)!.members.push(edge.data.source);
+            return false;
+        }
+        return true;
+    });
+
+    features.forEach((feature) => {
+        feature.data.properties.members = featuresMap.get(feature.data.id)?.members || [];
+    });
 
     // Handle node label and hide primitive node
     filteredNodes.forEach((node) => {
@@ -62,11 +77,11 @@ export function setupGraph(graph: Graph) {
         edge.data.label = edge.data.label || (Array.isArray(edge.data.labels) ? edge.data.labels.join() : edge.data.labels);
     });
 
-    let layers = []
+    console.log(features)
 
     return {
-        graph: {nodes: filteredNodes, edges: edges},
-        feature: features,
-        layer: layers
+        graph: { nodes: filteredNodes, edges },
+        feature: features, // Kembalikan features langsung
+        layer: [],
     };
 }

@@ -4,7 +4,7 @@ import cytoscape from "cytoscape";
 import cytoscapeCola from "cytoscape-cola";
 import { Stylesheet } from "cytoscape";
 import styleData from "./cy-style.json";
-import rawGraph from "./assets/jhotdraw-features.json";
+import rawGraph from "./assets/jhotdraw-features-v2.json";
 import { setupGraph } from "./utils/setupGraph";
 import Menu from './components/Menu/Menu';
 import { rsColors } from "./constants/nodeColoringData";
@@ -47,7 +47,15 @@ function App() {
               setCyInstance(cyEvent.cy);
             },
           });
+          cy.on('tap', 'node', (event) => {
+            console.log("Node clicked:", event.target.data());
+          });
+  
+          cy.on('tap', 'edge', (event) => {
+            console.log("Edge clicked:", event.target.data());
+          });
         }
+
       }
     });
 
@@ -69,7 +77,6 @@ function App() {
     colorMap.set('rs', rsColors);
     colorMap.set('rs-bg', generateBgColors(rsColors));
     colorMap.set('feature', generateColorMap(features));
-    colorMap.set('feature-bg', generateBgColors(colorMap.get('feature')));
     colorMap.set('layer', generateColorMap(layers));
     colorMap.set('layer-bg', generateBgColors(colorMap.get('layer')))
   }
@@ -87,35 +94,62 @@ function App() {
     const rsBgMap = colorMap.get('rs-bg')
 
     nodes.forEach((node) => {
-      if (node.data('properties.roleStereotype')) {
-        addScratch(node, 'style_rs', {
-          'background-fill': "solid",
-          'border-color': rsColorMap[node.data('properties.roleStereotype')] || rsColorMap['-'],
-          'background-color': rsBgMap[node.data('properties.roleStereotype')] || rsBgMap['-'],
-        });
-      }
+      addScratch(node, 'style_rs', {
+        'background-fill': "solid",
+        'border-color': rsColorMap[node.data('properties.roleStereotype')] || rsColorMap['-'],
+        'background-color': rsBgMap[node.data('properties.roleStereotype')] || rsBgMap['-'],
+      });
     });
   }
 
   function setFeatureStyles() {
     if (!cyInstance) return;
-
+  
     const featureColorMap = colorMap.get('feature');
-    const featureBgMap = colorMap.get('feature-bg')
-
-    features?.forEach((feature) => {
-      feature?.data?.properties?.feature_members.forEach((feature_member) => {
-        const node = cyInstance.getElementById(feature_member);
-        if (node) {
-          addScratch(node, 'style_feature', {
-            'background-fill': "solid",
-            'background-color': featureBgMap[feature.data.id],
-            'border-color': featureColorMap[feature.data.id]
-          });
-        }
+    const defaultColor = "#F2F2F2";
+  
+    const nodeFeatureMap = features.reduce((map, feature) => {
+      const featureId = feature.data.id;
+      const members = feature.data.properties?.members || [];
+  
+      members.forEach((member) => {
+        if (!map.has(member)) map.set(member, []);
+        map.get(member).push(featureId);
       });
+  
+      return map;
+    }, new Map<string, string[]>());
+  
+    cyInstance.nodes().forEach((node) => {
+      const nodeId = node.data('id');
+      const featureIds = nodeFeatureMap.get(nodeId) || [];
+  
+      if (!featureIds.length) {
+        return addScratch(node, 'style_feature', {
+          'background-color': defaultColor,
+          'border-color': '#5E5E5E'
+        });
+      }
+
+      const colors = featureIds.map((id) => featureColorMap[id] || defaultColor);
+      const positions = colors.map((_, index) => `${(index / (colors.length - 1)) * 100}%`);
+  
+      addScratch(node, 'style_feature', featureIds.length === 1
+        ? {
+            'background-color': colors[0],
+            'border-color': '#5E5E5E'
+          }
+        : {
+            "background-fill": "linear-gradient",
+            "background-gradient-direction": "to-right",
+            "background-gradient-stop-colors": colors,
+            "background-gradient-stop-positions": positions,
+            "border-color": "#5E5E5E"
+          }
+      );
     });
   }
+  
 
   return (
     <>

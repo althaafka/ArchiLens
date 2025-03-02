@@ -11,8 +11,8 @@ const ColoringLegend = ({ coloring, colorMap }) => {
             <span
               className="legend-box"
               style={{
-                backgroundColor: backgroundColors[key],
-                border: `3px solid ${color}`,
+                backgroundColor: coloring == "rs" ? backgroundColors[key]: color,
+                border: `3px solid ${coloring == "rs"? color : "#5E5E5E"}`,
               }}
             />
             {key}

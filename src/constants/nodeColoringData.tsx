@@ -28,5 +28,5 @@ export const rsColors = {
     "Service Provider": "hsl(208, 80%, 65%)",
     "Structurer": "hsl(271, 59%, 65%)",
     "Coordinator": "hsl(344, 100%, 65%)",
-    "-":"hsl(0, 0%, 37%)"
+    "-":"hsl(0, 0%, 60%)"
 }

@@ -10,7 +10,7 @@ export function generateColorMap(labels) {
 
 const generateColor = (index, total) => {
     const hue = (index * (360 / total)) % 360;
-    return `hsl(${hue}, 80%, 65%)`;
+    return `hsl(${hue}, 80%, 75%)`;
 };
 
 const lightenHSL = (hsl, percent) => {
