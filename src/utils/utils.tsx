@@ -2,7 +2,11 @@ export function generateColorMap(labels) {
     let colorMap = {};
 
     labels?.forEach((label, i) => { 
-        colorMap[label.data.id] = generateColor(i, labels.length);
+        if (label.data.id === "-") {
+            colorMap[label.data.id] = "hsl(0, 0%, 60%)";
+        } else {
+            colorMap[label.data.id] = generateColor(i, labels.length);
+        }
     });
 
     return colorMap;

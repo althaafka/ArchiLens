@@ -1,8 +1,5 @@
 import { useState, useEffect } from 'react'
 import { edgesLabel } from '../../constants/constants';
-import useNodeColoring from '../../hooks/useNodeColoring';
-import ColoringLegend from '../ColoringLegend';
-import FeaturesColoringLegend from '../FeaturesColoringLegend';
 import Layout from './Layout';
 import FileUpload from './FileUpload'
 import ShowPrimitives from './ShowPrimitives'

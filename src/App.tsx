@@ -67,6 +67,7 @@ function App() {
   useEffect(() => {
     if (!cyInstance) return;
 
+    addScratch(cyInstance, 'features', features)
     initNodeColors();
     setNodeStyles();
   }, [cyInstance]);
@@ -123,10 +124,11 @@ function App() {
     cyInstance.nodes().forEach((node) => {
       const nodeId = node.data('id');
       const featureIds = nodeFeatureMap.get(nodeId) || [];
-  
+
+      if (featureIds) node.data().properties = { ...node.data().properties, feature: featureIds };
       if (!featureIds.length) {
         return addScratch(node, 'style_feature', {
-          'background-color': defaultColor,
+          'background-color': colorMap.get('-'),
           'border-color': '#5E5E5E'
         });
       }

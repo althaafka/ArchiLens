@@ -27,7 +27,7 @@ export function setupGraph(graph: Graph) {
     });
 
     // Handle Features & Parent Relationship 
-    const featuresMap = new Map<string, { members: string[] }>();
+    const featuresMap = new Map<string, { members: string[] }>()
     const { features, filteredNodes } = nodes.reduce(
         (acc, node) => {
             const nodeLabels = node.data.labels || [node.data.label];
@@ -49,6 +49,26 @@ export function setupGraph(graph: Graph) {
         },
         { features: [] as typeof nodes, filteredNodes: [] as typeof nodes }
     );
+
+    features.push({
+        data: {
+            id: "-",
+            labels: ["Feature"],
+            properties: {
+                members: []
+            }
+        }
+    });
+    featuresMap.set("-", { members: [] });
+
+    filteredNodes.forEach((node) => {
+        const hasFeature = edges.some(edge => 
+            edge.data.label === "inFeature" && edge.data.source === node.data.id
+        );
+        if (!hasFeature && node.data.labels?.includes("Structure") && node.data.id !== "java.lang.String") {
+            featuresMap.get("-")!.members.push(node.data.id);
+        }
+    });
 
     edges = edges.filter((edge) => {
         if (edge.data.label === "inFeature" && featuresMap.has(edge.data.target)) {
