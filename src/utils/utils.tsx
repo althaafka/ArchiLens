@@ -3,7 +3,7 @@ export function generateColorMap(labels) {
 
     labels?.forEach((label, i) => { 
         if (label.data.id === "-") {
-            colorMap[label.data.id] = "hsl(0, 0%, 60%)";
+            colorMap[label.data.id] = "#F2F2F2";
         } else {
             colorMap[label.data.id] = generateColor(i, labels.length);
         }

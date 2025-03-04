@@ -90,12 +90,13 @@ function App() {
   function setRsStyles() {
     if (!cyInstance) return;
 
-    const nodes = cyInstance.nodes().filter(n => n.data('labels').includes("Structure"));
+    const nodes = cyInstance.nodes().filter(n => n.data('labels').includes("Structure") && n.data('id') !== "java.lang.String");
     const rsColorMap = colorMap.get('rs');
     const rsBgMap = colorMap.get('rs-bg')
 
     nodes.forEach((node) => {
       addScratch(node, 'style_rs', {
+        'display': "element",
         'background-fill': "solid",
         'border-color': rsColorMap[node.data('properties.roleStereotype')] || rsColorMap['-'],
         'background-color': rsBgMap[node.data('properties.roleStereotype')] || rsBgMap['-'],
@@ -121,13 +122,15 @@ function App() {
       return map;
     }, new Map<string, string[]>());
   
-    cyInstance.nodes().forEach((node) => {
+    const nodes = cyInstance.nodes().filter(n => n.data('labels').includes("Structure") && n.data('id') !== "java.lang.String");
+    nodes.forEach((node) => {
       const nodeId = node.data('id');
       const featureIds = nodeFeatureMap.get(nodeId) || [];
 
       if (featureIds) node.data().properties = { ...node.data().properties, feature: featureIds };
       if (!featureIds.length) {
         return addScratch(node, 'style_feature', {
+          'display': "element",
           'background-color': colorMap.get('-'),
           'border-color': '#5E5E5E'
         });
@@ -138,10 +141,12 @@ function App() {
   
       addScratch(node, 'style_feature', featureIds.length === 1
         ? {
+            'display': "element",
             'background-color': colors[0],
             'border-color': '#5E5E5E'
           }
         : {
+            'display': "element",
             "background-fill": "linear-gradient",
             "background-gradient-direction": "to-right",
             "background-gradient-stop-colors": colors,
