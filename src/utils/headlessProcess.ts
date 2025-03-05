@@ -6,7 +6,7 @@ export function headlessProcess(cyInstance: any) {
     groupLayers(cyInstance);
     removeInvalidNodes(cyInstance);
     removeInvalidEdges(cyInstance);
-    // liftEdges(cyInstance);
+    liftEdges(cyInstance);
     cyInstance.endBatch();
 }
 
@@ -65,3 +65,39 @@ function groupLayers(cyInstance: any) {
     // console.log("has contains edges 4:", cyInstance.edges(e => e.data('label') === "contains"))
 
 }
+
+export const liftEdges = (pCy) => {
+    console.log("yoo:",pCy.nodes(nl => nl.data('id') === "nl.tudelft.jpacman") );
+
+    const newEdges = pCy.edges(e => 
+        e.source().data('labels').includes("Structure") && 
+        e.target().data('labels').includes("Structure") && 
+        e.target().parent() !== e.source().parent()
+    ).reduce((acc, e) => {
+        const srcParent = e.source().parent().id();
+        const tgtParent = e.target().parent().id();
+        const nodeSrc = pCy.nodes(node => node.id() == srcParent);
+        const nodeTgt = pCy.nodes(node => node.id() == tgtParent);
+        if (!srcParent || !tgtParent) return acc;
+        if (nodeSrc.parent().id() == nodeTgt.id() || nodeSrc.id() == nodeTgt.parent().id()) return acc;
+
+        const key = `${srcParent}-${e.data('label')}-${tgtParent}`;
+        if (!acc[key]) {
+            acc[key] = {
+                group: "edges",
+                data: {
+                    source: srcParent,
+                    target: tgtParent,
+                    label: e.data('label'),
+                    interaction: e.data('label'),
+                    properties: { ...e.data('properties'), weight: 0, metaSrc: "lifting" }
+                }
+            };
+        }
+        acc[key].data.properties.weight += 1;
+        return acc;
+    }, {});
+
+    pCy.add(Object.values(newEdges));
+    pCy.edges(e => e.source().data('labels').includes("Structure") && e.target().data('labels').includes("Structure") && e.target().parent() !== e.source().parent()).remove();
+};
