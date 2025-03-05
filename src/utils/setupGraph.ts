@@ -15,20 +15,20 @@ export function setupGraph(graph: Graph) {
         nodes = abstractNodes;
         edges = abstractEdges;
     }
+    console.log("has hasScript:", edges.filter(edge => edge.data.label === "hasScript"))
+    // console.log("has contains edgesw:", edges.filter(edge => edge.data.label === "contains"))
 
     // Handle Contains
     const containsMap = new Map<string, string>();
-    edges = edges.filter((edge) => {
+    edges.map((edge) => {
         if (edge.data.labels?.includes("contains") || edge.data.label === "contains") {
             containsMap.set(edge.data.target, edge.data.source);
-            return false;
         }
-        return true;
     });
 
     // Handle Features & Parent Relationship 
     const featuresMap = new Map<string, { members: string[] }>()
-    const { features, filteredNodes } = nodes.reduce(
+    const { features, filteredNodes, layers } = nodes.reduce(
         (acc, node) => {
             const nodeLabels = node.data.labels || [node.data.label];
             if (nodeLabels.includes("Feature")) {
@@ -37,6 +37,9 @@ export function setupGraph(graph: Graph) {
                 node.data.properties = node.data.properties || {};
                 acc.features.push(node);
             } else {
+                if (nodeLabels.includes("Grouping")) {
+                    acc.layers.push(node);
+                }
                 acc.filteredNodes.push({
                     ...node,
                     data: {
@@ -47,7 +50,7 @@ export function setupGraph(graph: Graph) {
             }
             return acc;
         },
-        { features: [] as typeof nodes, filteredNodes: [] as typeof nodes }
+        { features: [] as typeof nodes, filteredNodes: [] as typeof nodes, layers: [] as typeof nodes }
     );
 
     features.push({
@@ -60,6 +63,12 @@ export function setupGraph(graph: Graph) {
         }
     });
     featuresMap.set("-", { members: [] });
+    layers.push({
+        data: {
+            id: "-",
+            labels: ["Layer"],
+        }
+    })
 
     filteredNodes.forEach((node) => {
         const hasFeature = edges.some(edge => 
@@ -97,11 +106,10 @@ export function setupGraph(graph: Graph) {
         edge.data.label = edge.data.label || (Array.isArray(edge.data.labels) ? edge.data.labels.join() : edge.data.labels);
     });
 
-    console.log(features)
 
     return {
         graph: { nodes: filteredNodes, edges },
-        feature: features, // Kembalikan features langsung
-        layer: [],
+        feature: features,
+        layer: layers,
     };
 }

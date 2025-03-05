@@ -13,5 +13,7 @@ export const detailedNodesLabel = {
     OPERATION: "Operation", 
     CONSTRUCTOR: "Constructor", 
     SCRIPT: "Script", 
-    VARIABLE: "Variable"
+    VARIABLE: "Variable",
+    GROUPING: "Grouping",
+    FEATURE: "Feature",
 } as const

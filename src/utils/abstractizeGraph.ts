@@ -2,10 +2,10 @@ import { detailedNodesLabel } from "../constants/constants";
 
 export function abstractizeGraph(nodes, edges) {
     
-    const abstractNodes = nodes.filter((node) => 
-        (node.data.labels?.some(label => !Object.values(detailedNodesLabel).includes(label)) || 
-        Object.values(detailedNodesLabel).includes(node.data.label))
-    );
+    // const abstractNodes = nodes.filter((node) => 
+    //     (node.data.labels?.some(label => !Object.values(detailedNodesLabel).includes(label)) || 
+    //     Object.values(detailedNodesLabel).includes(node.data.label))
+    // );
 
     const edgesMap = new Map<string, Set<any>>();
     edges.forEach((edge) => {
@@ -39,7 +39,6 @@ export function abstractizeGraph(nodes, edges) {
           }
           typeMap.get(edge.data.source)?.add(edge.data.target);
     })
-    console.log("typesMap:", typeMap)
 
     function mergeEdges(edgesMap1, edges2, newLabel) {
         let newEdges = []
@@ -108,13 +107,12 @@ export function abstractizeGraph(nodes, edges) {
         ...(returns || []),
         ...(holds || []),
         ...(calls || []),
-        ...(accepts || [])
+        ...(accepts || []),
+        ...(edgesMap.get("inFeature") || []),
+        ...(edgesMap.get("implements") || []),
+
+        ...(edgesMap.get("hasScript") || []),
     ]
 
-    return { nodes: abstractNodes, edges: removeInvalidEdges(abstractNodes, abstractEdges) }
-}
-
-function removeInvalidEdges(nodes, edges) {
-    const nodeIds = new Set(nodes.map((node) => node.data.id));
-    return edges.filter(({ data: { source, target } }) => nodeIds.has(source) && nodeIds.has(target));
+    return { nodes: nodes, edges: abstractEdges }
 }

@@ -4,12 +4,12 @@ import cytoscape from "cytoscape";
 import cytoscapeCola from "cytoscape-cola";
 import { Stylesheet } from "cytoscape";
 import styleData from "./cy-style.json";
-import rawGraph from "./assets/jhotdraw-features-v2.json";
+import rawGraph from "./assets/jpacman-v2.json";
 import { setupGraph } from "./utils/setupGraph";
 import Menu from './components/Menu/Menu';
 import { rsColors } from "./constants/nodeColoringData";
 import { generateColorMap, addScratch, generateBgColors } from "./utils/utils";
-
+import { headlessProcess } from "./utils/headlessProcess";
 const style: Stylesheet[] = styleData as Stylesheet[];
 
 cytoscape.use(cytoscapeCola);
@@ -18,6 +18,7 @@ function App() {
   const cyRef = useRef<HTMLDivElement>(null);
   const [graph, setGraph] = useState(rawGraph);
   const [cyInstance, setCyInstance] = useState(null);
+  const [hcyInstance, setHCyInstance] = useState(null);
   const [features, setFeatures] = useState([]);
   const [layers, setLayers] = useState([]);
   const [colorMap, setColorMap] = useState(new Map<string, Object>())
@@ -35,8 +36,8 @@ function App() {
       elements: processedGraph.graph,
       ready: (event) => {
         const hcyInstance = event.cy;
-        setCyInstance(hcyInstance);
-
+        setHCyInstance(hcyInstance);
+        headlessProcess(hcyInstance);
         if (cyRef.current) {
           const cy = cytoscape({
             container: cyRef.current,
@@ -85,6 +86,7 @@ function App() {
   function setNodeStyles() {
     setRsStyles();
     setFeatureStyles();
+    setLayerStyles();
   }
 
   function setRsStyles() {
@@ -156,7 +158,51 @@ function App() {
       );
     });
   }
-  
+
+  function setLayerStyles() {
+    if (!cyInstance) return;
+
+    const layerColorMap = colorMap.get('layer');
+    const defaultColor = "#F2F2F2";
+
+    const nodes = cyInstance.nodes().filter(n => n.hasClass('layers') && n.data('id') !== "java.lang.String");
+
+    nodes.forEach((node) => {
+        const layerData = node.data('properties').layers || {};
+        const layers = Object.keys(layerData);
+        
+        if (layers.length === 0) {
+          return addScratch(node, 'style_layer', {
+            'display': "element",
+            'background-color': defaultColor,
+            'border-color': '#5E5E5E'
+          });
+        }
+
+        const totalWeight = layers.reduce((sum, layer) => sum + Number(layerData[layer]), 0);
+        const colors = layers.map(layer => layerColorMap[layer] || defaultColor);
+        const positions = layers.map((layer, _) => {
+          const percentage = (Number(layerData[layer]) / totalWeight) * 100;
+          return `${percentage}%`;
+      });
+
+        addScratch(node, 'style_layer', layers.length === 1
+            ? {
+                'display': "element",
+                'background-color': colors[0],
+                'border-color': '#5E5E5E'
+            }
+            : {
+                'display': "element",
+                "background-fill": "linear-gradient",
+                "background-gradient-direction": node.data('properties').labels?.includes("Container") ? 'to-bottom-right' : 'to-right',
+                "background-gradient-stop-colors": colors,
+                "background-gradient-stop-positions": positions,
+                "border-color": "#5E5E5E"
+            }
+        );
+    });
+}
 
   return (
     <>
