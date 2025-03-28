@@ -65,12 +65,6 @@ const NodeColoring = ({ cyInstance, colorMap }) => {
             "display": "element"
           }
       );
-      if (node.data().id =="CH.ifa.draw.applet.DrawApplet") {
-        console.log("Filtered Feature IDs:", featureIds);
-        console.log("Updated Colors:", colors);
-        console.log("Updated Positions:", positions);
-  
-      }
     });
 
 
