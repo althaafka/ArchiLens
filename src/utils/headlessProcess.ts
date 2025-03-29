@@ -48,8 +48,6 @@ function groupLayers(cyInstance: any) {
         )
     );
 
-    console.log("dimensionIds", dimensionIds)
-
     structures.forEach(structure => {
         const scriptEdges = hasScripts.filter(edge => edge.data('source') === structure.id())
         const scripts = scriptEdges.map(edge => cyInstance.getElementById(edge.data('target')))
@@ -70,11 +68,7 @@ function groupLayers(cyInstance: any) {
             })
         })
         
-        if (structure.id() == "nl.tudelft.jpacman.sprite.ImageSprite"){
-            console.log("composedDimension", composedDimension)
-        }
         dimensionIds.forEach((dimensionId: any) => {
-            console.log("dimension:", composedDimension[dimensionId])
 
             if (!structure.data('properties').composedDimension) {
                 structure.data('properties').composedDimension = {};
@@ -84,7 +78,6 @@ function groupLayers(cyInstance: any) {
                 composedDimension[dimensionId] = [];
             }
 
-            console.log("ORDERED categories2:", cyInstance.nodes(node => node.id() == dimensionId).data('categories'))
             structure.data('properties').composedDimension[dimensionId] = counter(composedDimension[dimensionId]);
         })  
         structure.addClass("layers")
@@ -106,12 +99,10 @@ function groupLayers(cyInstance: any) {
             }
             const layerCounters = classes.map(c => counterToPercentage(c.data('properties.composedDimension')[dimensionId]));
             composedDimension[dimensionId] = layerCounters;
-            console.log("layerCounters", layerCounters)
 
         })
-        console.log("composedDimension container:", composedDimension)
+
         dimensionIds.forEach((dimensionId: any) => {
-            console.log("dimension:", composedDimension[dimensionId])
             container.data('properties').composedDimension[dimensionId] = mergeCounters(composedDimension[dimensionId]);
         })
 		container.addClass('layers');
@@ -185,7 +176,6 @@ function processDimension(cyInstance: any) {
         }
         orderedCategories.unshift(startCategory);
 
-        console.log("orderedCategories", orderedCategories)
         dim.data('categories', orderedCategories);
     });
 
@@ -197,7 +187,6 @@ function processDimension(cyInstance: any) {
     });
 
     implementsEdges.forEach(edge => {
-        console.log("loop")
         const node = cyInstance.getElementById(edge.data('source'));
 
         if (!node.data('properties').dimension) {

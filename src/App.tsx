@@ -59,7 +59,7 @@ function App() {
     return () => {
       hcy.destroy();
     };
-  }, []);
+  }, [graph]);
 
   return (
     <>

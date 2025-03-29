@@ -11,7 +11,6 @@ const useNodeColoring = (cyInstance, coloring, features) => {
 
   useEffect(() => {
     if (!cyInstance) return;
-    console.log("coloring:", coloring)
 
     if (coloring == "role stereotypes") {
       cyInstance.nodes().forEach((node) => {
