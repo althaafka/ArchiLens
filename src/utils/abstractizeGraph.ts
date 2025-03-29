@@ -108,10 +108,10 @@ export function abstractizeGraph(nodes, edges) {
         ...(holds || []),
         ...(calls || []),
         ...(accepts || []),
-        ...(edgesMap.get("inFeature") || []),
-        ...(edgesMap.get("implements") || []),
-
         ...(edgesMap.get("hasScript") || []),
+        ...(edgesMap.get("implements") || []),
+        ...(edgesMap.get("succeeds") || []),
+        ...(edgesMap.get("composes") || []),
     ]
 
     return { nodes: nodes, edges: abstractEdges }

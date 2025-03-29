@@ -4,7 +4,8 @@ import cytoscape from "cytoscape";
 import cytoscapeCola from "cytoscape-cola";
 import { Stylesheet } from "cytoscape";
 import styleData from "./cy-style.json";
-import rawGraph from "./assets/jpacman-v2.json";
+// import rawGraph from "./assets/jpacman-v2.json";
+import rawGraph from "./assets/jpacman-v3-dim.json";
 import { setupGraph } from "./utils/setupGraph";
 import Menu from './components/Menu/Menu';
 import { rsColors } from "./constants/nodeColoringData";
@@ -19,17 +20,13 @@ function App() {
   const [graph, setGraph] = useState(rawGraph);
   const [cyInstance, setCyInstance] = useState(null);
   const [hcyInstance, setHCyInstance] = useState(null);
-  const [features, setFeatures] = useState([]);
-  const [layers, setLayers] = useState([]);
-  const [colorMap, setColorMap] = useState(new Map<string, Object>())
 
   // Init cytoscape
   useEffect(() => {
     if (!cyRef.current) return;
+    console.log("Initializing Cytoscape...");
 
     const processedGraph = setupGraph(graph.elements);
-    setFeatures(processedGraph.feature);
-    setLayers(processedGraph.layer);
 
     const hcy = cytoscape({
       headless: true,
@@ -56,153 +53,13 @@ function App() {
             console.log("Edge clicked:", event.target.data());
           });
         }
-
       }
-    });
+    })
 
     return () => {
       hcy.destroy();
     };
-  }, [graph]);
-
-  useEffect(() => {
-    if (!cyInstance) return;
-
-    addScratch(cyInstance, 'features', features)
-    initNodeColors();
-    setNodeStyles();
-  }, [cyInstance]);
-
-
-  function initNodeColors() {
-    colorMap.set('default', { "default": "#F2F2F2" });
-    colorMap.set('rs', rsColors);
-    colorMap.set('rs-bg', generateBgColors(rsColors));
-    colorMap.set('feature', generateColorMap(features));
-    colorMap.set('layer', generateColorMap(layers));
-    colorMap.set('layer-bg', generateBgColors(colorMap.get('layer')))
-  }
-
-  function setNodeStyles() {
-    setRsStyles();
-    setFeatureStyles();
-    setLayerStyles();
-  }
-
-  function setRsStyles() {
-    if (!cyInstance) return;
-
-    const nodes = cyInstance.nodes().filter(n => n.data('labels').includes("Structure") && n.data('id') !== "java.lang.String");
-    const rsColorMap = colorMap.get('rs');
-    const rsBgMap = colorMap.get('rs-bg')
-
-    nodes.forEach((node) => {
-      addScratch(node, 'style_rs', {
-        'display': "element",
-        'background-fill': "solid",
-        'border-color': rsColorMap[node.data('properties.roleStereotype')] || rsColorMap['-'],
-        'background-color': rsBgMap[node.data('properties.roleStereotype')] || rsBgMap['-'],
-      });
-    });
-  }
-
-  function setFeatureStyles() {
-    if (!cyInstance) return;
-  
-    const featureColorMap = colorMap.get('feature');
-    const defaultColor = "#F2F2F2";
-  
-    const nodeFeatureMap = features.reduce((map, feature) => {
-      const featureId = feature.data.id;
-      const members = feature.data.properties?.members || [];
-  
-      members.forEach((member) => {
-        if (!map.has(member)) map.set(member, []);
-        map.get(member).push(featureId);
-      });
-  
-      return map;
-    }, new Map<string, string[]>());
-  
-    const nodes = cyInstance.nodes().filter(n => n.data('labels').includes("Structure") && n.data('id') !== "java.lang.String");
-    nodes.forEach((node) => {
-      const nodeId = node.data('id');
-      const featureIds = nodeFeatureMap.get(nodeId) || [];
-
-      if (featureIds) node.data().properties = { ...node.data().properties, feature: featureIds };
-      if (!featureIds.length) {
-        return addScratch(node, 'style_feature', {
-          'display': "element",
-          'background-color': colorMap.get('-'),
-          'border-color': '#5E5E5E'
-        });
-      }
-
-      const colors = featureIds.map((id) => featureColorMap[id] || defaultColor);
-      const positions = colors.map((_, index) => `${(index / (colors.length - 1)) * 100}%`);
-  
-      addScratch(node, 'style_feature', featureIds.length === 1
-        ? {
-            'display': "element",
-            'background-color': colors[0],
-            'border-color': '#5E5E5E'
-          }
-        : {
-            'display': "element",
-            "background-fill": "linear-gradient",
-            "background-gradient-direction": "to-right",
-            "background-gradient-stop-colors": colors,
-            "background-gradient-stop-positions": positions,
-            "border-color": "#5E5E5E"
-          }
-      );
-    });
-  }
-
-  function setLayerStyles() {
-    if (!cyInstance) return;
-
-    const layerColorMap = colorMap.get('layer');
-    const defaultColor = "#F2F2F2";
-
-    const nodes = cyInstance.nodes().filter(n => n.hasClass('layers') && n.data('id') !== "java.lang.String");
-
-    nodes.forEach((node) => {
-        const layerData = node.data('properties').layers || {};
-        const layers = Object.keys(layerData);
-        
-        if (layers.length === 0) {
-          return addScratch(node, 'style_layer', {
-            'display': "element",
-            'background-color': defaultColor,
-            'border-color': '#5E5E5E'
-          });
-        }
-
-        const totalWeight = layers.reduce((sum, layer) => sum + Number(layerData[layer]), 0);
-        const colors = layers.map(layer => layerColorMap[layer] || defaultColor);
-        const positions = layers.map((layer, _) => {
-          const percentage = (Number(layerData[layer]) / totalWeight) * 100;
-          return `${percentage}%`;
-      });
-
-        addScratch(node, 'style_layer', layers.length === 1
-            ? {
-                'display': "element",
-                'background-color': colors[0],
-                'border-color': '#5E5E5E'
-            }
-            : {
-                'display': "element",
-                "background-fill": "linear-gradient",
-                "background-gradient-direction": node.data('properties').labels?.includes("Container") ? 'to-bottom-right' : 'to-right',
-                "background-gradient-stop-colors": colors,
-                "background-gradient-stop-positions": positions,
-                "border-color": "#5E5E5E"
-            }
-        );
-    });
-}
+  }, []);
 
   return (
     <>
@@ -213,7 +70,7 @@ function App() {
       </div>
 
       {/* Menu Bar */}
-      <Menu cyInstance={cyInstance} setGraph={setGraph} colorMap={colorMap} />
+      <Menu cyInstance={cyInstance} setGraph={setGraph} />
     </div>
     </>
   );

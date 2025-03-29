@@ -14,7 +14,6 @@ const NodeColoring = ({ cyInstance, colorMap }) => {
 
   const [featureChanged, setFeatureChanged] = useState(null)
 
-
   useEffect(() => {
     if (!cyInstance) return;
     setFeatureVisibility(Object.keys(colorMap.get(coloring) || {}).reduce((acc, key) => {

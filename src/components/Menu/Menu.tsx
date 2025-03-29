@@ -8,7 +8,7 @@ import NodeColoring from './NodeColoring/NodeColoring';
 const Menu = ({
   cyInstance,
   setGraph,
-  colorMap,
+  // colorMap,
 
 }) => {
 
@@ -50,8 +50,8 @@ const Menu = ({
       <hr />
       <h2>Nodes</h2>
       <ShowPrimitives cyInstance={cyInstance}/>
-      <h3>Coloring</h3>
-      <NodeColoring cyInstance={cyInstance} colorMap={colorMap}/>
+      {/* <h3>Coloring</h3> */}
+      {/* <NodeColoring cyInstance={cyInstance} colorMap={colorMap}/> */}
       <hr />
       <h2>Relationships</h2>
       <ul>

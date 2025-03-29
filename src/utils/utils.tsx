@@ -51,7 +51,7 @@ export const counter = (arr) => arr.reduce((acc, val) => {
 	return acc;
 }, {});
 
-export const mergeCounters = (...counters) => {
+export const mergeCounters = (counters) => {
 	return counters.reduce((acc, counter) => {
 		Object.entries(counter).forEach(([key, val]) => {
 			acc[key] = (acc[key] || 0) + val;

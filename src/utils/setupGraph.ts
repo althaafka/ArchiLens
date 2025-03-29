@@ -1,11 +1,12 @@
 import { abstractizeGraph } from "./abstractizeGraph";
 import { Graph } from "../types";
 import { detailedNodesLabel } from "../constants/constants";
+import { handleDimension } from "./handleDimension.js";
 
 export function setupGraph(graph: Graph) {
     let { nodes, edges } = graph;
 
-    const isDetailedGraph=  nodes.some((node) => {
+    const isDetailedGraph = nodes.some((node) => {
         const labels = node.data.labels || [node.data.label]
         return labels.some((label) => Object.values(detailedNodesLabel).includes(label))
     });
@@ -15,8 +16,6 @@ export function setupGraph(graph: Graph) {
         nodes = abstractNodes;
         edges = abstractEdges;
     }
-    console.log("has hasScript:", edges.filter(edge => edge.data.label === "hasScript"))
-    // console.log("has contains edgesw:", edges.filter(edge => edge.data.label === "contains"))
 
     // Handle Contains
     const containsMap = new Map<string, string>();

@@ -12,8 +12,6 @@ export const edgesLabel = {
 export const detailedNodesLabel = {
     OPERATION: "Operation", 
     CONSTRUCTOR: "Constructor", 
-    SCRIPT: "Script", 
-    VARIABLE: "Variable",
-    GROUPING: "Grouping",
-    FEATURE: "Feature",
+    SCRIPT: "Script",
+    VARIABLE: "Variable"
 } as const
