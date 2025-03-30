@@ -11,6 +11,7 @@ import Menu from './components/Menu/Menu';
 import { rsColors } from "./constants/nodeColoringData";
 import { generateColorMap, addScratch, generateBgColors } from "./utils/utils";
 import { headlessProcess } from "./utils/headlessProcess";
+import { visualProcess } from "./utils/visualProcess";
 const style: Stylesheet[] = styleData as Stylesheet[];
 
 cytoscape.use(cytoscapeCola);
@@ -20,6 +21,8 @@ function App() {
   const [graph, setGraph] = useState(rawGraph);
   const [cyInstance, setCyInstance] = useState(null);
   const [hcyInstance, setHCyInstance] = useState(null);
+  const [dimensionsData, setDimensionsData] = useState({});
+  const [colorMap, setColorMap] = useState(new Map<string, Object>())
 
   // Init cytoscape
   useEffect(() => {
@@ -34,7 +37,8 @@ function App() {
       ready: (event) => {
         const hcyInstance = event.cy;
         setHCyInstance(hcyInstance);
-        headlessProcess(hcyInstance);
+        setDimensionsData(headlessProcess(hcyInstance));
+        console.log("dimension app.ts", dimensionsData);
         if (cyRef.current) {
           const cy = cytoscape({
             container: cyRef.current,
@@ -61,6 +65,11 @@ function App() {
     };
   }, [graph]);
 
+  useEffect(() => {
+    if (!cyInstance) return;
+    // visualProcess(cyInstance, dimensionsData);
+  }, [cyInstance]);
+
   return (
     <>
     <div className="app-container">
@@ -70,7 +79,7 @@ function App() {
       </div>
 
       {/* Menu Bar */}
-      <Menu cyInstance={cyInstance} setGraph={setGraph} />
+      <Menu cyInstance={cyInstance} setGraph={setGraph} dimension={dimensionsData} />
     </div>
     </>
   );

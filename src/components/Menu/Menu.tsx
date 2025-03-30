@@ -8,8 +8,7 @@ import NodeColoring from './NodeColoring/NodeColoring';
 const Menu = ({
   cyInstance,
   setGraph,
-  // colorMap,
-
+  dimension
 }) => {
 
   const [selectedEdges, setSelectedEdges] = useState(() => {
@@ -38,6 +37,7 @@ const Menu = ({
         display: selectedEdges[edgeType] ? "element" : "none",
       });
     });
+
   }, [selectedEdges, cyInstance]);
 
   return (
@@ -50,8 +50,8 @@ const Menu = ({
       <hr />
       <h2>Nodes</h2>
       <ShowPrimitives cyInstance={cyInstance}/>
-      {/* <h3>Coloring</h3> */}
-      {/* <NodeColoring cyInstance={cyInstance} colorMap={colorMap}/> */}
+      <h3>Coloring</h3>
+      <NodeColoring cyInstance={cyInstance} dimension={dimension}/>
       <hr />
       <h2>Relationships</h2>
       <ul>

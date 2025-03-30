@@ -1,15 +1,16 @@
 import { detailedNodesLabel } from "../constants/constants";
-import { counter, counterToPercentage, mergeCounters } from "./utils";
+import { counter, counterToPercentage, mergeCounters, addScratch } from "./utils";
 
 export function headlessProcess(cyInstance: any) {
     cyInstance.startBatch();
     processDimension(cyInstance);
     groupLayers(cyInstance);
-    deleteDimensionInformation(cyInstance);
+    const dimension = deleteDimensionInformation(cyInstance);
     removeInvalidNodes(cyInstance);
     removeInvalidEdges(cyInstance);
     liftEdges(cyInstance);
     cyInstance.endBatch();
+    return dimension;
 }
 
 function removeInvalidNodes(cyInstance: any) {
@@ -197,9 +198,24 @@ function processDimension(cyInstance: any) {
 }
 
 function deleteDimensionInformation(cyInstance) {
-    cyInstance.edges(edge => edge.data('label') === "composes").remove();
-    cyInstance.edges(edge => edge.data('label') === "implements").remove();
-    cyInstance.edges(edge => edge.data('label') === "succeeds").remove();
-    cyInstance.nodes(node => node.data('labels').includes("Dimension")).remove();
-    cyInstance.nodes(node => node.data('labels').includes("Category")).remove();
+    let deletedElements
+
+    // const nodesToRemove = cyInstance.nodes(node =>
+    //     node.data('labels').includes("Dimension") || node.data('labels').includes("Category")
+    // );
+
+    const dimension = cyInstance.nodes(node => node.data('labels').includes("Dimension"))
+    const category = cyInstance.nodes(node => node.data('labels').includes("Category"))
+
+    deletedElements = {dimension: dimension.map(node => node.data()), category: category.map(node => node.data())};
+
+    cyInstance.remove(dimension);
+    cyInstance.remove(category);
+    cyInstance.edges(edge =>
+        ["composes", "implements", "succeeds"].includes(edge.data('label'))
+    ).remove();
+
+    console.log("Deleted elements:", deletedElements);
+
+    return deletedElements;
 }

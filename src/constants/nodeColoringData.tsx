@@ -1,9 +1,9 @@
-export const nodeColoringTypes = {
-    "none": "None",
-    "rs": "Role Stereotypes",
-    "layer": "Abstraction Layer",
-    "feature": "Features"
-}
+// export const nodeColoringTypes = {
+//     "none": "None",
+//     "rs": "Role Stereotypes",
+//     "layer": "Abstraction Layer",
+//     "feature": "Features"
+// }
 
 // export const rsColors = {
 //     "Controller": "hsl(12, 100%, 94%)",
