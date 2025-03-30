@@ -37,8 +37,9 @@ function App() {
       ready: (event) => {
         const hcyInstance = event.cy;
         setHCyInstance(hcyInstance);
-        setDimensionsData(headlessProcess(hcyInstance));
-        console.log("dimension app.ts", dimensionsData);
+        const dimensions = headlessProcess(hcyInstance);
+        setDimensionsData(dimensions);
+
         if (cyRef.current) {
           const cy = cytoscape({
             container: cyRef.current,
@@ -46,7 +47,9 @@ function App() {
             style: style,
             wheelSensitivity: 0.25,
             ready: (cyEvent) => {
-              setCyInstance(cyEvent.cy);
+              const cyInstance = cyEvent.cy;
+              setCyInstance(cyInstance);
+              visualProcess(cyInstance, dimensions);
             },
           });
           cy.on('tap', 'node', (event) => {
@@ -65,10 +68,10 @@ function App() {
     };
   }, [graph]);
 
-  useEffect(() => {
-    if (!cyInstance) return;
-    // visualProcess(cyInstance, dimensionsData);
-  }, [cyInstance]);
+  // useEffect(() => {
+  //   if (!cyInstance) return;
+  //   visualProcess(cyInstance, dimensionsData);
+  // }, [cyInstance]);
 
   return (
     <>

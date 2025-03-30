@@ -176,6 +176,7 @@ function processDimension(cyInstance: any) {
             nextCategory = succeedsEdges.filter(edge => edge.data('source') == nextCat);
         }
         orderedCategories.unshift(startCategory);
+        orderedCategories.push("-");
 
         dim.data('categories', orderedCategories);
     });
@@ -189,11 +190,16 @@ function processDimension(cyInstance: any) {
 
     implementsEdges.forEach(edge => {
         const node = cyInstance.getElementById(edge.data('source'));
-
         if (!node.data('properties').dimension) {
-            node.data('properties').dimension = [];
+            node.data('properties').dimension = {};
         }
-        node.data('properties').dimension.push(edge.data('target'));
+
+        const dimId = composesEdges.filter(cEdge => edge.data('target') === cEdge.data('target'))[0].data('source');
+
+        if (!node.data('properties').dimension[dimId]) {
+            node.data('properties').dimension[dimId] = [];
+        }
+        node.data('properties').dimension[dimId].push(edge.data('target'));
     });
 }
 
@@ -207,7 +213,24 @@ function deleteDimensionInformation(cyInstance) {
     const dimension = cyInstance.nodes(node => node.data('labels').includes("Dimension"))
     const category = cyInstance.nodes(node => node.data('labels').includes("Category"))
 
-    deletedElements = {dimension: dimension.map(node => node.data()), category: category.map(node => node.data())};
+    deletedElements = {
+        dimension: dimension.map(node => node.data()), 
+        category: category.map(node => node.data()),
+        composedDimension: Array.from(
+            new Set(
+                cyInstance.edges(edge => edge.data('label') === "composes")
+                    .filter(cEdge => {
+                        const categoryId = cEdge.data('target');
+                        const implementsEdges = cyInstance.edges(edge => edge.data('label') === "implements" && edge.data('target') === categoryId);
+                        return implementsEdges.some(iEdge => {
+                            const sourceNode = cyInstance.getElementById(iEdge.data('source'));
+                            return sourceNode.data('labels').includes("Scripts") || sourceNode.data('labels').includes("Operation");
+                        });
+                    })
+                .map(cEdge => cEdge.data('source'))
+            )
+        )
+    };
 
     cyInstance.remove(dimension);
     cyInstance.remove(category);
@@ -215,7 +238,7 @@ function deleteDimensionInformation(cyInstance) {
         ["composes", "implements", "succeeds"].includes(edge.data('label'))
     ).remove();
 
-    console.log("Deleted elements:", deletedElements);
+    // console.log("Deleted elements:", deletedElements);
 
     return deletedElements;
 }

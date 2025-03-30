@@ -16,19 +16,22 @@ const NodeColoring = ({ cyInstance, dimension }) => {
   // const [featureChanged, setFeatureChanged] = useState(null)
 
   useEffect(() => {
-    // if (!cyInstance) return;
+    if (!cyInstance) return;
     // setFeatureVisibility(Object.keys(colorMap.get(coloring) || {}).reduce((acc, key) => {
     //   acc[key] = true;
     //   return acc;
     // }, {}))
+
+    console.log("coloring", coloring);
     
-    // cyInstance.nodes().forEach((node) => {
-    //   const styleKey = `style_${coloring}`;
-    //   const style = getScratch(node, styleKey);
-    //   if (style) {
-    //     node.style(style);
-    //   }
-    // });
+    cyInstance.nodes().forEach((node) => {
+      const styleKey = `style_${coloring}`;
+      const style = getScratch(node, styleKey);
+      console.log("node style", styleKey, style);
+      if (style) {
+        node.style(style);
+      }
+    });
 
   }, [coloring, cyInstance]);
 
