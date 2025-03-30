@@ -22,12 +22,12 @@ const NodeColoring = ({ cyInstance, dimension }) => {
     //   return acc;
     // }, {}))
 
-    console.log("coloring", coloring);
+    // console.log("coloring", coloring);
     
     cyInstance.nodes().forEach((node) => {
       const styleKey = `style_${coloring}`;
       const style = getScratch(node, styleKey);
-      console.log("node style", styleKey, style);
+      // console.log("node style", styleKey, style);
       if (style) {
         node.style(style);
       }
@@ -83,15 +83,15 @@ const NodeColoring = ({ cyInstance, dimension }) => {
           <option key={dim.id} value={dim.id}>{camelCaseToWords(dim.properties.simpleName)}</option> 
         ))}
       </select>
-      {/* {coloring !== "none" && (
-        // <ColoringLegend 
-        //   coloring={coloring} 
-        //   colorMap={colorMap} 
-        //   featureVisibility={featureVisibility}
-        //   setFeatureVisibility={setFeatureVisibility}
-        //   setFeatureChanged={setFeatureChanged}
-        // />
-      )} */}
+      {coloring !== "none" && (
+        <ColoringLegend 
+          coloring={coloring} 
+          dimension={dimension}
+          // featureVisibility={featureVisibility}
+          // setFeatureVisibility={setFeatureVisibility}
+          // setFeatureChanged={setFeatureChanged}
+        />
+      )}
     </div>
   );
 };
