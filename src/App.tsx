@@ -12,6 +12,8 @@ import { rsColors } from "./constants/nodeColoringData";
 import { generateColorMap, addScratch, generateBgColors } from "./utils/utils";
 import { headlessProcess } from "./utils/headlessProcess";
 import { visualProcess } from "./utils/visualProcess";
+import { saveAs } from 'file-saver';
+
 const style: Stylesheet[] = styleData as Stylesheet[];
 
 cytoscape.use(cytoscapeCola);
@@ -39,6 +41,8 @@ function App() {
         setHCyInstance(hcyInstance);
         const dimensions = headlessProcess(hcyInstance);
         setDimensionsData(dimensions);
+        
+        console.log("elements:", hcyInstance.json().elements);
 
         if (cyRef.current) {
           const cy = cytoscape({

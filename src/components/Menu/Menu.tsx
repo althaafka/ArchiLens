@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { edgesLabel } from '../../constants/constants';
+import { saveAs } from 'file-saver';
 import Layout from './Layout';
 import FileUpload from './FileUpload'
 import ShowPrimitives from './ShowPrimitives'
@@ -40,13 +41,30 @@ const Menu = ({
 
   }, [selectedEdges, cyInstance]);
 
+  const downloadGraphAsPng = () => {
+    if (!cyInstance) return;
+    const pngData = cyInstance.png({ full: true });
+    const byteString = atob(pngData.split(',')[1]);
+    const arrayBuffer = new ArrayBuffer(byteString.length);
+    const uint8Array = new Uint8Array(arrayBuffer);
+
+    for (let i = 0; i < byteString.length; i++) {
+      uint8Array[i] = byteString.charCodeAt(i);
+    }
+
+    const blob = new Blob([uint8Array], { type: 'image/png' });
+    saveAs(blob, 'graph.png');
+  };
+
   return (
     <div className="menu-bar">
       <h1>ArchiLens</h1>
       <hr />
       <FileUpload setGraph={setGraph}/>
       <hr />
-      <Layout cyInstance={cyInstance}/>
+      <Layout cyInstance={cyInstance} dimension={dimension}/>
+      <hr />
+      <button onClick={downloadGraphAsPng}>Download Graph as PNG</button>
       <hr />
       <h2>Nodes</h2>
       <ShowPrimitives cyInstance={cyInstance}/>

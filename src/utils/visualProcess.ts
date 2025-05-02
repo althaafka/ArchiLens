@@ -16,6 +16,60 @@ function initNodeColors(dimension){
 }
 
 function setNodeStyles(dimension, cyInstance) {
+    function setDefaultNodeStyle(){
+        const nodes = cyInstance.nodes(node => node.data('labels').includes("Structure") && node.data('id') !== "java.lang.String");
+        nodes.forEach((node) => {
+            addScratch(node, 'style_none', {
+                'background-color': 	'hsl(0, 0%, 95%)',
+                'display': 'element',
+                'background-fill': 'solid',
+            })
+        })
+            const pureContainers = cyInstance.nodes(node => node.data('labels').includes("Container") && !node.data('labels').includes("Structure") && node.data('id') !== "java.lang.String");
+        
+            let maxDepth = 0;
+            pureContainers.forEach((node) => {
+                let depth = 0;
+                let current = node;
+        
+                while (current.parent().length > 0) {
+                    depth++;
+                    current = current.parent()[0];
+                }
+        
+                maxDepth = Math.max(maxDepth, depth);
+            });
+        
+            console.log("Max Depth:", maxDepth);
+        
+            const minLightness = 80;
+            const maxLightness = 92;
+        
+            pureContainers.forEach((node) => {
+                let depth = 0;
+                let current = node;
+        
+                while (current.parent().length > 0) {
+                    depth++;
+                    current = current.parent()[0];
+                }
+        
+                const lightness = minLightness + ((maxLightness - minLightness) / maxDepth) * depth;
+                const adjustedColor = `hsl(0, 0%, ${lightness}%)`;
+        
+                addScratch(node, 'style_none', {
+                    'background-color': adjustedColor,
+                    'border-color': 'hsl(0, 0%, 35%)',
+                    'display': 'element',
+                    'background-fill': 'solid',
+                });
+            });
+        
+
+    }
+
+    setDefaultNodeStyle();
+
     dimension.dimension.forEach((dim) => {
         if (!dimension.composedDimension.includes(dim.id)){
             const nodes = cyInstance.nodes(n => n.hasClass('layers') && n.data('id') !== "java.lang.String")
@@ -23,7 +77,7 @@ function setNodeStyles(dimension, cyInstance) {
                 const categoryIds = node.data('properties').dimension;
 
                 if (categoryIds && categoryIds[dim.id]){
-                    const colors = categoryIds[dim.id].map((id) => dimension.colorMap[dim.id][id] || "#F2F2F2");
+                    const colors = categoryIds[dim.id].map((id) => dimension.colorMap[dim.id][id] || "#f2f2f2");
                     const positions = colors.map((_, index) => `${(index / (colors.length - 1)) * 100}%`);
 
                     // console.log("set node style", `style_${dim.id}`)
@@ -52,6 +106,14 @@ function setNodeStyles(dimension, cyInstance) {
                 }
             })
         } else {
+            const container = cyInstance.nodes(node => node.data('labels').includes("Container") && !node.data('labels').includes("Structure"));
+            container.forEach((node) => {
+                addScratch(node, `style_${dim.id}`, {
+                    'background-color': 'hsl(0, 0%, 85%)',
+                    'display': 'element',
+                    'background-fill': 'solid',
+                })
+            })
             // console.log("composed dimension jk", dim.id);            
             const nodes = cyInstance.nodes(n => n.hasClass('layers') && n.data('id') !== "java.lang.String")
             nodes.forEach((node) => {

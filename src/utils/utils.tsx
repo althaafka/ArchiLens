@@ -4,7 +4,7 @@ export function generateColorMap(labels) {
     labels?.forEach((label, i) => { 
         colorMap[label] = generateColor(i, labels.length);
     });
-    colorMap["-"] = "#F2F2F2";
+    colorMap["-"] = "#f2f2f2";
 
     return colorMap;
 }
@@ -34,6 +34,7 @@ export const generateBgColors = (colorMap) => {
 
 export function lightenHSLArray(hslArray) {
     return hslArray.map(hsl => {
+        if (hsl === "#f2f2f2") return "#e6e6e6";
         return lightenHSL(hsl, 15);
     })
 }

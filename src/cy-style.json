@@ -2,7 +2,7 @@
     {
       "selector": "node",
       "style": {
-        "shape": "rectangle",
+        "shape": "round-rectangle",
         "height": "8px",
         "width": "label",
         "padding": "16px",
@@ -10,20 +10,23 @@
         "content": "data(label)",
         "text-valign": "center",
         "text-halign": "center",
-        "background-color": "#F2F2F2",
+        "background-color": "#f2f2f2",
         "border-width": "3",
-        "border-color": "#5E5E5E"
+        "border-color": "#5E5E5E",
+        "box-radius": "5px"
+
       }
     },
     {
       "selector": ":parent",
       "style": {
+        "shape" : "rectangle",
         "text-valign": "top",
         "text-halign": "center",
         "padding": "16px",
-        "border-width": "2",
-        "border-color": "#9E9E9E",
-        "background-color": "#EEEEEE"
+        "border-width": "3px",
+        "border-color": "#5E5E5E",
+        "background-color": "#f2f2f2"
       }
     },
     {

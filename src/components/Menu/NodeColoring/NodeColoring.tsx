@@ -6,28 +6,32 @@ import { camelCaseToWords } from '../../../utils/utils';
 
 const NodeColoring = ({ cyInstance, dimension }) => {
   const [coloring, setColoring] = useState("none");
-  // const [featureVisibility, setFeatureVisibility] = useState(
-    // Object.keys(colorMap.get(coloring) || {}).reduce((acc, key) => {
-    //   acc[key] = true;
-    //   return acc;
-    // }, {})
-  // );
+  const [categoriesVisibility, setCategoriesVisibility] = useState({});
 
   // const [featureChanged, setFeatureChanged] = useState(null)
 
   useEffect(() => {
     if (!cyInstance) return;
-    // setFeatureVisibility(Object.keys(colorMap.get(coloring) || {}).reduce((acc, key) => {
-    //   acc[key] = true;
-    //   return acc;
-    // }, {}))
 
-    // console.log("coloring", coloring);
+
+    let catVis = {};
+    if (coloring != "none"){
+      catVis = Object.keys(dimension.colorMap[coloring]).reduce((acc, key) => {
+        acc[key] = true;
+        return acc;
+      }, {})
+    }
+    setCategoriesVisibility(catVis);
+    console.log("catVis", catVis);
+
+
+    console.log("coloring", coloring);
+    console.log("categoriesVisibility", categoriesVisibility)
     
     cyInstance.nodes().forEach((node) => {
+      node.style(getScratch(node, 'style_none'));
       const styleKey = `style_${coloring}`;
       const style = getScratch(node, styleKey);
-      // console.log("node style", styleKey, style);
       if (style) {
         node.style(style);
       }
@@ -35,50 +39,22 @@ const NodeColoring = ({ cyInstance, dimension }) => {
 
   }, [coloring, cyInstance]);
 
-  // useEffect(() => {
-    // if (coloring !== 'feature' || !cyInstance || !featureChanged) return;
-  
-    // const nodes = cyInstance.nodes().filter(n => n.data('labels').includes("Structure") && n.data('id') !== "java.lang.String");
-    // nodes.forEach((node) => {
-    //   const featureIds = (node.data().properties.feature || []).filter(featureId => featureVisibility[featureId]);
-  
-    //   if (!featureIds.length) {
-    //     node.style({
-    //       "display": "none"
-    //     });
-    //     return;
-    //   }
-  
-    //   const colors = featureIds.map((id) => colorMap.get('feature')[id] || "#F2F2F2");
-    //   const positions = colors.map((_, index) => `${(index / (colors.length - 1)) * 100}%`);
-  
-    //   node.style(featureIds.length === 1
-    //     ? {
-    //         'background-color': colors[0],
-    //         'border-color': '#5E5E5E',
-    //         'background-fill': 'solid',
-    //         'display': "element"
-    //       }
-    //     : {
-    //         "background-fill": "linear-gradient",
-    //         "background-gradient-direction": "to-right",
-    //         "background-gradient-stop-colors": colors,
-    //         "background-gradient-stop-positions": positions,
-    //         "border-color": "#5E5E5E",
-    //         "display": "element"
-    //       }
-    //   );
-    // });
+  useEffect(() => {
+    if (!cyInstance || coloring === "none") return;
 
 
-  
-  // }, [featureVisibility]);
-  
+    cyInstance.nodes(n => n.data("labels")?.includes("Structure")).forEach((node) => {
+      const categoriesIds = dimension.composedDimension.includes(coloring)? Object.keys(node.data('properties').composedDimension?.[coloring] || {}) : (node?.data('properties')?.dimension?.[coloring] || []);
+      const isVisible = categoriesIds.some((id) => categoriesVisibility[id])
+      node.style('display', isVisible ? 'element' : 'none');
+    })
+  }, [categoriesVisibility, coloring, cyInstance]);
 
   return (
     <div>
       <h3>Node Coloring</h3>
       <select value={coloring} onChange={(e) => setColoring(e.target.value)}>
+        <option key="none" value="none">None</option> 
         {dimension?.dimension?.map((dim) => ( 
           <option key={dim.id} value={dim.id}>{camelCaseToWords(dim.properties.simpleName)}</option> 
         ))}
@@ -87,9 +63,8 @@ const NodeColoring = ({ cyInstance, dimension }) => {
         <ColoringLegend 
           coloring={coloring} 
           dimension={dimension}
-          // featureVisibility={featureVisibility}
-          // setFeatureVisibility={setFeatureVisibility}
-          // setFeatureChanged={setFeatureChanged}
+          categoriesVisibility={categoriesVisibility}
+          setCategoriesVisibility={setCategoriesVisibility}
         />
       )}
     </div>

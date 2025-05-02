@@ -18,10 +18,16 @@ export function setupGraph(graph: Graph) {
     }
 
     // Handle Contains
-    const containsMap = new Map<string, string>();
+    const containsMap = new Map<string, string[]>();
     edges.map((edge) => {
-        if (edge.data.labels?.includes("contains") || edge.data.label === "contains") {
-            containsMap.set(edge.data.target, edge.data.source);
+        if ((edge.data.labels?.includes("contains") || edge.data.label === "contains")) {
+            if (containsMap.get(edge.data.target)) {
+                // console.log("edge target:", edge.data.target)
+                containsMap.get(edge.data.target).push(edge.data.target)
+                // console.log(containsMap.get(edge.data.target))
+            } else {
+                containsMap.set(edge.data.target, [edge.data.source]);
+            }
         }
     });
 
@@ -39,11 +45,25 @@ export function setupGraph(graph: Graph) {
                 if (nodeLabels.includes("Grouping")) {
                     acc.layers.push(node);
                 }
+
+                let parent 
+                if (containsMap.get(node.data.id)?.length > 1) {
+                    containsMap.get(node.data.id)?.find((p) => {
+                        parent = nodes.find((n) => n.data.id === p);
+                        while (parent && parent.data.labels?.includes("Structure")) {
+                            const nextParentId = containsMap.get(parent.data.id)?.[0];
+                            parent = nodes.find((n) => n.data.id === nextParentId);
+                        }
+                        return parent && !parent.data.labels?.includes("Structure");
+                    });
+                
+                }
+                
                 acc.filteredNodes.push({
                     ...node,
                     data: {
                         ...node.data,
-                        parent: containsMap.get(node.data.id) || node.data.parent,
+                        parent: parent?.data?.id || containsMap.get(node.data.id)?.[0] || node.data.parent,
                     },
                 });
             }

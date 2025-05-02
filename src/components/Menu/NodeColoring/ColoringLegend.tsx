@@ -1,23 +1,19 @@
 const ColoringLegend = ({ 
     coloring, 
     dimension,
-    // featureVisibility, 
-    // setFeatureVisibility, 
-    // setFeatureChanged 
+    categoriesVisibility, 
+    setCategoriesVisibility, 
   }) => {
   
     const dimensionId = dimension.dimension.find(d => d.id === coloring)?.id;
-    console.log("dimensionId", dimensionId);
-    console.log("colormap", dimension.colorMap[dimensionId]);
 
-  // if (!colorMap) return null;
-  // const backgroundColors = colorMap.get(`${coloring}-bg`);
+    const handleCheckboxChange = (key) => {
+      setCategoriesVisibility((prev) => ({
+          ...prev,
+          [key]: !prev[key],
+      }));
+  };
 
-  // const handleCheckboxChange = (feature) => {
-  //   setFeatureChanged({key: feature, visibility: !featureVisibility[feature]})
-  //   const updatedVisibility = { ...featureVisibility, [feature]: !featureVisibility[feature] };
-  //   setFeatureVisibility(updatedVisibility);
-  // };  1 
 
   return (
     <div className="legend-container">
@@ -26,13 +22,11 @@ const ColoringLegend = ({
         {/* {Object.entries(colorMap.get(coloring)).map(([key, color]) => ( */}
         {Object.keys(dimension.colorMap[dimensionId]).map(key => (
           <li key={key} className="legend-item">
-            {/* {coloring === "feature" && (
               <input
                 type="checkbox"
-                checked={featureVisibility[key] ?? true}
+                checked={categoriesVisibility[key] ?? true}
                 onChange={() => handleCheckboxChange(key)}
               />
-            )} */}
             <span
               className="legend-box"
               style={{

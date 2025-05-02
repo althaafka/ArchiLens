@@ -1,4 +1,5 @@
 export const layoutTypes = {
     "grid": "Default",
-    "cola": "Cola"
+    "cola": "Cola",
+    "semanticGrid": "Semantic Grid"
 }
