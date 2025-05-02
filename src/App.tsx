@@ -4,16 +4,11 @@ import cytoscape from "cytoscape";
 import cytoscapeCola from "cytoscape-cola";
 import { Stylesheet } from "cytoscape";
 import styleData from "./cy-style.json";
-// import rawGraph from "./assets/jpacman-v2.json";
 import rawGraph from "./assets/jpacman-v3-dim.json";
 import { setupGraph } from "./utils/setupGraph";
 import Menu from './components/Menu/Menu';
-import { rsColors } from "./constants/nodeColoringData";
-import { generateColorMap, addScratch, generateBgColors } from "./utils/utils";
 import { headlessProcess } from "./utils/headlessProcess";
 import { visualProcess } from "./utils/visualProcess";
-import { saveAs } from 'file-saver';
-
 const style: Stylesheet[] = styleData as Stylesheet[];
 
 cytoscape.use(cytoscapeCola);
