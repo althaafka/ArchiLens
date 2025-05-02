@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { layoutTypes } from '../../constants/layoutData'
 import registerSemanticGridLayout from 'cytoscape.js-semanticGrid';
 import cytoscape from 'cytoscape';
@@ -10,32 +10,32 @@ const Layout = ({ cyInstance, dimension }) => {
   const [xDimension, setXDimension] = useState('');
   const [yDimension, setYDimension] = useState('');
 
-  console.log("test:", cyInstance?.nodes()[14].data().properties?.dimension['Dimension:RoleStereotypes'][0])
+  const prevLayoutRef = useRef(null)
 
   const relayout = () => {
     if (!cyInstance) return;
     
+    if (prevLayoutRef.current && typeof prevLayoutRef.current.destroy === 'function') {
+      prevLayoutRef.current.destroy();
+    }
+    
     if (layout == "semanticGrid") {
       if (!xDimension || !yDimension) return;
-      console.log("test", xDimension, yDimension);
-      console.log(dimension.dimension)
 
-      cyInstance.layout({
+      const layoutInstance = cyInstance.layout({
         name: 'semanticGrid',
         xDimension: (node) => {
-          const composedDimension = node?.data().properties?.dimension?.[xDimension];
-
-          return composedDimension
-            ? composedDimension[0].split(`${xDimension.split("Dimension:")[1]}:`)[1]
-            : null;
+          const composed = node?.data().properties?.dimension?.[xDimension];
+          return composed ? composed[0].split(`${xDimension.split("Dimension:")[1]}:`)[1] : null;
         },
         yDimension: (node) => {
-          const composedDimension = node?.data().properties?.dimension?.[yDimension];
-          return composedDimension
-            ? composedDimension[0].split(`${yDimension.split("Dimension:")[1]}:`)[1]
-            : null;
+          const composed = node?.data().properties?.dimension?.[yDimension];
+          return composed ? composed[0].split(`${yDimension.split("Dimension:")[1]}:`)[1] : null;
         }
-      }).run();
+      });
+
+      prevLayoutRef.current = layoutInstance;
+      layoutInstance.run();
     } else {
       cyInstance.layout({
         name: layout,
