@@ -3,6 +3,7 @@ import { layoutTypes } from '../../constants/layoutData'
 import registerSemanticGridLayout from 'cytoscape.js-semanticGrid';
 import cytoscape from 'cytoscape';
 import { initGraph, getGraph } from '../../utils/graphManagement';
+import Dimension from '../../utils/dimension';
 registerSemanticGridLayout(cytoscape);
 
 
@@ -19,6 +20,8 @@ const Layout = ({ cyInstance, dimension }) => {
   const relayout = () => {
     if (!cyInstance) return;
     const graph = initGraph(cyInstance);
+    const dimInstance = new Dimension(dimension);
+
     
     if (prevLayoutRef.current && typeof prevLayoutRef.current.destroy === 'function' && prevLayoutType == "semanticGrid") {
       prevLayoutRef.current.destroy();
@@ -33,22 +36,21 @@ const Layout = ({ cyInstance, dimension }) => {
     if (layout == "semanticGrid") {
       if (!xDimension || !yDimension) return;
 
-      hidePackages? graph.hidePackage() : graph.unhidePackage();
-
+      
+      cyInstance.nodes().forEach((node) => {
+        console.log(dimInstance.getNodeCategory(node, 'Dimension:Container'))
+      })
+      
       const layoutInstance = cyInstance.layout({
         name: 'semanticGrid',
-        xDimension: (node) => {
-          const composed = node?.data().properties?.dimension?.[xDimension];
-          return composed ? composed[0].split(`${xDimension.split("Dimension:")[1]}:`)[1] : null;
-        },
-        yDimension: (node) => {
-          const composed = node?.data().properties?.dimension?.[yDimension];
-          return composed ? composed[0].split(`${yDimension.split("Dimension:")[1]}:`)[1] : null;
-        }
+        xDimension: node => dimInstance.getNodeCategory(node, xDimension),
+        yDimension: node => dimInstance.getNodeCategory(node, yDimension)
       });
-
+      
       prevLayoutRef.current = layoutInstance;
       layoutInstance.run();
+
+      hidePackages? graph.hidePackage() : graph.unhidePackage();
     } else {
       cyInstance.layout({
         name: layout,
@@ -85,6 +87,7 @@ const Layout = ({ cyInstance, dimension }) => {
                     {dim.properties.simpleName || dim.id}
                   </option>
                 ))}
+              <option value="Dimension:Container" key="Dimension:Container">Container</option>
             </select>
           </label>
           <div></div>

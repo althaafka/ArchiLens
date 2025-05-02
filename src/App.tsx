@@ -35,6 +35,7 @@ function App() {
         const hcyInstance = event.cy;
         setHCyInstance(hcyInstance);
         const dimensions = headlessProcess(hcyInstance);
+        console.log("DIMENSION:", dimensions)
         setDimensionsData(dimensions);
         
         console.log("elements:", hcyInstance.json().elements);

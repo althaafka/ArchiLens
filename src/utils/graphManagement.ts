@@ -33,6 +33,10 @@ class Graph {
     return this.getAllNodes(this.node.isPureContainer)
   }
 
+  getNodeContainer(node): cytoscape.NodeSingular {
+    return this.node.getContainer(node)[0]
+  }
+
   //------------EDGES--------------
   getContainsMap(): Map<string, Set<string>> {
     const map = new Map<string, Set<string>>();
@@ -87,6 +91,10 @@ class Node {
   hasLabel(node: cytoscape.NodeSingular, label: string): boolean {
     const labels = node.data().labels || [];
     return labels.includes(label)
+  }
+
+  getContainer(node: cytoscape.NodeSingular): cytoscape.NodeCollection {
+    return node.parent()
   }
   
   isPureContainer(node: cytoscape.NodeSingular): boolean {
