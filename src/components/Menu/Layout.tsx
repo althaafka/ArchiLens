@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { layoutTypes } from '../../constants/layoutData'
 import registerSemanticGridLayout from 'cytoscape.js-semanticGrid';
 import cytoscape from 'cytoscape';
+import { initGraph, getGraph } from '../../utils/graphManagement';
 registerSemanticGridLayout(cytoscape);
 
 
@@ -9,18 +10,30 @@ const Layout = ({ cyInstance, dimension }) => {
   const [layout, setLayout] = useState(layoutTypes.grid);
   const [xDimension, setXDimension] = useState('');
   const [yDimension, setYDimension] = useState('');
+  const [hidePackages, setHidePackages] = useState(false);
 
   const prevLayoutRef = useRef(null)
+  const [prevLayoutType, setPrevLayoutType] = useState(null);
+
 
   const relayout = () => {
     if (!cyInstance) return;
+    const graph = initGraph(cyInstance);
     
-    if (prevLayoutRef.current && typeof prevLayoutRef.current.destroy === 'function') {
+    if (prevLayoutRef.current && typeof prevLayoutRef.current.destroy === 'function' && prevLayoutType == "semanticGrid") {
       prevLayoutRef.current.destroy();
     }
+
+    if (prevLayoutType === 'semanticGrid') {
+      graph.unhidePackage();
+    }
     
+    setPrevLayoutType(layout);
+
     if (layout == "semanticGrid") {
       if (!xDimension || !yDimension) return;
+
+      hidePackages? graph.hidePackage() : graph.unhidePackage();
 
       const layoutInstance = cyInstance.layout({
         name: 'semanticGrid',
@@ -87,6 +100,15 @@ const Layout = ({ cyInstance, dimension }) => {
                   </option>
                 ))}
             </select>
+          </label>
+          <br></br>
+          <label>
+            <input
+              type="checkbox"
+              checked={hidePackages}
+              onChange={(e) => setHidePackages(e.target.checked)}
+            />
+            Hide Package Nodes
           </label>
           <br></br>
         </div>
