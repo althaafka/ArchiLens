@@ -18,7 +18,7 @@ function App() {
   const [graph, setGraph] = useState(rawGraph);
   const [cyInstance, setCyInstance] = useState(null);
   const [hcyInstance, setHCyInstance] = useState(null);
-  const [dimensionsData, setDimensionsData] = useState({});
+  const [analysisData, setAnalysisData] = useState({});
   const [colorMap, setColorMap] = useState(new Map<string, Object>())
 
   // Init cytoscape
@@ -34,9 +34,9 @@ function App() {
       ready: (event) => {
         const hcyInstance = event.cy;
         setHCyInstance(hcyInstance);
-        const dimensions = headlessProcess(hcyInstance);
-        console.log("DIMENSION:", dimensions)
-        setDimensionsData(dimensions);
+        const analysisData= headlessProcess(hcyInstance);
+        console.log("Analysis Data:", analysisData)
+        setAnalysisData(analysisData);
         
         console.log("elements:", hcyInstance.json().elements);
 
@@ -49,7 +49,7 @@ function App() {
             ready: (cyEvent) => {
               const cyInstance = cyEvent.cy;
               setCyInstance(cyInstance);
-              visualProcess(cyInstance, dimensions);
+              visualProcess(cyInstance, analysisData);
             },
           });
           cy.on('tap', 'node', (event) => {
@@ -82,7 +82,7 @@ function App() {
       </div>
 
       {/* Menu Bar */}
-      <Menu cyInstance={cyInstance} setGraph={setGraph} dimension={dimensionsData} />
+      <Menu cyInstance={cyInstance} setGraph={setGraph} analysisData={analysisData} />
     </div>
     </>
   );

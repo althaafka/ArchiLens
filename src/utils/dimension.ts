@@ -1,14 +1,14 @@
 import { getGraph } from './graphManagement';
 
-export default class Dimension {
-    private dimension;
+export default class AnalysisAspect {
+    private analysisData;
 
-    constructor(dimension) {
-        this.dimension = dimension
+    constructor(analysisData) {
+        this.analysisData = analysisData
     }
 
     getDimensionById(dimId: string) {
-        return this.dimension.dimension.find((dim) => dim.id === dimId) || null;
+        return this.analysisData.dimension.find((dim) => dim.id === dimId) || null;
       }
 
     getDimensionName(dimension) {
@@ -23,7 +23,7 @@ export default class Dimension {
         if (dimension == 'Dimension:Container') return null;
         const rawCat = this.getDimensionById(dimension).categories
         const catOrder = rawCat.map((cat) => {
-            return this.dimension.category.find((c) => c.id === cat)?.properties?.simpleName || "-"
+            return this.analysisData.category.find((c) => c.id === cat)?.properties?.simpleName || "-"
         })
         return catOrder;
     }

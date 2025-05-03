@@ -4,7 +4,7 @@ import { getScratch } from '../../../utils/utils';
 // import { nodeColoringTypes } from '../../../constants/nodeColoringData';
 import { camelCaseToWords } from '../../../utils/utils';
 
-const NodeColoring = ({ cyInstance, dimension }) => {
+const NodeColoring = ({ cyInstance, analysisData}) => {
   const [coloring, setColoring] = useState("none");
   const [categoriesVisibility, setCategoriesVisibility] = useState({});
 
@@ -16,7 +16,7 @@ const NodeColoring = ({ cyInstance, dimension }) => {
 
     let catVis = {};
     if (coloring != "none"){
-      catVis = Object.keys(dimension.colorMap[coloring]).reduce((acc, key) => {
+      catVis = Object.keys(analysisData.colorMap[coloring]).reduce((acc, key) => {
         acc[key] = true;
         return acc;
       }, {})
@@ -44,7 +44,7 @@ const NodeColoring = ({ cyInstance, dimension }) => {
 
 
     cyInstance.nodes(n => n.data("labels")?.includes("Structure")).forEach((node) => {
-      const categoriesIds = dimension.composedDimension.includes(coloring)? Object.keys(node.data('properties').composedDimension?.[coloring] || {}) : (node?.data('properties')?.dimension?.[coloring] || []);
+      const categoriesIds = analysisData.composedDimension.includes(coloring)? Object.keys(node.data('properties').composedDimension?.[coloring] || {}) : (node?.data('properties')?.dimension?.[coloring] || []);
       const isVisible = categoriesIds.some((id) => categoriesVisibility[id])
       node.style('display', isVisible ? 'element' : 'none');
     })
@@ -55,14 +55,14 @@ const NodeColoring = ({ cyInstance, dimension }) => {
       <h3>Node Coloring</h3>
       <select value={coloring} onChange={(e) => setColoring(e.target.value)}>
         <option key="none" value="none">None</option> 
-        {dimension?.dimension?.map((dim) => ( 
+        {analysisData?.dimension?.map((dim) => ( 
           <option key={dim.id} value={dim.id}>{camelCaseToWords(dim.properties.simpleName)}</option> 
         ))}
       </select>
       {coloring !== "none" && (
         <ColoringLegend 
           coloring={coloring} 
-          dimension={dimension}
+          analysisData={analysisData}
           categoriesVisibility={categoriesVisibility}
           setCategoriesVisibility={setCategoriesVisibility}
         />

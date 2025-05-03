@@ -106,7 +106,7 @@ class Node {
   }
 
   addChildRelation(parent: cytoscape.NodeSingular, child: cytoscape.NodeSingular) {
-    child.move({ parent: parent.id() });
+    child?.move({ parent: parent?.id() });
   }
 }
 

@@ -9,7 +9,7 @@ import NodeColoring from './NodeColoring/NodeColoring';
 const Menu = ({
   cyInstance,
   setGraph,
-  dimension
+  analysisData
 }) => {
 
   const [selectedEdges, setSelectedEdges] = useState(() => {
@@ -62,14 +62,14 @@ const Menu = ({
       <hr />
       <FileUpload setGraph={setGraph}/>
       <hr />
-      <Layout cyInstance={cyInstance} dimension={dimension}/>
+      <Layout cyInstance={cyInstance} analysisData={analysisData}/>
       <hr />
       <button onClick={downloadGraphAsPng}>Download Graph as PNG</button>
       <hr />
       <h2>Nodes</h2>
       <ShowPrimitives cyInstance={cyInstance}/>
       <h3>Coloring</h3>
-      <NodeColoring cyInstance={cyInstance} dimension={dimension}/>
+      <NodeColoring cyInstance={cyInstance} analysisData={analysisData}/>
       <hr />
       <h2>Relationships</h2>
       <ul>

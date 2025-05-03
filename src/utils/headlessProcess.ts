@@ -5,12 +5,12 @@ export function headlessProcess(cyInstance: any) {
     cyInstance.startBatch();
     processDimension(cyInstance);
     groupLayers(cyInstance);
-    const dimension = deleteDimensionInformation(cyInstance);
+    const analysisAspect = deleteDimensionInformation(cyInstance);
     removeInvalidNodes(cyInstance);
     removeInvalidEdges(cyInstance);
     liftEdges(cyInstance);
     cyInstance.endBatch();
-    return dimension;
+    return analysisAspect;
 }
 
 function removeInvalidNodes(cyInstance: any) {

@@ -3,11 +3,11 @@ import { layoutTypes } from '../../constants/layoutData'
 import registerSemanticGridLayout from 'cytoscape.js-semanticGrid';
 import cytoscape from 'cytoscape';
 import { initGraph, getGraph } from '../../utils/graphManagement';
-import Dimension from '../../utils/dimension';
+import AnalysisAspect from '../../utils/dimension';
 registerSemanticGridLayout(cytoscape);
 
 
-const Layout = ({ cyInstance, dimension }) => {
+const Layout = ({ cyInstance, analysisData }) => {
   const [layout, setLayout] = useState(layoutTypes.grid);
   const [xDimension, setXDimension] = useState('');
   const [yDimension, setYDimension] = useState('');
@@ -20,7 +20,7 @@ const Layout = ({ cyInstance, dimension }) => {
   const relayout = () => {
     if (!cyInstance) return;
     const graph = initGraph(cyInstance);
-    const dimInstance = new Dimension(dimension);
+    const analysisAspect = new AnalysisAspect(analysisData);
 
     
     if (prevLayoutRef.current && typeof prevLayoutRef.current.destroy === 'function' && prevLayoutType == "semanticGrid") {
@@ -38,16 +38,16 @@ const Layout = ({ cyInstance, dimension }) => {
 
       const layoutOptions = {
         name: 'semanticGrid',
-        xDimension: node => dimInstance.getNodeCategory(node, xDimension),
-        yDimension: node => dimInstance.getNodeCategory(node, yDimension),
+        xDimension: node => analysisAspect.getNodeCategory(node, xDimension),
+        yDimension: node => analysisAspect.getNodeCategory(node, yDimension),
       };
 
       if (xDimension !== "Dimension:Container") {
-        layoutOptions.xCategories = dimInstance.getCategoriesOrder(xDimension);
+        layoutOptions.xCategories = analysisAspect.getCategoriesOrder(xDimension);
       }
 
       if (yDimension !== "Dimension:Container") {
-        layoutOptions.yCategories = dimInstance.getCategoriesOrder(yDimension);
+        layoutOptions.yCategories = analysisAspect.getCategoriesOrder(yDimension);
       }
 
       const layoutInstance = cyInstance.layout(layoutOptions);
@@ -84,7 +84,7 @@ const Layout = ({ cyInstance, dimension }) => {
             X Dimension:
             <select value={xDimension} onChange={(e) => setXDimension(e.target.value)}>
               <option value="" disabled>Choose</option>
-              {dimension.dimension
+              {analysisData.dimension
                 .map((dim) => (
                   <option key={dim.id} value={dim.id}>
                     {dim.properties.simpleName || dim.id}
@@ -98,7 +98,7 @@ const Layout = ({ cyInstance, dimension }) => {
             Y Dimension:
             <select value={yDimension} onChange={(e) => setYDimension(e.target.value)}>
               <option value="" disabled>Choose</option>
-              {dimension.dimension
+              {analysisData.dimension
                 .map((dim) => (
                   <option key={dim.id} value={dim.id}>
                     {dim.properties.simpleName || dim.id}
