@@ -35,16 +35,12 @@ const Layout = ({ cyInstance, dimension }) => {
 
     if (layout == "semanticGrid") {
       if (!xDimension || !yDimension) return;
-
-      
-      cyInstance.nodes().forEach((node) => {
-        console.log(dimInstance.getNodeCategory(node, 'Dimension:Container'))
-      })
-      
+      // console.log("xCategories: ", dimInstance.getCategoriesOrder(xDimension))
+ 
       const layoutInstance = cyInstance.layout({
         name: 'semanticGrid',
         xDimension: node => dimInstance.getNodeCategory(node, xDimension),
-        yDimension: node => dimInstance.getNodeCategory(node, yDimension)
+        yDimension: node => dimInstance.getNodeCategory(node, yDimension),
       });
       
       prevLayoutRef.current = layoutInstance;
@@ -81,7 +77,6 @@ const Layout = ({ cyInstance, dimension }) => {
             <select value={xDimension} onChange={(e) => setXDimension(e.target.value)}>
               <option value="" disabled>Choose</option>
               {dimension.dimension
-                .filter((dim) => !dimension.composedDimension.includes(dim.id))
                 .map((dim) => (
                   <option key={dim.id} value={dim.id}>
                     {dim.properties.simpleName || dim.id}
@@ -96,12 +91,12 @@ const Layout = ({ cyInstance, dimension }) => {
             <select value={yDimension} onChange={(e) => setYDimension(e.target.value)}>
               <option value="" disabled>Choose</option>
               {dimension.dimension
-                .filter((dim) => !dimension.composedDimension.includes(dim.id))
                 .map((dim) => (
                   <option key={dim.id} value={dim.id}>
                     {dim.properties.simpleName || dim.id}
                   </option>
                 ))}
+              <option value="Dimension:Container" key="Dimension:Container">Container</option>
             </select>
           </label>
           <br></br>

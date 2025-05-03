@@ -7,12 +7,25 @@ export default class Dimension {
         this.dimension = dimension
     }
 
+    getDimensionById(dimId: string) {
+        return this.dimension.dimension.find((dim) => dim.id === dimId) || null;
+      }
+
     getDimensionName(dimension) {
         return dimension.split("Dimension:")[1];
     }
 
     getCategoryName(category, dimension) {
         return category.split(`${this.getDimensionName(dimension)}:`)[1]
+    }
+
+    getCategoriesOrder(dimension: string): string[] {
+        if (dimension == 'Dimension:Container') return null;
+        const rawCat = this.getDimensionById(dimension).categories
+        const catOrder = rawCat.map((cat) => {
+            return this.dimension.category.find((c) => c.id === cat)?.properties?.simpleName || "-"
+        })
+        return catOrder;
     }
 
     getNodeCategory(node, dimension: string): string{
