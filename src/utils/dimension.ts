@@ -29,14 +29,15 @@ export default class Dimension {
     }
 
     getNodeCategory(node, dimension: string): string{
+        if (!node.data().labels.includes("Structure")) return null;
         if (dimension == 'Dimension:Container') {
             const graph = getGraph();
             const container = graph.getNodeContainer(node);
-            return container? container.data().properties.name || container.id() : null;
+            return container? container.data().properties.simpleName || container.id() : null;
         }
 
         const composed = node?.data().properties?.dimension?.[dimension];
-        return composed ? this.getCategoryName(composed[0], dimension) : null;
+        return composed ? this.getCategoryName(composed[0], dimension) : "-";
     }
 
 }

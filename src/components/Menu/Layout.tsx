@@ -35,18 +35,26 @@ const Layout = ({ cyInstance, dimension }) => {
 
     if (layout == "semanticGrid") {
       if (!xDimension || !yDimension) return;
-      // console.log("xCategories: ", dimInstance.getCategoriesOrder(xDimension))
- 
-      const layoutInstance = cyInstance.layout({
+
+      const layoutOptions = {
         name: 'semanticGrid',
         xDimension: node => dimInstance.getNodeCategory(node, xDimension),
         yDimension: node => dimInstance.getNodeCategory(node, yDimension),
-      });
-      
+      };
+
+      if (xDimension !== "Dimension:Container") {
+        layoutOptions.xCategories = dimInstance.getCategoriesOrder(xDimension);
+      }
+
+      if (yDimension !== "Dimension:Container") {
+        layoutOptions.yCategories = dimInstance.getCategoriesOrder(yDimension);
+      }
+
+      const layoutInstance = cyInstance.layout(layoutOptions);
       prevLayoutRef.current = layoutInstance;
       layoutInstance.run();
 
-      hidePackages? graph.hidePackage() : graph.unhidePackage();
+      hidePackages ? graph.hidePackage() : graph.unhidePackage();
     } else {
       cyInstance.layout({
         name: layout,
