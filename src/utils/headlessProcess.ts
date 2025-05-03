@@ -214,21 +214,30 @@ function processMetric(cyInstance: any) {
             .filter(edge => edge.data('target') === metric.id())
             .map(edge => [edge.data('source'), edge.data('properties').value]);
 
+        metric.data("properties").members = measuredNode;
         // console.log("metric:", metric.id());
         // console.log(measuredNode)
+        let maxVal = -Infinity;
+        let minVal = Infinity;
         measuredNode.forEach(([nodeId, value]) => {
             const node = cyInstance.getElementById(nodeId)
+            if (maxVal < value) maxVal = value
+            if (minVal > value) minVal = value
+
+            
             if (!node.data('properties').metric) {
                 node.data('properties').metric = {};
-
+                
                 const metricId = metric.id();
-
+                
                 if (!node.data('properties').metric[metricId]) {
                     node.data('properties').metric[metricId] = value;
                 }
                 node.data('properties').metric[metricId] = value
             }
         })
+        metrics.data('properties').maxValue = maxVal;
+        metrics.data('properties').minValue = minVal;
     })
 }
 

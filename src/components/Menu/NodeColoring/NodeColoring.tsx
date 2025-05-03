@@ -14,19 +14,17 @@ const NodeColoring = ({ cyInstance, analysisData}) => {
     if (!cyInstance) return;
 
 
-    let catVis = {};
-    if (coloring != "none"){
-      catVis = Object.keys(analysisData.colorMap[coloring]).reduce((acc, key) => {
-        acc[key] = true;
-        return acc;
-      }, {})
+    if (!analysisData.metric.find(m => m.id == coloring)) {
+      let catVis = {};
+      if (coloring != "none"){
+        catVis = Object.keys(analysisData.colorMap[coloring]).reduce((acc, key) => {
+          acc[key] = true;
+          return acc;
+        }, {})
+      }
+      setCategoriesVisibility(catVis);
+
     }
-    setCategoriesVisibility(catVis);
-    console.log("catVis", catVis);
-
-
-    console.log("coloring", coloring);
-    console.log("categoriesVisibility", categoriesVisibility)
     
     cyInstance.nodes().forEach((node) => {
       node.style(getScratch(node, 'style_none'));
@@ -41,7 +39,7 @@ const NodeColoring = ({ cyInstance, analysisData}) => {
 
   useEffect(() => {
     if (!cyInstance || coloring === "none") return;
-
+    if (analysisData.metric.find(m => m.id == coloring)) return;
 
     cyInstance.nodes(n => n.data("labels")?.includes("Structure")).forEach((node) => {
       const categoriesIds = analysisData.composedDimension.includes(coloring)? Object.keys(node.data('properties').composedDimension?.[coloring] || {}) : (node?.data('properties')?.dimension?.[coloring] || []);
@@ -58,8 +56,11 @@ const NodeColoring = ({ cyInstance, analysisData}) => {
         {analysisData?.dimension?.map((dim) => ( 
           <option key={dim.id} value={dim.id}>{camelCaseToWords(dim.properties.simpleName)}</option> 
         ))}
+        {analysisData?.metric?.map((metric) => (
+          <option key={metric.id} value={metric.id}>{camelCaseToWords(metric.properties.simpleName)}</option>
+        ))}
       </select>
-      {coloring !== "none" && (
+      {coloring !== "none" && !analysisData.metric.find(m => m.id == coloring) && (
         <ColoringLegend 
           coloring={coloring} 
           analysisData={analysisData}

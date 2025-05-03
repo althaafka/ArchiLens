@@ -9,6 +9,40 @@ export function generateColorMap(labels) {
     return colorMap;
 }
 
+export function generateColorMetric(minVal, maxVal, val) {
+    const startHue = 3;
+    const endHue = 255;
+
+    if (isNaN(val) || val == null) return "#f2f2f2";
+    if (maxVal === minVal) return `hsl(${startHue}, 30%, 60%)`;
+
+    const ratio = (val - minVal) / (maxVal - minVal);
+    const clampedRatio = Math.max(0, Math.min(1, ratio)); // Ensure ratio is between 0 and 1
+
+    const hue = startHue + (endHue - startHue) * clampedRatio;
+
+    return `hsl(${hue}, 67%, 60%)`;
+}
+
+// export function generateColorMetric(minVal, maxVal, val) {
+//     const startHue = 0;   // green-yellow
+//     const endHue = 255;    // blue-purple
+
+//     if (isNaN(val) || val == null) return "#f2f2f2";
+//     if (maxVal === minVal) return `hsl(${startHue}, 100%, 5%)`;
+
+//     const ratio = (val - minVal) / (maxVal - minVal);
+//     const clampedRatio = Math.max(0, Math.min(1, ratio));
+
+//     const hue = startHue + (endHue - startHue) * clampedRatio;
+//     const saturation = 80 + 20 * Math.abs(0.5 - clampedRatio);  // from 80% to 100%
+//     const lightness = 35 + 30 * (1 - clampedRatio);             // from 65% to 35%
+
+//     return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+// }
+
+
+
 const generateColor = (index, total) => {
     const hue = (index * (360 / total)) % 360;
     return `hsl(${hue}, 80%, 75%)`;

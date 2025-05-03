@@ -1,5 +1,5 @@
 import { handleDimension } from "./handleDimension";
-import { generateColorMap, addScratch, lightenHSLArray, lightenHSL } from "./utils";
+import { generateColorMap, addScratch, lightenHSLArray, lightenHSL, generateColorMetric } from "./utils";
 
 export function visualProcess(cyInstance, dimension) {
     cyInstance.startBatch();
@@ -70,7 +70,45 @@ function setNodeStyles(dimension, cyInstance) {
 
     setDefaultNodeStyle();
 
-    dimension.dimension.forEach((dim) => {
+    dimension?.metric?.forEach((m) => {
+        // console.log(m);
+        const members = m.properties.members;
+        // console.log("styleket2:", `style_${m.id}`)
+        // cyInstance.nodes().forEach(node => {
+        //     const nodeMember = members.find(n => n[0] == node.id())
+        //     if (nodeMember){
+        //         const color = generateColorMetric(m.properties.minValue, m.properties.maxValue, nodeMember[1]);
+        //         console.log("Sdas:", color)
+        //         return addScratch(node, `style_${m.id}`, {
+        //             'background-color': color,
+        //             'border-color': '#5E5E5E',
+        //             'background-fill': 'solid',
+        //             'display': 'element',
+        //         });
+        //     } else {
+        //         return addScratch(node, `style_${m.id}`, {
+        //             'background-color': 'hsl(0, 0%, 85%)',
+        //             'display': 'element',
+        //             'background-fill': 'solid',
+        //         })
+        //     }
+        // })
+
+        members.forEach(([nodeId, value]) => {
+            if (nodeId == "java.lang.String") return;
+            const node = cyInstance.getElementById(nodeId);
+            const color = generateColorMetric(m.properties.minValue, m.properties.maxValue, value);
+
+            addScratch(node, `style_${m.id}`, {
+                'background-color': color,
+                'border-color': '#5E5E5E',
+                'background-fill': 'solid',
+                'display': 'element',
+            });
+        });
+    });
+
+    dimension.dimension?.forEach((dim) => {
         if (!dimension.composedDimension.includes(dim.id)){
             const nodes = cyInstance.nodes(n => n.hasClass('layers') && n.data('id') !== "java.lang.String")
             nodes.forEach((node) => {
