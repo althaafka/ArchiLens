@@ -112,6 +112,7 @@ export function abstractizeGraph(nodes, edges) {
         ...(edgesMap.get("implements") || []),
         ...(edgesMap.get("succeeds") || []),
         ...(edgesMap.get("composes") || []),
+        ...(edgesMap.get("measures") || [])
     ]
 
     return { nodes: nodes, edges: abstractEdges }

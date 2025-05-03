@@ -41,3 +41,7 @@ export default class AnalysisAspect {
     }
 
 }
+
+export class Metric {
+    
+}

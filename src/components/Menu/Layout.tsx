@@ -3,7 +3,7 @@ import { layoutTypes } from '../../constants/layoutData'
 import registerSemanticGridLayout from 'cytoscape.js-semanticGrid';
 import cytoscape from 'cytoscape';
 import { initGraph, getGraph } from '../../utils/graphManagement';
-import AnalysisAspect from '../../utils/dimension';
+import AnalysisAspect from '../../utils/analysisAspect';
 registerSemanticGridLayout(cytoscape);
 
 

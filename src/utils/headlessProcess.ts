@@ -4,8 +4,9 @@ import { counter, counterToPercentage, mergeCounters, addScratch } from "./utils
 export function headlessProcess(cyInstance: any) {
     cyInstance.startBatch();
     processDimension(cyInstance);
+    processMetric(cyInstance);
     groupLayers(cyInstance);
-    const analysisAspect = deleteDimensionInformation(cyInstance);
+    const analysisAspect = deleteAnalysisAspect(cyInstance);
     removeInvalidNodes(cyInstance);
     removeInvalidEdges(cyInstance);
     liftEdges(cyInstance);
@@ -149,12 +150,13 @@ const liftEdges = (pCy) => {
 
 function processDimension(cyInstance: any) {
     const composesEdges = cyInstance.edges(edge => edge.data('label') === "composes");
+    console.log("tes: ", composesEdges.length)
     const implementsEdges = cyInstance.edges(edge => edge.data('label') === "implements");
     const succeedsEdges = cyInstance.edges(edge => edge.data('label') === "succeeds");
     const dimensions = cyInstance.nodes(node => node.data('labels').includes("Dimension"));
     const categories = cyInstance.nodes(node => node.data('labels').includes("Category"));
 
-    dimensions.forEach(dim => {
+    dimensions?.forEach(dim => {
         const composedCategories = composesEdges
             .filter(edge => edge.data('source') === dim.id())
             .map(edge => edge.data('target'));
@@ -203,7 +205,34 @@ function processDimension(cyInstance: any) {
     });
 }
 
-function deleteDimensionInformation(cyInstance) {
+function processMetric(cyInstance: any) {
+    const measuresEdges = cyInstance.edges(edge => edge.data('label') == "measures");
+    const metrics = cyInstance.nodes(node => node.data('labels').includes("Metric"));
+
+    metrics?.forEach(metric => {
+        const measuredNode = measuresEdges
+            .filter(edge => edge.data('target') === metric.id())
+            .map(edge => [edge.data('source'), edge.data('properties').value]);
+
+        // console.log("metric:", metric.id());
+        // console.log(measuredNode)
+        measuredNode.forEach(([nodeId, value]) => {
+            const node = cyInstance.getElementById(nodeId)
+            if (!node.data('properties').metric) {
+                node.data('properties').metric = {};
+
+                const metricId = metric.id();
+
+                if (!node.data('properties').metric[metricId]) {
+                    node.data('properties').metric[metricId] = value;
+                }
+                node.data('properties').metric[metricId] = value
+            }
+        })
+    })
+}
+
+function deleteAnalysisAspect(cyInstance) {
     let deletedElements
 
     // const nodesToRemove = cyInstance.nodes(node =>
@@ -212,10 +241,12 @@ function deleteDimensionInformation(cyInstance) {
 
     const dimension = cyInstance.nodes(node => node.data('labels').includes("Dimension"))
     const category = cyInstance.nodes(node => node.data('labels').includes("Category"))
+    const metric = cyInstance.nodes(node => node.data('labels').includes("Metric"))
 
     deletedElements = {
         dimension: dimension.map(node => node.data()), 
         category: category.map(node => node.data()),
+        metric: metric.map(node => node.data()),
         composedDimension: Array.from(
             new Set(
                 cyInstance.edges(edge => edge.data('label') === "composes")
@@ -234,8 +265,9 @@ function deleteDimensionInformation(cyInstance) {
 
     cyInstance.remove(dimension);
     cyInstance.remove(category);
+    cyInstance.remove(metric);
     cyInstance.edges(edge =>
-        ["composes", "implements", "succeeds"].includes(edge.data('label'))
+        ["composes", "implements", "succeeds", "measures"].includes(edge.data('label'))
     ).remove();
 
     // console.log("Deleted elements:", deletedElements);
