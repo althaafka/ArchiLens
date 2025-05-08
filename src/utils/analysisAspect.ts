@@ -35,9 +35,16 @@ export default class AnalysisAspect {
             const container = graph.getNodeContainer(node);
             return container? container.data().properties.simpleName || container.id() : null;
         }
+        if (this.isMetric(dimension)) {
+            return node?.data().properties?.metric?.[dimension]
+        }
 
         const composed = node?.data().properties?.dimension?.[dimension];
         return composed ? this.getCategoryName(composed[0], dimension) : "-";
+    }
+
+    isMetric(metricId) {
+        return this.analysisData.metric.find((m) => m.id == metricId)? true: false;
     }
 
 }

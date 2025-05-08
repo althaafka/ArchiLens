@@ -12,6 +12,8 @@ const Layout = ({ cyInstance, analysisData }) => {
   const [xDimension, setXDimension] = useState('');
   const [yDimension, setYDimension] = useState('');
   const [hidePackages, setHidePackages] = useState(false);
+  const [xRangeStep, setXRangeStep] = useState(1);
+  const [yRangeStep, setYRangeStep] = useState(1);
 
   const prevLayoutRef = useRef(null)
   const [prevLayoutType, setPrevLayoutType] = useState(null);
@@ -42,12 +44,18 @@ const Layout = ({ cyInstance, analysisData }) => {
         yDimension: node => analysisAspect.getNodeCategory(node, yDimension),
       };
 
-      if (xDimension !== "Dimension:Container") {
+
+      if (xDimension !== "Dimension:Container" && !analysisAspect.isMetric(xDimension)) {
         layoutOptions.xCategories = analysisAspect.getCategoriesOrder(xDimension);
+      } else if (analysisAspect.isMetric(xDimension)) {
+        layoutOptions.rangeStep = {x: xRangeStep, y:null};
       }
 
-      if (yDimension !== "Dimension:Container") {
-        layoutOptions.yCategories = analysisAspect.getCategoriesOrder(yDimension);
+
+      if (yDimension !== "Dimension:Container" && !analysisAspect.isMetric(yDimension)) {
+        layoutOptions.yCategories = analysisAspect.getCategoriesOrder(yDimension) ;
+      } else if (analysisAspect.isMetric(yDimension)) {
+        layoutOptions.rangeStep = {x: null, y: yRangeStep};
       }
 
       const layoutInstance = cyInstance.layout(layoutOptions);
@@ -91,8 +99,28 @@ const Layout = ({ cyInstance, analysisData }) => {
                   </option>
                 ))}
               <option value="Dimension:Container" key="Dimension:Container">Container</option>
+              {analysisData.metric
+                .map((metric) => (
+                  <option key={metric.id} value={metric.id}>
+                  {metric.properties.simpleName || metric.id}
+                </option>
+                ))
+              }
             </select>
           </label>
+          {analysisData.metric.find((metric) => metric.id === xDimension) && (
+            <div>
+              <label>
+                X Range Step:
+                <input
+                  type="number"
+                  value={xRangeStep}
+                  onChange={(e) => setXRangeStep(Number(e.target.value))}
+                  min="0"
+                />
+              </label>
+            </div>
+          )}
           <div></div>
           <label>
             Y Dimension:
@@ -105,8 +133,28 @@ const Layout = ({ cyInstance, analysisData }) => {
                   </option>
                 ))}
               <option value="Dimension:Container" key="Dimension:Container">Container</option>
+              {analysisData.metric
+                .map((metric) => (
+                  <option key={metric.id} value={metric.id}>
+                  {metric.properties.simpleName || metric.id}
+                </option>
+                ))
+              }
             </select>
           </label>
+          {analysisData.metric.find((metric) => metric.id === yDimension) && (
+            <div>
+              <label>
+                Y Range Step:
+                <input
+                  type="number"
+                  value={yRangeStep}
+                  onChange={(e) => setYRangeStep(Number(e.target.value))}
+                  min="0"
+                />
+              </label>
+            </div>
+          )}
           <br></br>
           <label>
             <input
@@ -122,6 +170,7 @@ const Layout = ({ cyInstance, analysisData }) => {
       <button onClick={relayout} disabled={layout === "semanticGrid" && (!xDimension || !yDimension)}>
         Relayout
       </button>
+      
     </>
   );
 };
