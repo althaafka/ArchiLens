@@ -1,4 +1,3 @@
-import { handleDimension } from "./handleDimension";
 import { generateColorMap, addScratch, lightenHSLArray, lightenHSL, generateColorMetric } from "./utils";
 
 export function visualProcess(cyInstance, dimension) {

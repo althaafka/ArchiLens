@@ -1,7 +1,6 @@
 import { abstractizeGraph } from "./abstractizeGraph";
 import { Graph } from "../types";
 import { detailedNodesLabel } from "../constants/constants";
-import { handleDimension } from "./handleDimension.js";
 
 export function setupGraph(graph: Graph) {
     let { nodes, edges } = graph;

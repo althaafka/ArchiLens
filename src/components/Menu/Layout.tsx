@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { layoutTypes } from '../../constants/layoutData'
 import registerSemanticGridLayout from 'cytoscape.js-semanticGrid';
 import cytoscape from 'cytoscape';
-import { initGraph, getGraph } from '../../utils/graphManagement';
+import { initGraph } from '../../utils/graphManagement';
 import AnalysisAspect from '../../utils/analysisAspect';
 registerSemanticGridLayout(cytoscape);
 
@@ -38,7 +38,14 @@ const Layout = ({ cyInstance, analysisData }) => {
     if (layout == "semanticGrid") {
       if (!xDimension || !yDimension) return;
 
-      const layoutOptions = {
+      const layoutOptions: {
+        name: string;
+        xDimension: (node: any) => string;
+        yDimension: (node: any) => string;
+        xCategories?: string[];
+        yCategories?: string[];
+        rangeStep?: { x: number | null; y: number | null };
+      } = {
         name: 'semanticGrid',
         xDimension: node => analysisAspect.getNodeCategory(node, xDimension),
         yDimension: node => analysisAspect.getNodeCategory(node, yDimension),

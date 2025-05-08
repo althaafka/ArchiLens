@@ -73,7 +73,7 @@ class Graph {
         const children = containsMap.get(node.id());
   
         if (children) {
-          children.forEach((childId) => {
+          children?.forEach((childId) => {
             const childNode = this.getElementById(childId);
             if (childNode && childNode.length > 0) {
               this.node.addChildRelation(node, childNode);
@@ -106,7 +106,17 @@ class Node {
   }
 
   addChildRelation(parent: cytoscape.NodeSingular, child: cytoscape.NodeSingular) {
-    child?.move({ parent: parent?.id() });
+    if (!parent || !parent.id || !child || !child.move) {
+      // console.warn("Invalid parent or child in addChildRelation", { parent, child });
+      return;
+    }
+  
+    if (!parent.length || !child.length) {
+      // console.warn("Node not found in cytoscape instance", { parent, child });
+      return;
+    }
+  
+    child.move({ parent: parent.id() });
   }
 }
 

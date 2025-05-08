@@ -1,5 +1,5 @@
 import { detailedNodesLabel } from "../constants/constants";
-import { counter, counterToPercentage, mergeCounters, addScratch } from "./utils";
+import { counter, counterToPercentage, mergeCounters } from "./utils";
 
 export function headlessProcess(cyInstance: any) {
     cyInstance.startBatch();
@@ -55,7 +55,7 @@ function groupLayers(cyInstance: any) {
         const scripts = scriptEdges.map(edge => cyInstance.getElementById(edge.data('target')))
         
         const composedDimension = [];
-        scripts.forEach((script, i) => {
+        scripts.forEach((script, _) => {
 
             dimensionIds.forEach((dimensionId: string) => {
                 const impementsEdge = implementsEdges.filter(edge => edge.data('source') === script.id() && edge.data('target').split(":")[0] === dimensionId.split(":")[1]);

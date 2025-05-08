@@ -1,4 +1,4 @@
-import { detailedNodesLabel } from "../constants/constants";
+// import { detailedNodesLabel } from "../constants/constants";
 
 export function abstractizeGraph(nodes, edges) {
     

@@ -98,13 +98,13 @@ export const mergeCounters = (counters) => {
 	}, {});
 };
 
-export function counterToPercentage(counter) {
-	const total = Object.values(counter).reduce((sum, count) => sum + count, 0);
-	const result = {};
-	for (const key in counter) {
-		result[key] = total ? counter[key] / total : 0;
-	}
-	return result;
+export function counterToPercentage(counter: Record<string, number>) {
+    const total = Object.values(counter).reduce((sum, count) => sum + count, 0);
+    const result: Record<string, number> = {};
+    for (const key in counter) {
+        result[key] = total ? counter[key] / total : 0;
+    }
+    return result;
 }
 
 export function camelCaseToWords(input) {

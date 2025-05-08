@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import './App.css';
 import cytoscape from "cytoscape";
 import cytoscapeCola from "cytoscape-cola";
-import { Stylesheet } from "cytoscape";
+import { StylesheetCSS } from "cytoscape";
 import styleData from "./cy-style.json";
 // import rawGraph from "./assets/jpacman-v3-dim.json";
 import rawGraph from "./assets/jpacman-v4-metric.json";
@@ -10,7 +10,7 @@ import { setupGraph } from "./utils/setupGraph";
 import Menu from './components/Menu/Menu';
 import { headlessProcess } from "./utils/headlessProcess";
 import { visualProcess } from "./utils/visualProcess";
-const style: Stylesheet[] = styleData as Stylesheet[];
+const style: StylesheetCSS[] = styleData as unknown as StylesheetCSS[];
 
 cytoscape.use(cytoscapeCola);
 
@@ -18,9 +18,8 @@ function App() {
   const cyRef = useRef<HTMLDivElement>(null);
   const [graph, setGraph] = useState(rawGraph);
   const [cyInstance, setCyInstance] = useState(null);
-  const [hcyInstance, setHCyInstance] = useState(null);
+  const [_, setHCyInstance] = useState(null);
   const [analysisData, setAnalysisData] = useState({});
-  const [colorMap, setColorMap] = useState(new Map<string, Object>())
 
   // Init cytoscape
   useEffect(() => {
@@ -44,7 +43,7 @@ function App() {
         if (cyRef.current) {
           const cy = cytoscape({
             container: cyRef.current,
-            elements: hcyInstance.json().elements,
+            elements: (hcyInstance.json() as { elements: any }).elements,
             style: style,
             wheelSensitivity: 0.25,
             ready: (cyEvent) => {
@@ -52,7 +51,8 @@ function App() {
               setCyInstance(cyInstance);
               visualProcess(cyInstance, analysisData);
             },
-          });
+          } as any);
+  
           cy.on('tap', 'node', (event) => {
             console.log("Node clicked:", event.target.data());
           });
@@ -62,7 +62,7 @@ function App() {
           });
         }
       }
-    })
+    } as any)
 
     return () => {
       hcy.destroy();
