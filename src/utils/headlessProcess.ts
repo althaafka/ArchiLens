@@ -31,8 +31,8 @@ function removeInvalidEdges(cyInstance: any) {
 }
 
 function groupLayers(cyInstance: any) {
-    const structures = cyInstance.nodes(node => node.data('labels').includes("Structure"))
-    const hasScripts = cyInstance.edges(edge => edge.data('label').includes("hasScript"))
+    const structures = cyInstance.nodes(node => node.data('labels')?.includes("Structure"))
+    const hasScripts = cyInstance.edges(edge => edge.data('label')?.includes("hasScript"))
     const composesEdges = cyInstance.edges(edge => edge.data('label') === "composes")
     const implementsEdges = cyInstance.edges(edge => edge.data('label') === "implements")
     const dimensionIds = Array.from(

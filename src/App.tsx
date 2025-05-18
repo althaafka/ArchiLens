@@ -11,6 +11,7 @@ import Menu from './components/Menu/Menu';
 import { headlessProcess } from "./utils/headlessProcess";
 import { visualProcess } from "./utils/visualProcess";
 const style: StylesheetCSS[] = styleData as unknown as StylesheetCSS[];
+import GraphSetup from './core/GraphSetup'
 
 cytoscape.use(cytoscapeCola);
 
@@ -26,11 +27,12 @@ function App() {
     if (!cyRef.current) return;
     console.log("Initializing Cytoscape...");
 
-    const processedGraph = setupGraph(graph.elements);
+    const processedGraph = new GraphSetup(graph.elements).initialize();
+    console.log("processedGraph", processedGraph)
 
     const hcy = cytoscape({
       headless: true,
-      elements: processedGraph.graph,
+      elements: processedGraph,
       ready: (event) => {
         const hcyInstance = event.cy;
         setHCyInstance(hcyInstance);
@@ -68,11 +70,6 @@ function App() {
       hcy.destroy();
     };
   }, [graph]);
-
-  // useEffect(() => {
-  //   if (!cyInstance) return;
-  //   visualProcess(cyInstance, dimensionsData);
-  // }, [cyInstance]);
 
   return (
     <>
