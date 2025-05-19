@@ -128,8 +128,6 @@ export default class VisualProcessor {
             addScratch(node, `style_${dim.id}`, style);
           } else {
             addScratch(node, `style_${dim.id}`, {
-              'background-color': this.dimension.colorMap[dim.id]["-"],
-              'border-color': '#5E5E5E',
               'display': 'element'
             });
           }
