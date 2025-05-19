@@ -118,6 +118,29 @@ export default class HeadlessProcessor {
             }
             node.data('properties').dimension[dimId].push(edge.data('target'));
         });
+
+        const allNodes = this.cy.nodes().filter(n => {
+            const id = n.id();
+            const isExcluded = id === 'java.lang.String';
+            const labels = n.data('labels') || [];
+            return !isExcluded && !labels.includes('Container') && labels.includes('Structure');
+          });
+          
+          dimensions.forEach(dim => {
+            const dimId = dim.id();
+            allNodes.forEach(node => {
+              if (!node.data('properties').dimension) {
+                node.data('properties').dimension = {};
+              }
+          
+              const hasCategory = node.data('properties').dimension[dimId];
+          
+              if (!hasCategory || hasCategory.length === 0) {
+                node.data('properties').dimension[dimId] = ["-"];
+              }
+            });
+          });
+          
     }
 
     private processMetric() {
@@ -155,104 +178,218 @@ export default class HeadlessProcessor {
         })
     }
 
-    private groupLayers(){
+    private groupLayers() {
         const structures = this.getNodesByLabel('Structure');
         const hasScripts = this.getEdgesByLabel('hasScript');
-        const composesEdges =this.getEdgesByLabel('composes');
-        const implementsEdges = this.getEdgesByLabel('implements')
-
-        const dimensionIds = Array.from(
-            new Set(
-                composesEdges
-                    .filter(cEdge => {
-                        const categoryId = cEdge.data('target');
-                        const implementsEdges = this.edges.filter(edge => edge.data('label') === "implements" && edge.data('target') === categoryId);
-                        return implementsEdges.some(iEdge => {
-                            const sourceNode = this.cy.getElementById(iEdge.data('source'));
-                            return sourceNode.data('labels').includes("Scripts") || sourceNode.data('labels').includes("Operation");
-                        });
-                    })
-                    .map(cEdge => cEdge.data('source'))
-            )
-        );
-
-        console.log("dimensionId:", dimensionIds)
-
+        const composesEdges = this.getEdgesByLabel('composes');
+        const implementsEdges = this.getEdgesByLabel('implements');
+      
+        // Ambil semua dimension ID: composed + simple
+        const composedDimIds = composesEdges
+          .filter(cEdge => {
+            const categoryId = cEdge.data('target');
+            const relatedImpls = this.edges.filter(edge =>
+              edge.data('label') === 'implements' && edge.data('target') === categoryId
+            );
+            return relatedImpls.some(iEdge => {
+              const sourceNode = this.cy.getElementById(iEdge.data('source'));
+              return sourceNode.data('labels')?.includes('Scripts') || sourceNode.data('labels')?.includes('Operation');
+            });
+          })
+          .map(cEdge => cEdge.data('source'));
+      
+        const simpleDimIds = this.getNodesByLabel('Dimension').map(node => node.id());
+        const dimensionIds = Array.from(new Set([...composedDimIds, ...simpleDimIds]));
+      
+        // ───── Structure node processing ─────
         structures.forEach(structure => {
-            const scriptEdges = hasScripts.filter(edge => edge.data('source') === structure.id())
-            const scripts = scriptEdges.map(edge => this.cy.getElementById(edge.data('target')))
-            
-            const composedDimension = [];
-            scripts.forEach((script, _) => {
-    
-                dimensionIds.forEach((dimensionId: string) => {
-                    const impementsEdge = implementsEdges.filter(edge => edge.data('source') === script.id() && edge.data('target').split(":")[0] === dimensionId.split(":")[1]);
-                    if (!composedDimension[dimensionId]) {
-                        composedDimension[dimensionId] = [];
-                    }
-                    if (impementsEdge.length != 0) {
-                        composedDimension[dimensionId].push(impementsEdge[0].data('target'));
-                    } else {
-                        composedDimension[dimensionId].push("-");
-                    }
-                })
-            })
-            
-            dimensionIds.forEach((dimensionId: any) => {
-    
-                if (!structure.data('properties').composedDimension) {
-                    structure.data('properties').composedDimension = {};
-                }
-            
-                if (!composedDimension[dimensionId] || composedDimension[dimensionId].length === 0) {
-                    composedDimension[dimensionId] = [];
-                }
-    
-                structure.data('properties').composedDimension[dimensionId] = counter(composedDimension[dimensionId]);
-            })  
-            structure.addClass("layers")
-        })
-
-        const containers = this.nodes.filter(node => node.data('labels').includes("Container") && !node.data('labels').includes("Structure"));
-        
-        containers.forEach(container => {
-            console.log("tes", container.id())
-            const contains = container.outgoers().filter(e => e.isEdge() && e.data('label') === "contains");
-            const classes = contains.targets().filter(t => t.data('labels').includes('Structure'));
-            const subContainers = contains.targets().filter(t => t.data('labels').includes('Container'));
-
-            console.log("classes", classes)
-            console.log("subContainers", subContainers)
-
-            const composedDimension = [];
-            dimensionIds.forEach((dimensionId: string) => {
-                if (!container.data('properties').composedDimension) {
-                    container.data('properties').composedDimension = {};
-                }
-    
-                if (!composedDimension[dimensionId] || composedDimension[dimensionId].length === 0) {
-                    composedDimension[dimensionId] = [];
-                }
-
-                // Hitung composedDimension dari struktur
-                const layerCounters = classes.map(c => counterToPercentage(c.data('properties.composedDimension')[dimensionId]));
-                composedDimension[dimensionId] = layerCounters;
-
-                // Tambahkan composedDimension dari sub-containers
-                subContainers.forEach(subContainer => {
-                    const subComposedDimension = subContainer.data('properties').composedDimension?.[dimensionId];
-                    if (subComposedDimension) {
-                        composedDimension[dimensionId].push(counterToPercentage(subComposedDimension));
-                    }
-                });
+          const scriptEdges = hasScripts.filter(edge => edge.data('source') === structure.id());
+          const scripts = scriptEdges.map(edge => this.cy.getElementById(edge.data('target')));
+      
+          const composedDimension: Record<string, string[]> = {};
+      
+          scripts.forEach(script => {
+            composedDimIds.forEach(dimensionId => {
+              const matchedImpl = implementsEdges.filter(edge =>
+                edge.data('source') === script.id() && edge.data('target').split(':')[0] === dimensionId.split(':')[1]
+              );
+              if (!composedDimension[dimensionId]) composedDimension[dimensionId] = [];
+              if (matchedImpl.length > 0) {
+                composedDimension[dimensionId].push(matchedImpl[0].data('target'));
+              } else {
+                composedDimension[dimensionId].push('-');
+              }
             });
-    
-            dimensionIds.forEach((dimensionId: any) => {
-                container.data('properties').composedDimension[dimensionId] = mergeCounters(composedDimension[dimensionId]);
-            });
-            container.addClass('layers');
+          });
+      
+          // Simpan hasil ke properties
+          composedDimIds.forEach(dimensionId => {
+            if (!structure.data('properties').composedDimension) {
+              structure.data('properties').composedDimension = {};
+            }
+      
+            if (!composedDimension[dimensionId] || composedDimension[dimensionId].length === 0) {
+              composedDimension[dimensionId] = [];
+            }
+      
+            structure.data('properties').composedDimension[dimensionId] = counter(composedDimension[dimensionId]);
+          });
+      
+          structure.addClass('layers');
         });
-    }
+      
+        // ───── Container node processing ─────
+        const containers = this.nodes.filter(
+          node => node.data('labels')?.includes('Container') && !node.data('labels')?.includes('Structure')
+        );
+      
+        containers.forEach(container => {
+          const contains = container.outgoers().filter(e => e.isEdge() && e.data('label') === 'contains');
+          const classes = contains.targets().filter(t => t.data('labels')?.includes('Structure'));
+          const subContainers = contains.targets().filter(t => t.data('labels')?.includes('Container'));
+      
+          const composedDimension: Record<string, any[]> = {};
+      
+          dimensionIds.forEach(dimensionId => {
+            if (!container.data('properties').composedDimension) {
+              container.data('properties').composedDimension = {};
+            }
+            if (!composedDimension[dimensionId]) composedDimension[dimensionId] = [];
+      
+            // Ambil dari structure anak
+            const layerCounters = classes.map(c => {
+              const fromComposed = c.data('properties')?.composedDimension?.[dimensionId];
+              if (fromComposed) {
+                return counterToPercentage(fromComposed);
+              }
+              const fromSimple = c.data('properties')?.dimension?.[dimensionId] || [];
+              return counterToPercentage(counter(fromSimple));
+            });
+      
+            composedDimension[dimensionId].push(...layerCounters);
+      
+            // Tambahkan dari sub-container
+            subContainers.forEach(subContainer => {
+              const subData = subContainer.data('properties')?.composedDimension?.[dimensionId];
+              if (subData) {
+                composedDimension[dimensionId].push(counterToPercentage(subData));
+              }
+            });
+          });
+      
+          dimensionIds.forEach(dimensionId => {
+            container.data('properties').composedDimension[dimensionId] = mergeCounters(composedDimension[dimensionId]);
+          });
+      
+          container.addClass('layers');
+          container.addClass('container');
+        });
+      }
+      
+
+    // private groupLayers(){
+    //     const structures = this.getNodesByLabel('Structure');
+    //     const hasScripts = this.getEdgesByLabel('hasScript');
+    //     const composesEdges =this.getEdgesByLabel('composes');
+    //     const implementsEdges = this.getEdgesByLabel('implements')
+
+    //     const composedDimIds = Array.from(
+    //         new Set(
+    //             composesEdges
+    //                 .filter(cEdge => {
+    //                     const categoryId = cEdge.data('target');
+    //                     const implementsEdges = this.edges.filter(edge => edge.data('label') === "implements" && edge.data('target') === categoryId);
+    //                     return implementsEdges.some(iEdge => {
+    //                         const sourceNode = this.cy.getElementById(iEdge.data('source'));
+    //                         return sourceNode.data('labels').includes("Scripts") || sourceNode.data('labels').includes("Operation");
+    //                     });
+    //                 })
+    //                 .map(cEdge => cEdge.data('source'))
+    //         )
+    //     );
+
+    //     const dimensionIds = this.getNodesByLabel('Dimension').map(node => node.id());
+    //     const simpleDimIds =dimensionIds.filter(dim => !composedDimIds.includes(dim));
+
+
+    //     console.log("dimensionId:", dimensionIds)
+    //     console.log("composedIds", composedDimIds)
+    //     console.log("simpleDimDis", simpleDimIds)
+
+    //     structures.forEach(structure => {
+    //         const scriptEdges = hasScripts.filter(edge => edge.data('source') === structure.id())
+    //         const scripts = scriptEdges.map(edge => this.cy.getElementById(edge.data('target')))
+            
+    //         const composedDimension = [];
+    //         scripts.forEach((script, _) => {
+    
+    //             dimensionIds.forEach((dimensionId: string) => {
+    //                 const impementsEdge = implementsEdges.filter(edge => edge.data('source') === script.id() && edge.data('target').split(":")[0] === dimensionId.split(":")[1]);
+    //                 if (!composedDimension[dimensionId]) {
+    //                     composedDimension[dimensionId] = [];
+    //                 }
+    //                 if (impementsEdge.length != 0) {
+    //                     composedDimension[dimensionId].push(impementsEdge[0].data('target'));
+    //                 } else {
+    //                     composedDimension[dimensionId].push("-");
+    //                 }
+    //             })
+    //         })
+            
+    //         dimensionIds.forEach((dimensionId: any) => {
+    
+    //             if (!structure.data('properties').composedDimension) {
+    //                 structure.data('properties').composedDimension = {};
+    //             }
+            
+    //             if (!composedDimension[dimensionId] || composedDimension[dimensionId].length === 0) {
+    //                 composedDimension[dimensionId] = [];
+    //             }
+    
+    //             structure.data('properties').composedDimension[dimensionId] = counter(composedDimension[dimensionId]);
+    //         })  
+    //         structure.addClass("layers")
+    //     })
+
+    //     const containers = this.nodes.filter(node => node.data('labels').includes("Container") && !node.data('labels').includes("Structure"));
+        
+    //     containers.forEach(container => {
+    //         const contains = container.outgoers().filter(e => e.isEdge() && e.data('label') === "contains");
+    //         const classes = contains.targets().filter(t => t.data('labels').includes('Structure'));
+    //         const subContainers = contains.targets().filter(t => t.data('labels').includes('Container'));
+
+    //         console.log("classes", classes)
+    //         console.log("subContainers", subContainers)
+
+    //         const composedDimension = [];
+    //         dimensionIds.forEach((dimensionId: string) => {
+    //             if (!container.data('properties').composedDimension) {
+    //                 container.data('properties').composedDimension = {};
+    //             }
+    
+    //             if (!composedDimension[dimensionId] || composedDimension[dimensionId].length === 0) {
+    //                 composedDimension[dimensionId] = [];
+    //             }
+
+    //             // Hitung composedDimension dari struktur
+    //             const layerCounters = classes.map(c => counterToPercentage(c.data('properties.composedDimension')[dimensionId]));
+    //             composedDimension[dimensionId] = layerCounters;
+
+    //             // Tambahkan composedDimension dari sub-containers
+    //             subContainers.forEach(subContainer => {
+    //                 const subComposedDimension = subContainer.data('properties').composedDimension?.[dimensionId];
+    //                 if (subComposedDimension) {
+    //                     composedDimension[dimensionId].push(counterToPercentage(subComposedDimension));
+    //                 }
+    //             });
+    //         });
+    
+    //         dimensionIds.forEach((dimensionId: any) => {
+    //             container.data('properties').composedDimension[dimensionId] = mergeCounters(composedDimension[dimensionId]);
+    //         });
+    //         container.addClass('layers');
+    //     });
+    // }
 
     private cleanUp(): void{
         this.nodes.filter((node) => 

@@ -102,8 +102,16 @@ export default class VisualProcessor {
         // Simple dimension
         const nodes = this.cy.nodes().filter(n => n.hasClass('layers') && n.data('id') !== 'java.lang.String');
         nodes.forEach((node) => {
+            if (node.id() == "nl.tudelft.jpacman.PacmanConfigurationException") {
+                console.log(dim.id)
+                console.log("sdf")
+            }
           const categoryIds = node.data('properties')?.dimension;
           if (categoryIds && categoryIds[dim.id]) {
+            if (node.id() == "nl.tudelft.jpacman.PacmanConfigurationException") {
+                console.log(dim.id)
+                console.log("sdf2")
+            }
             const colors = categoryIds[dim.id].map((id: string) =>
               this.dimension.colorMap[dim.id][id] || '#f2f2f2'
             );
@@ -126,9 +134,55 @@ export default class VisualProcessor {
                 };
 
             addScratch(node, `style_${dim.id}`, style);
+          } else if (node.data('properties').composedDimension[dim.id]){
+            if (node.id() == "nl.tudelft.jpacman.PacmanConfigurationException") {
+                console.log(dim.id)
+                console.log("sdf3")
+            }
+                const categoriesId = node.data('properties').composedDimension;
+                if (categoriesId && categoriesId[dim.id]){
+                    if (Object.keys(categoriesId[dim.id]).length == 0) return;
+
+                    const composedDimension = node.data('properties').composedDimension[dim.id];
+                    const totalWeight  = Object.keys(composedDimension).reduce((acc, cat) => acc + (Number(categoriesId[dim.id][cat]) || 0), 0);
+                    const colors =  dim.categories.filter(cat => Object.keys(composedDimension).includes(cat)).flatMap((cat) => [this.dimension.colorMap[dim.id][cat], this.dimension.colorMap[dim.id][cat]]);
+
+                    let cumulativePercentage = 0;
+                    const positions = dim.categories
+                        .filter(cat => Object.keys(composedDimension).includes(cat))
+                        .flatMap((cat) => {
+                            const weight = Number(categoriesId[dim.id]?.[cat]) || 0;
+                            const percentage = (weight / totalWeight) * 100;
+                            const startPercentage = cumulativePercentage;
+                            cumulativePercentage += percentage;
+                            if (cumulativePercentage > 100) cumulativePercentage = 100;
+                            if (100 - cumulativePercentage < 0.00001) cumulativePercentage = 100;
+                            const endPercentage = cumulativePercentage;
+                            return [`${startPercentage}%`, `${endPercentage}%`];
+                        });
+
+
+                    const isPureContainer = node.data('labels').includes("Container") && !node.data('labels').includes("Structure")
+
+                    return addScratch(node, `style_${dim.id}`, Object.keys(categoriesId[dim.id]).length == 1
+                        ? {
+                            'background-color': isPureContainer? lightenHSL(colors[0], 15) :colors[0],
+                            'border-color': '#5E5E5E',
+                            'display': 'element',
+                            "background-fill": 'solid'
+                        }
+                        : {
+                            "background-fill": "linear-gradient",
+                            "background-gradient-direction": isPureContainer? 'to-bottom-right': "to-right",
+                            "background-gradient-stop-colors": isPureContainer? lightenHSLArray(colors) : colors,
+                            "background-gradient-stop-positions": positions,
+                            "border-color": '#5E5E5E',
+                            'display': 'element',
+                        })
+                }
           } else {
             addScratch(node, `style_${dim.id}`, {
-              'display': 'element'
+                'display': 'element',
             });
           }
         });
