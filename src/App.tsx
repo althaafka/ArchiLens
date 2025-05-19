@@ -6,12 +6,11 @@ import { StylesheetCSS } from "cytoscape";
 import styleData from "./cy-style.json";
 // import rawGraph from "./assets/jpacman-v3-dim.json";
 import rawGraph from "./assets/jpacman-v4-metric.json";
-import { setupGraph } from "./utils/setupGraph";
 import Menu from './components/Menu/Menu';
-import { headlessProcess } from "./utils/headlessProcess";
-import { visualProcess } from "./utils/visualProcess";
 const style: StylesheetCSS[] = styleData as unknown as StylesheetCSS[];
 import GraphSetup from './core/GraphSetup'
+import HeadlessProcessor from './core/HeadlessProcessor';
+import VisualProcessor from './core/VisualProcessor';
 
 cytoscape.use(cytoscapeCola);
 
@@ -28,7 +27,6 @@ function App() {
     console.log("Initializing Cytoscape...");
 
     const processedGraph = new GraphSetup(graph.elements).initialize();
-    console.log("processedGraph", processedGraph)
 
     const hcy = cytoscape({
       headless: true,
@@ -36,7 +34,9 @@ function App() {
       ready: (event) => {
         const hcyInstance = event.cy;
         setHCyInstance(hcyInstance);
-        const analysisData= headlessProcess(hcyInstance);
+        const processor = new HeadlessProcessor(hcyInstance);
+        const analysisData = processor.process();
+
         console.log("Analysis Data:", analysisData)
         setAnalysisData(analysisData);
         
@@ -51,7 +51,10 @@ function App() {
             ready: (cyEvent) => {
               const cyInstance = cyEvent.cy;
               setCyInstance(cyInstance);
-              visualProcess(cyInstance, analysisData);
+              // visualProcess(cyInstance, analysisData);
+
+              const visualizer = new VisualProcessor(cyInstance, analysisData);
+              visualizer.process();
             },
           } as any);
   
