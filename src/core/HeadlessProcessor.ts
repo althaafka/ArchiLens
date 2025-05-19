@@ -176,6 +176,8 @@ export default class HeadlessProcessor {
             )
         );
 
+        console.log("dimensionId:", dimensionIds)
+
         structures.forEach(structure => {
             const scriptEdges = hasScripts.filter(edge => edge.data('source') === structure.id())
             const scripts = scriptEdges.map(edge => this.cy.getElementById(edge.data('target')))
@@ -214,8 +216,14 @@ export default class HeadlessProcessor {
         const containers = this.nodes.filter(node => node.data('labels').includes("Container") && !node.data('labels').includes("Structure"));
         
         containers.forEach(container => {
-            const contains = container.outgoers().filter(e => e.isEdge() && e.data('label') === "contains" && e.target().data('labels').includes('Structure'));
-            const classes = contains.targets();
+            console.log("tes", container.id())
+            const contains = container.outgoers().filter(e => e.isEdge() && e.data('label') === "contains");
+            const classes = contains.targets().filter(t => t.data('labels').includes('Structure'));
+            const subContainers = contains.targets().filter(t => t.data('labels').includes('Container'));
+
+            console.log("classes", classes)
+            console.log("subContainers", subContainers)
+
             const composedDimension = [];
             dimensionIds.forEach((dimensionId: string) => {
                 if (!container.data('properties').composedDimension) {
@@ -225,16 +233,25 @@ export default class HeadlessProcessor {
                 if (!composedDimension[dimensionId] || composedDimension[dimensionId].length === 0) {
                     composedDimension[dimensionId] = [];
                 }
+
+                // Hitung composedDimension dari struktur
                 const layerCounters = classes.map(c => counterToPercentage(c.data('properties.composedDimension')[dimensionId]));
                 composedDimension[dimensionId] = layerCounters;
-    
-            })
+
+                // Tambahkan composedDimension dari sub-containers
+                subContainers.forEach(subContainer => {
+                    const subComposedDimension = subContainer.data('properties').composedDimension?.[dimensionId];
+                    if (subComposedDimension) {
+                        composedDimension[dimensionId].push(counterToPercentage(subComposedDimension));
+                    }
+                });
+            });
     
             dimensionIds.forEach((dimensionId: any) => {
                 container.data('properties').composedDimension[dimensionId] = mergeCounters(composedDimension[dimensionId]);
-            })
+            });
             container.addClass('layers');
-        })
+        });
     }
 
     private cleanUp(): void{
