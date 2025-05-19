@@ -30,7 +30,7 @@ class Graph {
   }
 
   getPureContainers() {
-    return this.getAllNodes(this.node.isPureContainer)
+    return this.getAllNodes(node => this.node.isPureContainer(node))
   }
 
   getNodeContainer(node): cytoscape.NodeSingular {
@@ -82,6 +82,10 @@ class Graph {
         }
       }
     })
+  }
+
+  hideStructureLevel() {
+
   }
 
 }
