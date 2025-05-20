@@ -10,7 +10,9 @@ import LevelManager from '../../core/LevelManager';
 const Menu = ({
   cyInstance,
   setGraph,
-  analysisData
+  analysisData,
+  showStructure,
+  setShowStructure
 }) => {
 
   const [selectedEdges, setSelectedEdges] = useState(() => {
@@ -20,7 +22,7 @@ const Menu = ({
     }, {});
   });
 
-  const [showStructure, setShowStructure] = useState(true)
+  // const [showStructure, setShowStructure] = useState(true)
   // Filter Edges
   const handleEdgeFilterChange = (event) => {
     const { name, checked } = event.target;
@@ -64,7 +66,7 @@ const Menu = ({
       <hr />
       <FileUpload setGraph={setGraph}/>
       <hr />
-      <Layout cyInstance={cyInstance} analysisData={analysisData}/>
+      <Layout cyInstance={cyInstance} analysisData={analysisData} showStructure={showStructure}/>
       <hr />
       <button onClick={downloadGraphAsPng}>Download Graph as PNG</button>
       <hr />

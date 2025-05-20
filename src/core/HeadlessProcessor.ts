@@ -6,20 +6,30 @@ export default class HeadlessProcessor {
     private cy: cytoscape.Core;
     private edges: cytoscape.EdgeCollection;
     private nodes: cytoscape.NodeCollection;
+    private showStructure: boolean;
 
     constructor(cy: cytoscape.Core) {
         this.cy = cy;
     }
-
-    public process(): any {
+    
+    public process(showStructure): any {
         this.edges = this.cy.edges();
         this.nodes = this.cy.nodes();
-
+        this.showStructure = showStructure;
+    
+        
+        this.flattenParentChild();
         this.processDimension();
         this.processMetric();
         this.groupLayers();
         const analyticAspect = this.collectAnalyticAspect()
+        console.log("ANALYTIC ASPECT:", analyticAspect)
         this.cleanUp();
+        if (this.showStructure) {
+            this.handleParentChild();
+        } else {
+            this.hideStructure();
+        }
         this.liftEdges();
         return analyticAspect;
     }
@@ -61,6 +71,15 @@ export default class HeadlessProcessor {
     
         return deletedElements;
     }
+
+    private flattenParentChild(): void {
+        console.log("FLATTEN PARENT-CHILD")
+        this.cy.nodes().forEach(node => {
+          if (node.parent().nonempty()) {
+            node.move({ parent: null });
+          }
+        });
+    }      
 
     private processDimension(): void {
         const composesEdges = this.getEdgesByLabel('composes');
@@ -222,7 +241,6 @@ export default class HeadlessProcessor {
             });
           });
       
-          // Simpan hasil ke properties
           composedDimIds.forEach(dimensionId => {
             if (!structure.data('properties').composedDimension) {
               structure.data('properties').composedDimension = {};
@@ -238,7 +256,6 @@ export default class HeadlessProcessor {
           structure.addClass('layers');
         });
       
-        // ───── Container node processing ─────
         const containers = this.nodes.filter(
           node => node.data('labels')?.includes('Container') && !node.data('labels')?.includes('Structure')
         );
@@ -280,7 +297,9 @@ export default class HeadlessProcessor {
           });
       
           container.addClass('layers');
-          container.addClass('package');
+          if (this.showStructure){
+            container.addClass('package')
+          }
         });
       }
 
@@ -334,6 +353,67 @@ export default class HeadlessProcessor {
         this.cy.add(Object.values(newEdges));
         this.edges.filter(e => e.source().data('labels').includes("Structure") && e.target().data('labels').includes("Structure") && e.target().parent() !== e.source().parent()).remove();
     }
+
+    private handleParentChild() {
+        console.log("HANDLE PARENT-CHILD")
+        const containsMap = new Map<string, string[]>();
+      
+        // Bangun peta: target → list of parent candidates
+        this.cy.edges().forEach(edge => {
+          if (this.edgeHasLabel(edge, "contains")) {
+            const sourceId = edge.data('source');
+            const targetId = edge.data('target');
+      
+            if (containsMap.has(targetId)) {
+              containsMap.get(targetId).push(sourceId);
+            } else {
+              containsMap.set(targetId, [sourceId]);
+            }
+          }
+        });
+      
+        // Tetapkan parent untuk setiap node target
+        this.cy.nodes().forEach(node => {
+          const nodeId = node.id();
+          const parentCandidates = containsMap.get(nodeId) || [];
+      
+          let parentNode = null;
+      
+          for (let candidateId of parentCandidates) {
+            let candidate = this.cy.getElementById(candidateId);
+      
+            // Traverse ke atas jika candidate adalah Structure
+            while (candidate && this.nodeHasLabel(candidate, "Structure")) {
+              const nextParentId = containsMap.get(candidate.id())?.[0];
+              if (!nextParentId) {
+                candidate = null;
+                break;
+              }
+              candidate = this.cy.getElementById(nextParentId);
+            }
+      
+            if (candidate && !this.nodeHasLabel(candidate, "Structure")) {
+              parentNode = candidate;
+              break;
+            }
+          }
+      
+          // Tetapkan parent jika ditemukan
+          if (parentNode) {
+            node.move({ parent: parentNode.id() });
+          }
+        });
+      }
+      
+    private hideStructure(): void {
+        console.log("HIDE STRUCTURE");
+      
+        const structureNodes = this.getNodesByLabel("Structure");
+      
+        const connectedEdges = structureNodes.connectedEdges();
+      
+        this.cy.remove(structureNodes);
+      }
       
       
     private getNodesByLabel(label: string): cytoscape.NodeCollection {
@@ -359,6 +439,4 @@ export default class HeadlessProcessor {
     private getEdgeLabel(edge: cytoscape.EdgeSingular) {
         return edge.data('label');
     }
-
-
 }

@@ -21,7 +21,7 @@ export default class GraphSetup {
         }
     
         this.mergeChainedPackages();
-        this.handleParentChild();
+        // this.handleParentChild();
         this.hidePrimitivesAndUpdateLabels();
     
         return this.elements;
@@ -41,12 +41,14 @@ export default class GraphSetup {
         this.elements.edges.map((edge) => {
             if (this.edgeHasLabel(edge, "contains")) {
                 if (containsMap.get(edge.data.target)) {
-                    containsMap.get(edge.data.target).push(edge.data.target)
+                    containsMap.get(edge.data.target).push(edge.data.source)
                 } else {
                     containsMap.set(edge.data.target, [edge.data.source]);
                 }
             }
         });
+
+        console.log("containsMap:", containsMap)
 
         const updatedNodes = this.elements.nodes.map((node) => {
             let parentNode = undefined;
@@ -122,8 +124,7 @@ export default class GraphSetup {
             chain.push(child);
             current = child;
           }
-      
-          // Kalau chain lebih dari 1, maka hapus semua kecuali ujung terakhir
+
           if (chain.length > 1) {
             const last = chain[chain.length - 1];
       
@@ -131,7 +132,6 @@ export default class GraphSetup {
               const parent = chain[i];
               toRemoveNodeIds.add(parent.data.id);
       
-              // Cari edge contains dari parent ke child dan tandai untuk dihapus
               const child = chain[i + 1];
               const edge = this.elements.edges.find(e =>
                 e.data.source === parent.data.id &&
@@ -141,7 +141,6 @@ export default class GraphSetup {
               if (edge) toRemoveEdgeIds.add(edge.data.id);
             }
       
-            // Set label node terakhir jika perlu
             if (last && !last.data.label) {
               last.data.label = last.data.properties?.qualifiedName || last.data.id;
             }

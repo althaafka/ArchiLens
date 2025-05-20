@@ -20,6 +20,7 @@ function App() {
   const [cyInstance, setCyInstance] = useState(null);
   const [_, setHCyInstance] = useState(null);
   const [analysisData, setAnalysisData] = useState({});
+  const [showStructure, setShowStructure] = useState(true);
 
   // Init cytoscape
   useEffect(() => {
@@ -35,9 +36,9 @@ function App() {
         const hcyInstance = event.cy;
         setHCyInstance(hcyInstance);
         const processor = new HeadlessProcessor(hcyInstance);
-        const analysisData = processor.process();
+        const analysisData = processor.process(showStructure);
 
-        console.log("Analysis Data:", analysisData)
+        // console.log("Analysis Data:", analysisData)
         setAnalysisData(analysisData);
         
         console.log("elements:", hcyInstance.json().elements);
@@ -51,7 +52,6 @@ function App() {
             ready: (cyEvent) => {
               const cyInstance = cyEvent.cy;
               setCyInstance(cyInstance);
-              // visualProcess(cyInstance, analysisData);
 
               const visualizer = new VisualProcessor(cyInstance, analysisData);
               visualizer.process();
@@ -72,7 +72,7 @@ function App() {
     return () => {
       hcy.destroy();
     };
-  }, [graph]);
+  }, [graph, showStructure]);
 
   return (
     <>
@@ -83,7 +83,7 @@ function App() {
       </div>
 
       {/* Menu Bar */}
-      <Menu cyInstance={cyInstance} setGraph={setGraph} analysisData={analysisData} />
+      <Menu cyInstance={cyInstance} setGraph={setGraph} analysisData={analysisData} showStructure={showStructure} setShowStructure={setShowStructure}/>
     </div>
     </>
   );

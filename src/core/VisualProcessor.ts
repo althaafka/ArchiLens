@@ -84,6 +84,7 @@ export default class VisualProcessor {
       m.properties.members.forEach(([nodeId, value]: [string, number]) => {
         if (nodeId === 'java.lang.String') return;
         const node = this.cy.getElementById(nodeId);
+        if (!node.nonempty()) return;
         const color = generateColorMetric(m.properties.minValue, m.properties.maxValue, value);
 
         addScratch(node, `style_${m.id}`, {
@@ -102,16 +103,9 @@ export default class VisualProcessor {
         // Simple dimension
         const nodes = this.cy.nodes().filter(n => n.hasClass('layers') && n.data('id') !== 'java.lang.String');
         nodes.forEach((node) => {
-            if (node.id() == "nl.tudelft.jpacman.PacmanConfigurationException") {
-                console.log(dim.id)
-                console.log("sdf")
-            }
+
           const categoryIds = node.data('properties')?.dimension;
           if (categoryIds && categoryIds[dim.id]) {
-            if (node.id() == "nl.tudelft.jpacman.PacmanConfigurationException") {
-                console.log(dim.id)
-                console.log("sdf2")
-            }
             const colors = categoryIds[dim.id].map((id: string) =>
               this.dimension.colorMap[dim.id][id] || '#f2f2f2'
             );
@@ -135,10 +129,6 @@ export default class VisualProcessor {
 
             addScratch(node, `style_${dim.id}`, style);
           } else if (node.data('properties').composedDimension[dim.id]){
-            if (node.id() == "nl.tudelft.jpacman.PacmanConfigurationException") {
-                console.log(dim.id)
-                console.log("sdf3")
-            }
                 const categoriesId = node.data('properties').composedDimension;
                 if (categoriesId && categoriesId[dim.id]){
                     if (Object.keys(categoriesId[dim.id]).length == 0) return;

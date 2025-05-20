@@ -29,8 +29,30 @@ export default class AnalysisAspect {
         return catOrder;
     }
 
-    getNodeCategory(node, dimension: string): string{
-        if (!node.data().labels.includes("Structure")) return null;
+    getMaxCategory(counterObj: Record<string, number>): string | null {
+        if (!counterObj) return null
+        let maxKey: string | null = null;
+        let maxVal = -Infinity;
+      
+        for (const [key, value] of Object.entries(counterObj)) {
+          if (value > maxVal) {
+            maxVal = value;
+            maxKey = key;
+          }
+        }
+      
+        return maxKey;
+    }
+      
+
+    getNodeCategory(node, dimension: string, showStructure = true): string{
+        if (!node.data().labels.includes("Structure") && showStructure) return null;
+        if (!node.data().labels.includes("Structure")) {
+            const composed = node.data('properties').composedDimension?.[dimension];
+            if (!composed) return null;
+            const categoryName = this.getCategoryName(this.getMaxCategory(composed), dimension)
+            return categoryName
+        }
         if (dimension == 'Dimension:Container') {
             const graph = getGraph();
             const container = graph.getNodeContainer(node);

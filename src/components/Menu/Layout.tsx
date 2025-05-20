@@ -7,7 +7,7 @@ import AnalysisAspect from '../../utils/analysisAspect';
 registerSemanticGridLayout(cytoscape);
 
 
-const Layout = ({ cyInstance, analysisData }) => {
+const Layout = ({ cyInstance, analysisData, showStructure }) => {
   const [layout, setLayout] = useState(layoutTypes.grid);
   const [xDimension, setXDimension] = useState('');
   const [yDimension, setYDimension] = useState('');
@@ -29,14 +29,18 @@ const Layout = ({ cyInstance, analysisData }) => {
       prevLayoutRef.current.destroy();
     }
 
-    if (prevLayoutType === 'semanticGrid') {
-      graph.unhidePackage();
+    if (prevLayoutType === 'semanticGrid' ) {
+      graph.unhidePackage(cyInstance);
     }
     
     setPrevLayoutType(layout);
-
+    
     if (layout == "semanticGrid") {
       if (!xDimension || !yDimension) return;
+      
+      // if (showStructure) {
+        hidePackages ? graph.hidePackage(cyInstance) : graph.unhidePackage(cyInstance);
+      // }
 
       const layoutOptions: {
         name: string;
@@ -47,13 +51,13 @@ const Layout = ({ cyInstance, analysisData }) => {
         rangeStep?: { x: number | null; y: number | null };
       } = {
         name: 'semanticGrid',
-        xDimension: node => analysisAspect.getNodeCategory(node, xDimension),
-        yDimension: node => analysisAspect.getNodeCategory(node, yDimension),
+        xDimension: node => analysisAspect.getNodeCategory(node, xDimension, showStructure),
+        yDimension: node => analysisAspect.getNodeCategory(node, yDimension, showStructure),
       };
 
-      cyInstance.nodes().forEach(node => {
-        console.log(node.id(), "(",analysisAspect.getNodeCategory(node, xDimension),",",analysisAspect.getNodeCategory(node, yDimension),")")
-      })
+      // cyInstance.nodes().forEach(node => {
+      //   console.log(node.id(), "(",analysisAspect.getNodeCategory(node, xDimension, showStructure),",",analysisAspect.getNodeCategory(node, yDimension, showStructure),")")
+      // })
 
 
       if (xDimension !== "Dimension:Container" && !analysisAspect.isMetric(xDimension)) {
@@ -71,9 +75,9 @@ const Layout = ({ cyInstance, analysisData }) => {
 
       const layoutInstance = cyInstance.layout(layoutOptions);
       prevLayoutRef.current = layoutInstance;
+
       layoutInstance.run();
 
-      hidePackages ? graph.hidePackage() : graph.unhidePackage();
     } else {
       cyInstance.layout({
         name: layout,
