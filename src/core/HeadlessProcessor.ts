@@ -280,7 +280,7 @@ export default class HeadlessProcessor {
           });
       
           container.addClass('layers');
-          container.addClass('container');
+          container.addClass('package');
         });
       }
 

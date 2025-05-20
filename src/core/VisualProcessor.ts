@@ -37,7 +37,7 @@ export default class VisualProcessor {
     nodes.forEach((node) => {
       addScratch(node, 'style_none', {
         'background-color': 'hsl(0, 0%, 95%)',
-        'display': 'element',
+        // 'display': 'element',
         'background-fill': 'solid'
       });
     });
@@ -73,7 +73,7 @@ export default class VisualProcessor {
       addScratch(node, 'style_none', {
         'background-color': adjustedColor,
         'border-color': 'hsl(0, 0%, 35%)',
-        'display': 'element',
+        // 'display': 'element',
         'background-fill': 'solid'
       });
     });
@@ -90,7 +90,7 @@ export default class VisualProcessor {
           'background-color': color,
           'border-color': '#5E5E5E',
           'background-fill': 'solid',
-          'display': 'element'
+        //   'display': 'element'
         });
       });
     });
@@ -122,7 +122,7 @@ export default class VisualProcessor {
                   'background-color': colors[0],
                   'border-color': '#5E5E5E',
                   'background-fill': 'solid',
-                  'display': 'element'
+                //   'display': 'element'
                 }
               : {
                   'background-fill': 'linear-gradient',
@@ -130,7 +130,7 @@ export default class VisualProcessor {
                   'background-gradient-stop-colors': colors,
                   'background-gradient-stop-positions': positions,
                   'border-color': '#5E5E5E',
-                  'display': 'element'
+                //   'display': 'element'
                 };
 
             addScratch(node, `style_${dim.id}`, style);
@@ -168,7 +168,7 @@ export default class VisualProcessor {
                         ? {
                             'background-color': isPureContainer? lightenHSL(colors[0], 15) :colors[0],
                             'border-color': '#5E5E5E',
-                            'display': 'element',
+                            // 'display': 'element',
                             "background-fill": 'solid'
                         }
                         : {
@@ -177,12 +177,12 @@ export default class VisualProcessor {
                             "background-gradient-stop-colors": isPureContainer? lightenHSLArray(colors) : colors,
                             "background-gradient-stop-positions": positions,
                             "border-color": '#5E5E5E',
-                            'display': 'element',
+                            // 'display': 'element',
                         })
                 }
           } else {
             addScratch(node, `style_${dim.id}`, {
-                'display': 'element',
+                // 'display': 'element',
             });
           }
         });
@@ -191,7 +191,7 @@ export default class VisualProcessor {
                     container.forEach((node) => {
                         addScratch(node, `style_${dim.id}`, {
                             'background-color': 'hsl(0, 0%, 85%)',
-                            'display': 'element',
+                            // 'display': 'element',
                             'background-fill': 'solid',
                         })
                     })     
@@ -226,7 +226,7 @@ export default class VisualProcessor {
                                 ? {
                                     'background-color': isPureContainer? lightenHSL(colors[0], 15) :colors[0],
                                     'border-color': '#5E5E5E',
-                                    'display': 'element',
+                                    // 'display': 'element',
                                     "background-fill": 'solid'
                                 }
                                 : {
@@ -235,7 +235,7 @@ export default class VisualProcessor {
                                     "background-gradient-stop-colors": isPureContainer? lightenHSLArray(colors) : colors,
                                     "background-gradient-stop-positions": positions,
                                     "border-color": '#5E5E5E',
-                                    'display': 'element',
+                                    // 'display': 'element',
                                 })
                         }
                     })

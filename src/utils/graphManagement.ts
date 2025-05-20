@@ -84,10 +84,6 @@ class Graph {
     })
   }
 
-  hideStructureLevel() {
-
-  }
-
 }
 
 class Node {
