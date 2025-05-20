@@ -51,6 +51,10 @@ const Layout = ({ cyInstance, analysisData }) => {
         yDimension: node => analysisAspect.getNodeCategory(node, yDimension),
       };
 
+      cyInstance.nodes().forEach(node => {
+        console.log(node.id(), "(",analysisAspect.getNodeCategory(node, xDimension),",",analysisAspect.getNodeCategory(node, yDimension),")")
+      })
+
 
       if (xDimension !== "Dimension:Container" && !analysisAspect.isMetric(xDimension)) {
         layoutOptions.xCategories = analysisAspect.getCategoriesOrder(xDimension);

@@ -5,6 +5,7 @@ import Layout from './Layout';
 import FileUpload from './FileUpload'
 import ShowPrimitives from './ShowPrimitives'
 import NodeColoring from './NodeColoring/NodeColoring';
+import LevelManager from '../../core/LevelManager';
 
 const Menu = ({
   cyInstance,
@@ -19,6 +20,7 @@ const Menu = ({
     }, {});
   });
 
+  const [showStructure, setShowStructure] = useState(true)
   // Filter Edges
   const handleEdgeFilterChange = (event) => {
     const { name, checked } = event.target;
@@ -68,6 +70,16 @@ const Menu = ({
       <hr />
       <h2>Nodes</h2>
       <ShowPrimitives cyInstance={cyInstance}/>
+      <hr />
+      <h2>Show Options</h2>
+      <label>
+        <input
+          type="checkbox"
+          checked={showStructure}
+          onChange={(e) => setShowStructure(e.target.checked)}
+        />
+        Show Structure Nodes
+      </label>
       <h3>Coloring</h3>
       <NodeColoring cyInstance={cyInstance} analysisData={analysisData}/>
       <hr />

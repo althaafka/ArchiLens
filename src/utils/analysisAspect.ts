@@ -16,6 +16,7 @@ export default class AnalysisAspect {
     }
 
     getCategoryName(category, dimension) {
+        if (category == '-') return '-';
         return category.split(`${this.getDimensionName(dimension)}:`)[1]
     }
 

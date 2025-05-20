@@ -21,20 +21,17 @@ export default class LevelManager {
     public buildParentChild(): void {
         const containsMap = new Map<string, string>();
       
-        // Bangun peta: target → parent (source)
         this.cy.edges().forEach((edge) => {
           if (this.edgeHasLabel(edge, "contains")) {
             const sourceId = edge.data('source');
             const targetId = edge.data('target');
       
-            // Abaikan jika loop
             if (sourceId !== targetId) {
               containsMap.set(targetId, sourceId);
             }
           }
         });
       
-        // Tetapkan parent ke node jika memenuhi syarat
         this.cy.nodes().forEach((node) => {
             const isPackage = this.nodeHasLabel(node, 'Container') && !this.nodeHasLabel(node, 'Structure');
             if (isPackage) {
@@ -46,10 +43,8 @@ export default class LevelManager {
       
           const candidateParent = this.cy.getElementById(candidateParentId);
       
-          // Lewati jika parent adalah Structure
           if (this.nodeHasLabel(candidateParent, 'Structure')) return;
       
-          // Tetapkan parent
           node.move({ parent: candidateParentId });
         });
       }
