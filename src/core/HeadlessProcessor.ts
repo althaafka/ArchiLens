@@ -23,14 +23,14 @@ export default class HeadlessProcessor {
         this.processMetric();
         this.groupLayers();
         const analyticAspect = this.collectAnalyticAspect()
-        console.log("ANALYTIC ASPECT:", analyticAspect)
-        this.cleanUp();
+        // console.log("ANALYTIC ASPECT:", analyticAspect)
         if (this.showStructure) {
             this.handleParentChild();
         } else {
             this.hideStructure();
         }
         this.liftEdges();
+        this.cleanUp();
         return analyticAspect;
     }
 
@@ -340,8 +340,8 @@ export default class HeadlessProcessor {
                     data: {
                         source: srcParent,
                         target: tgtParent,
-                        label: e.data('label'),
-                        interaction: e.data('label'),
+                        label: this.getEdgeLabel(e),
+                        interaction: this.getEdgeLabel(e),
                         properties: { ...e.data('properties'), weight: 0, metaSrc: "lifting" }
                     }
                 };
@@ -411,11 +411,116 @@ export default class HeadlessProcessor {
         const structureNodes = this.getNodesByLabel("Structure");
       
         const connectedEdges = structureNodes.connectedEdges();
+        const containsMap = this.buildContainsMap();
+
+        const redirectedEdges: Record<string, any> = {};
+
+        connectedEdges.forEach(edge => {
+            const sourceNode = edge.source();
+            const targetNode = edge.target();
+
+            if (!this.nodeHasLabel(sourceNode, "Structure") && !this.nodeHasLabel(targetNode, "Structure")) {
+                return;
+            }
+
+            const sourceContainer = this.getContainerFromContainsMap(containsMap, sourceNode.id());
+            const targetContainer = this.getContainerFromContainsMap(containsMap, targetNode.id());
+
+            // Jika salah satu tidak ditemukan, skip
+            console.log("----------")
+            console.log(edge.data())
+            console.log(sourceNode.id(), sourceContainer);
+            console.log(targetNode.id(), targetContainer)
+            if (!sourceContainer || !targetContainer || sourceContainer === targetContainer) return;
+
+            const label = this.getEdgeLabel(edge)
+            const key = `${sourceContainer}-${label}-${targetContainer}`;
+            console.log("LABEL", label)
+
+            if (!redirectedEdges[key]) {
+                redirectedEdges[key] = {
+                  group: "edges",
+                  data: {
+                    id: key,
+                    source: sourceContainer,
+                    target: targetContainer,
+                    label: label,
+                    properties: {
+                      ...edge.data("properties"),
+                      weight: 1,
+                    }
+                  }
+                };
+            } else {
+                redirectedEdges[key].data.properties.weight += 1;
+            }
+        })
+
+
+        // console.log("EDGES MAP:", edgesMap)
+        console.log("CONTAINS MAP:", containsMap)
       
+        // this.cy.remove(connectedEdges);
         this.cy.remove(structureNodes);
+        this.cy.add(Object.values(redirectedEdges));
+        console.log("REDIRECTED EDGE:", redirectedEdges)
+    }
+
+    private buildEdgeMap(edges: Set<any> | undefined): Map<string, Set<string>> {
+        const map = new Map<string, Set<string>>();
+        edges?.forEach(edge => {
+            if (!map.has(edge.data('target'))) {
+                map.set(edge.data('target'), new Set());
+            }
+            map.get(edge.data('target'))?.add(edge.data('source'));
+        });
+        return map;
+    }
+
+    private groupEdgesByLabel(edges): Map<string, Set<any>> {
+        const edgesMap = new Map<string, Set<any>>();
+        edges.forEach(edge => {
+            const label = this.getEdgesLabel(edge);
+            if (!edgesMap.has(label)) {
+                edgesMap.set(label, new Set());
+            }
+            edgesMap.get(label)?.add(edge);
+        });
+        return edgesMap;
+    }
+
+    private buildContainsMap(): Map<string, Set<string>> {
+        const map = new Map<string, Set<string>>();
+        this.cy.edges().forEach(edge => {
+          if (edge.data('label') !== 'contains') return;
+      
+          const source = edge.data('source');
+          const target = edge.data('target');
+      
+          if (!map.has(target)) map.set(target, new Set());
+          map.get(target)?.add(source);
+        });
+        return map;
       }
       
+      private getContainerFromContainsMap(containsMap: Map<string, Set<string>>, structureId: string): string | null {
+        const candidates = containsMap.get(structureId);
+        if (!candidates) return null;
       
+        for (const id of candidates) {
+          const node = this.cy.getElementById(id);
+          if (this.nodeHasLabel(node, "Container") && !this.nodeHasLabel(node, "Structure")) {
+            return id;
+          }
+        }
+        return null;
+      }
+      
+
+    private getEdgesLabel(edge: any): string {
+        return edge.data('labels')?.join() || edge.data('label')
+    }
+    
     private getNodesByLabel(label: string): cytoscape.NodeCollection {
         return this.nodes.filter(node => this.nodeHasLabel(node, label))
     }
@@ -436,7 +541,7 @@ export default class HeadlessProcessor {
         return this.getEdgeLabel(edge) === label;
     }
 
-    private getEdgeLabel(edge: cytoscape.EdgeSingular) {
-        return edge.data('label');
+    private getEdgeLabel(edge: cytoscape.EdgeSingular): string {
+        return edge.data('labels')?.join() || edge.data('label');
     }
 }

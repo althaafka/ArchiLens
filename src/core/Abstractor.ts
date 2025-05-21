@@ -51,7 +51,7 @@ export default class Abstractor {
             edgesMap.get(label)?.add(edge);
         });
         return edgesMap;
-      }
+    }
     
     private buildEdgeMap(edges: Set<any> | undefined): Map<string, Set<string>> {
         const map = new Map<string, Set<string>>();
@@ -62,7 +62,7 @@ export default class Abstractor {
             map.get(edge.data.target)?.add(edge.data.source);
         });
         return map;
-      }
+    }
     
     private buildTypeMap(edges: Set<any> | undefined): Map<string, Set<string>> {
         const map = new Map<string, Set<string>>();

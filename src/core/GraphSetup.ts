@@ -110,7 +110,6 @@ export default class GraphSetup {
         this.elements.nodes.forEach(node => {
           if (!this.nodeHasLabel(node, 'Container')) return;
       
-          // Mencari chain package
           let chain = [node];
           let current = node;
       
