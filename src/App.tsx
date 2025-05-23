@@ -6,7 +6,6 @@ function App() {
 
   return (
     <MainLayout>
-      <div>Your content here</div>
     </MainLayout>
   )
 }
