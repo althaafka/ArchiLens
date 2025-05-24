@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import cytoscape from "cytoscape"
 import { StylesheetCSS } from "cytoscape";
 import styleData from "../cy-style.json";
-import rawGraph from "../assets/jhotdraw_abstract.json"
+import rawGraph from "../assets/small.json"
 const style: StylesheetCSS[] = styleData as unknown as StylesheetCSS[];
 
 import { GraphManager } from "@/core/GraphManager";
@@ -16,6 +16,10 @@ export default function MainLayout() {
     const graphManagerRef = useRef<GraphManager | null>(null)
     const [isLoading, setIsLoading] = useState(true)
 
+    const handleUploadGraph = (rawJson: any) => {
+      const elements = GraphBuilder.buildGraph(rawJson.elements);
+      graphManagerRef.current?.resetGraph(elements);
+    }
 
     useEffect(() => {
         if (!cyRef.current) return
@@ -40,7 +44,7 @@ export default function MainLayout() {
     return (
       <SidebarProvider>
         <div className="flex h-screen w-screen overflow-hidden">
-          <AppSidebar/>
+          <AppSidebar onUpload={handleUploadGraph}/>
           <main className="flex-1 relative flex h-full w-full">
             {isLoading && (
               <div className="absolute inset-0 z-50 bg-white/80 flex items-center justify-center">
