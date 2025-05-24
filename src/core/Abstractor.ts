@@ -88,7 +88,7 @@ export default class Abstractor {
                     id: `${source}-${edge.data.target}-${newLabel}`,
                     source: source,
                     target: edge.data.target,
-                    labels: [newLabel]
+                    label: newLabel
                 }
             });
           });
@@ -116,7 +116,7 @@ export default class Abstractor {
                             id: `${source}-${target}-${newLabel}`,
                             source: source,
                             target: target,
-                            labels: [newLabel]
+                            label: newLabel
                         }
                     });
                 });

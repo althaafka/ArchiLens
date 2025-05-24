@@ -321,15 +321,12 @@ export default class HeadlessProcessor {
         const newEdges = this.edges.filter(e =>
           e.source().data('labels')?.includes("Structure") &&
           e.target().data('labels')?.includes("Structure") &&
-          e.source().parent().nonempty() &&
-          e.target().parent().nonempty() &&
           e.target().parent() !== e.source().parent()
         ).reduce((acc, e: cytoscape.EdgeSingular) => {
             const srcParent = e.source().parent().first().id();
             const tgtParent = e.target().parent().first().id();
             const nodeSrc = this.nodes.filter(node => node.id() == srcParent);
             const nodeTgt = this.nodes.filter(node => node.id() == tgtParent);
-
             if (!srcParent || !tgtParent) return acc;
             if (nodeSrc.parent().first().id() == nodeTgt.id() || nodeSrc.id() == nodeTgt.parent().first().id()) return acc;
     
@@ -358,7 +355,6 @@ export default class HeadlessProcessor {
         console.log("HANDLE PARENT-CHILD")
         const containsMap = new Map<string, string[]>();
       
-        // Bangun peta: target → list of parent candidates
         this.cy.edges().forEach(edge => {
           if (this.edgeHasLabel(edge, "contains")) {
             const sourceId = edge.data('source');
@@ -372,7 +368,6 @@ export default class HeadlessProcessor {
           }
         });
       
-        // Tetapkan parent untuk setiap node target
         this.cy.nodes().forEach(node => {
           const nodeId = node.id();
           const parentCandidates = containsMap.get(nodeId) || [];
