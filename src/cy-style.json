@@ -19,7 +19,8 @@
     {
       "selector": "node[label]",
       "style": {
-        "content": "data(label)"
+        "content": "data(label)",
+        "width": "label"
       }
     },
     {
