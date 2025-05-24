@@ -1,4 +1,5 @@
 import Abstractor from "./Abstractor";
+import { getNodeLabels, getEdgeLabel, nodeHasLabels, edgeHasLabel } from "../utils/rawGraphUtils";
 
 const detailedNodesLabel = {
     OPERATION: "Operation", 
@@ -30,7 +31,7 @@ export default class GraphSetup {
     private isDetailedGraph(): boolean {
         const nodes = this.elements.nodes
         const isDetailed = nodes.some((node) => {
-            const labels = this.getNodeLabels(node);
+            const labels = getNodeLabels(node);
             return labels.some((label) => Object.values(detailedNodesLabel).includes(label))
         })
         return isDetailed;
@@ -39,7 +40,7 @@ export default class GraphSetup {
     private handleParentChild() {
         const containsMap = new Map<string, string[]>();
         this.elements.edges.map((edge) => {
-            if (this.edgeHasLabel(edge, "contains")) {
+            if (edgeHasLabel(edge, "contains")) {
                 if (containsMap.get(edge.data.target)) {
                     containsMap.get(edge.data.target).push(edge.data.source)
                 } else {
@@ -56,12 +57,12 @@ export default class GraphSetup {
             for (const candidateId of parentCandidates) {
                 let candidate = this.elements.nodes.find((n) => n.data.id === candidateId);
                 
-                while (candidate && this.getNodeLabels(candidate).includes('Structure')) {
+                while (candidate && nodeHasLabels(candidate, ["Structure"])) {
                     const nextParentId = containsMap.get(candidate.data.id)?.[0];
                     candidate = this.elements.nodes.find((n) => n.data.id === nextParentId);
                 }
 
-                if (candidate && !this.getNodeLabels(candidate).includes('Structure')) {
+                if (candidate && !nodeHasLabels(candidate, ["Structure"])) {
                     parentNode = candidate;
                     break;
                 }
@@ -80,7 +81,7 @@ export default class GraphSetup {
 
     private hidePrimitivesAndUpdateLabels() {
         this.elements.nodes.forEach((node) => {
-            if (this.nodeHasLabel(node, 'Primitive') || node.data.id.includes("java.lang.string")) {
+            if (nodeHasLabels(node, ['Primitive']) || node.data.id.includes("java.lang.String")) {
                 node.data.hidden = true;
             }
 
@@ -97,7 +98,7 @@ export default class GraphSetup {
         const containsMap = new Map<string, string[]>();
       
         this.elements.edges.forEach(edge => {
-          if (this.edgeHasLabel(edge, 'contains')) {
+          if (edgeHasLabel(edge, 'contains')) {
             const children = containsMap.get(edge.data.source) || [];
             children.push(edge.data.target);
             containsMap.set(edge.data.source, children);
@@ -108,7 +109,7 @@ export default class GraphSetup {
         const toRemoveEdgeIds = new Set<string>();
       
         this.elements.nodes.forEach(node => {
-          if (!this.nodeHasLabel(node, 'Container')) return;
+          if (!nodeHasLabels(node, ['Container'])) return;
       
           let chain = [node];
           let current = node;
@@ -118,7 +119,7 @@ export default class GraphSetup {
             if (!children || children.length !== 1) break;
       
             const child = idToNode.get(children[0]);
-            if (!child || !this.nodeHasLabel(child, 'Container')) break;
+            if (!child || !nodeHasLabels(child, ['Container'])) break;
       
             chain.push(child);
             current = child;
@@ -135,7 +136,7 @@ export default class GraphSetup {
               const edge = this.elements.edges.find(e =>
                 e.data.source === parent.data.id &&
                 e.data.target === child.data.id &&
-                this.edgeHasLabel(e, 'contains')
+                edgeHasLabel(e, 'contains')
               );
               if (edge) toRemoveEdgeIds.add(edge.data.id);
             }
@@ -156,17 +157,4 @@ export default class GraphSetup {
           
     }
       
-      
-    // Khusus NODE & EDGE
-    private getNodeLabels(node): string[] {
-        return node.data.labels || [node.data.label]
-    }
-
-    private edgeHasLabel(edge, label): boolean {
-        return (edge.data.labels?.includes(label) || edge.data.label === label)
-    }
-
-    private nodeHasLabel(node, label): boolean {
-        return this.getNodeLabels(node).includes(label);
-    }
 }

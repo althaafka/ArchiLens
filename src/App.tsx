@@ -38,7 +38,6 @@ function App() {
         const processor = new HeadlessProcessor(hcyInstance);
         const analysisData = processor.process(showStructure);
 
-        // console.log("Analysis Data:", analysisData)
         setAnalysisData(analysisData);
         
         console.log("elements:", hcyInstance.json().elements);

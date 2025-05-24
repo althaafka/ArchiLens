@@ -1,11 +1,12 @@
 import cytoscape from "cytoscape";
 import { counter, counterToPercentage, mergeCounters } from "../utils/utils";
 import { detailedNodesLabel } from "../constants/constants";
+import { getNodeLabels, nodeHasLabels } from "../utils/nodeUtils"
+import { getEdgeLabel, edgeHasLabel } from "../utils/edgeUtils"
+import { getEdgesByLabel, getNodesByLabel } from "../utils/graphUtils";
 
 export default class HeadlessProcessor {
     private cy: cytoscape.Core;
-    private edges: cytoscape.EdgeCollection;
-    private nodes: cytoscape.NodeCollection;
     private showStructure: boolean;
 
     constructor(cy: cytoscape.Core) {
@@ -13,11 +14,8 @@ export default class HeadlessProcessor {
     }
     
     public process(showStructure): any {
-        this.edges = this.cy.edges();
-        this.nodes = this.cy.nodes();
         this.showStructure = showStructure;
     
-        
         this.flattenParentChild();
         this.processDimension();
         this.processMetric();
@@ -36,10 +34,12 @@ export default class HeadlessProcessor {
 
     private collectAnalyticAspect(): any {
         let deletedElements
+        const nodes = this.cy.nodes()
+        const edges = this.cy.edges()
 
-        const dimension = this.getNodesByLabel('Dimension')
-        const category = this.getNodesByLabel('Category')
-        const metric = this.getNodesByLabel('Metric')
+        const dimension = getNodesByLabel(nodes, 'Dimension')
+        const category = getNodesByLabel(nodes, 'Category')
+        const metric = getNodesByLabel(nodes, 'Metric')
     
         deletedElements = {
             dimension: dimension.map(node => node.data()), 
@@ -47,10 +47,10 @@ export default class HeadlessProcessor {
             metric: metric.map(node => node.data()),
             composedDimension: Array.from(
                 new Set(
-                    this.getEdgesByLabel('composes')
+                    getEdgesByLabel(edges, 'composes')
                         .filter(cEdge => {
                             const categoryId = cEdge.data('target');
-                            const implementsEdges = this.edges.filter(edge => edge.data('label') === "implements" && edge.data('target') === categoryId);
+                            const implementsEdges = edges.filter(edge => edge.data('label') === "implements" && edge.data('target') === categoryId);
                             return implementsEdges.some(iEdge => {
                                 const sourceNode = this.cy.getElementById(iEdge.data('source'));
                                 return sourceNode.data('labels').includes("Scripts") || sourceNode.data('labels').includes("Operation");
@@ -64,7 +64,7 @@ export default class HeadlessProcessor {
         this.cy.remove(dimension);
         this.cy.remove(category);
         this.cy.remove(metric);
-        this.edges.filter(edge =>
+        this.cy.edges().filter(edge =>
             ["composes", "implements", "succeeds", "measures"].includes(edge.data('label'))
         ).remove();
     
@@ -82,12 +82,15 @@ export default class HeadlessProcessor {
     }      
 
     private processDimension(): void {
-        const composesEdges = this.getEdgesByLabel('composes');
-        const implementsEdges = this.getEdgesByLabel('implements');
-        const succeedsEdges = this.getEdgesByLabel('succeeds');
+      const edges = this.cy.edges();
+      const nodes = this.cy.nodes();
 
-        const dimensions = this.getNodesByLabel('Dimension');
-        const categories = this.getNodesByLabel('Category');
+      const composesEdges = getEdgesByLabel(edges, 'composes');
+      const implementsEdges = getEdgesByLabel(edges, 'implements');
+      const succeedsEdges = getEdgesByLabel(edges, 'succeeds');
+      
+      const dimensions = getNodesByLabel(nodes, 'Dimension');
+      const categories = getNodesByLabel(nodes, 'Category');
 
 
         dimensions?.forEach( dim => {
@@ -95,7 +98,6 @@ export default class HeadlessProcessor {
                 .filter(edge => edge.data('source') === dim.id())
                 .map(edge => edge.data('target'));
 
-            // Order Category
             let orderedCategories = [];
             let startCategory
             composedCategories.forEach(cat => {
@@ -163,8 +165,11 @@ export default class HeadlessProcessor {
     }
 
     private processMetric() {
-        const measuresEdges = this.getEdgesByLabel('measures');
-        const metrics = this.getNodesByLabel('Metric');
+      const edges = this.cy.edges();
+      const nodes = this.cy.nodes();
+
+        const measuresEdges = getEdgesByLabel(edges, 'measures');
+        const metrics = getNodesByLabel(nodes, 'Metric');
 
         metrics?.forEach(metric => {
             const measuredNode = measuresEdges
@@ -198,16 +203,18 @@ export default class HeadlessProcessor {
     }
 
     private groupLayers() {
-        const structures = this.getNodesByLabel('Structure');
-        const hasScripts = this.getEdgesByLabel('hasScript');
-        const composesEdges = this.getEdgesByLabel('composes');
-        const implementsEdges = this.getEdgesByLabel('implements');
+      const edges = this.cy.edges();
+      const nodes = this.cy.nodes();
+
+        const structures = getNodesByLabel(nodes, 'Structure');
+        const hasScripts = getEdgesByLabel(edges, 'hasScript');
+        const composesEdges = getEdgesByLabel(edges, 'composes');
+        const implementsEdges = getEdgesByLabel(edges, 'implements');
       
-        // Ambil semua dimension ID: composed + simple
         const composedDimIds = composesEdges
           .filter(cEdge => {
             const categoryId = cEdge.data('target');
-            const relatedImpls = this.edges.filter(edge =>
+            const relatedImpls = edges.filter(edge =>
               edge.data('label') === 'implements' && edge.data('target') === categoryId
             );
             return relatedImpls.some(iEdge => {
@@ -217,7 +224,7 @@ export default class HeadlessProcessor {
           })
           .map(cEdge => cEdge.data('source'));
       
-        const simpleDimIds = this.getNodesByLabel('Dimension').map(node => node.id());
+        const simpleDimIds = getNodesByLabel(nodes, 'Dimension').map(node => node.id());
         const dimensionIds = Array.from(new Set([...composedDimIds, ...simpleDimIds]));
       
         // ───── Structure node processing ─────
@@ -256,7 +263,7 @@ export default class HeadlessProcessor {
           structure.addClass('layers');
         });
       
-        const containers = this.nodes.filter(
+        const containers = nodes.filter(
           node => node.data('labels')?.includes('Container') && !node.data('labels')?.includes('Structure')
         );
       
@@ -304,13 +311,15 @@ export default class HeadlessProcessor {
       }
 
     private cleanUp(): void{
-        this.nodes.filter((node) => 
+        const edges = this.cy.edges();
+        const nodes = this.cy.nodes();
+        nodes.filter((node) => 
             !(node.data().labels?.some(label => !Object.values(detailedNodesLabel).includes(label))
         )).remove();
 
         const nodeIds = new Set();
-        this.nodes.forEach(node => { nodeIds.add(node.data('id')); });
-        this.edges.filter(edge => {
+        nodes.forEach(node => { nodeIds.add(node.data('id')); });
+        edges.filter(edge => {
             const source = edge.data('source');
             const target = edge.data('target');
             return !(nodeIds.has(source) && nodeIds.has(target));
@@ -318,15 +327,17 @@ export default class HeadlessProcessor {
     }
 
     private liftEdges(): void {
-        const newEdges = this.edges.filter(e =>
+      const edges = this.cy.edges();
+      const nodes = this.cy.nodes();
+        const newEdges = edges.filter(e =>
           e.source().data('labels')?.includes("Structure") &&
           e.target().data('labels')?.includes("Structure") &&
           e.target().parent() !== e.source().parent()
         ).reduce((acc, e: cytoscape.EdgeSingular) => {
             const srcParent = e.source().parent().first().id();
             const tgtParent = e.target().parent().first().id();
-            const nodeSrc = this.nodes.filter(node => node.id() == srcParent);
-            const nodeTgt = this.nodes.filter(node => node.id() == tgtParent);
+            const nodeSrc = nodes.filter(node => node.id() == srcParent);
+            const nodeTgt = nodes.filter(node => node.id() == tgtParent);
             if (!srcParent || !tgtParent) return acc;
             if (nodeSrc.parent().first().id() == nodeTgt.id() || nodeSrc.id() == nodeTgt.parent().first().id()) return acc;
     
@@ -337,8 +348,8 @@ export default class HeadlessProcessor {
                     data: {
                         source: srcParent,
                         target: tgtParent,
-                        label: this.getEdgeLabel(e),
-                        interaction: this.getEdgeLabel(e),
+                        label: getEdgeLabel(e),
+                        interaction: getEdgeLabel(e),
                         properties: { ...e.data('properties'), weight: 0, metaSrc: "lifting" }
                     }
                 };
@@ -348,7 +359,7 @@ export default class HeadlessProcessor {
         }, {})
       
         this.cy.add(Object.values(newEdges));
-        this.edges.filter(e => e.source().data('labels').includes("Structure") && e.target().data('labels').includes("Structure") && e.target().parent() !== e.source().parent()).remove();
+        this.cy.edges().filter(e => e.source().data('labels').includes("Structure") && e.target().data('labels').includes("Structure") && e.target().parent() !== e.source().parent()).remove();
     }
 
     private handleParentChild() {
@@ -356,7 +367,7 @@ export default class HeadlessProcessor {
         const containsMap = new Map<string, string[]>();
       
         this.cy.edges().forEach(edge => {
-          if (this.edgeHasLabel(edge, "contains")) {
+          if (edgeHasLabel(edge, "contains")) {
             const sourceId = edge.data('source');
             const targetId = edge.data('target');
       
@@ -378,7 +389,7 @@ export default class HeadlessProcessor {
             let candidate = this.cy.getElementById(candidateId);
       
             // Traverse ke atas jika candidate adalah Structure
-            while (candidate && this.nodeHasLabel(candidate, "Structure")) {
+            while (candidate && nodeHasLabels(candidate, ["Structure"])) {
               const nextParentId = containsMap.get(candidate.id())?.[0];
               if (!nextParentId) {
                 candidate = null;
@@ -387,7 +398,7 @@ export default class HeadlessProcessor {
               candidate = this.cy.getElementById(nextParentId);
             }
       
-            if (candidate && !this.nodeHasLabel(candidate, "Structure")) {
+            if (candidate && !nodeHasLabels(candidate, ["Structure"])) {
               parentNode = candidate;
               break;
             }
@@ -403,7 +414,7 @@ export default class HeadlessProcessor {
     private hideStructure(): void {
         console.log("HIDE STRUCTURE");
       
-        const structureNodes = this.getNodesByLabel("Structure");
+        const structureNodes = getNodesByLabel(this.cy.nodes(), "Structure");
       
         const connectedEdges = structureNodes.connectedEdges();
         const containsMap = this.buildContainsMap();
@@ -414,7 +425,7 @@ export default class HeadlessProcessor {
             const sourceNode = edge.source();
             const targetNode = edge.target();
 
-            if (!this.nodeHasLabel(sourceNode, "Structure") && !this.nodeHasLabel(targetNode, "Structure")) {
+            if (!nodeHasLabels(sourceNode, ["Structure"]) && !nodeHasLabels(targetNode, ["Structure"])) {
                 return;
             }
 
@@ -428,7 +439,7 @@ export default class HeadlessProcessor {
             console.log(targetNode.id(), targetContainer)
             if (!sourceContainer || !targetContainer || sourceContainer === targetContainer) return;
 
-            const label = this.getEdgeLabel(edge)
+            const label = getEdgeLabel(edge)
             const key = `${sourceContainer}-${label}-${targetContainer}`;
             console.log("LABEL", label)
 
@@ -475,7 +486,7 @@ export default class HeadlessProcessor {
     private groupEdgesByLabel(edges): Map<string, Set<any>> {
         const edgesMap = new Map<string, Set<any>>();
         edges.forEach(edge => {
-            const label = this.getEdgesLabel(edge);
+            const label = getEdgeLabel(edge);
             if (!edgesMap.has(label)) {
                 edgesMap.set(label, new Set());
             }
@@ -504,39 +515,11 @@ export default class HeadlessProcessor {
       
         for (const id of candidates) {
           const node = this.cy.getElementById(id);
-          if (this.nodeHasLabel(node, "Container") && !this.nodeHasLabel(node, "Structure")) {
+          if (nodeHasLabels(node, ["Container"]) && !nodeHasLabels(node, ["Structure"])) {
             return id;
           }
         }
         return null;
       }
       
-
-    private getEdgesLabel(edge: any): string {
-        return edge.data('labels')?.join() || edge.data('label')
-    }
-    
-    private getNodesByLabel(label: string): cytoscape.NodeCollection {
-        return this.nodes.filter(node => this.nodeHasLabel(node, label))
-    }
-
-    private nodeHasLabel(node: cytoscape.NodeSingular, label: string): boolean {
-        return this.getNodeLabel(node)?.includes(label);
-    }
-
-    private getNodeLabel(node: cytoscape.NodeSingular) {
-        return node.data('labels') || [node.data('label')]
-    }
-
-    private getEdgesByLabel(label: string): cytoscape.EdgeCollection {
-        return this.edges.filter(edge => this.edgeHasLabel(edge, label));
-    }
-
-    private edgeHasLabel(edge: cytoscape.EdgeSingular, label: string): boolean{
-        return this.getEdgeLabel(edge) === label;
-    }
-
-    private getEdgeLabel(edge: cytoscape.EdgeSingular): string {
-        return edge.data('labels')?.join() || edge.data('label');
-    }
 }
