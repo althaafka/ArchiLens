@@ -1,3 +1,5 @@
+import { useState } from "react"
+
 import {
   Sidebar,
   SidebarContent,
@@ -13,7 +15,27 @@ import {
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 
-export function AppSidebar({onUpload}: {onUpload: (data:any) => void}) {
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select"
+import { Button } from "@/components/ui/button"
+
+export function AppSidebar({
+  onUpload,
+  onRelayout,
+  selectedLayout,
+  setSelectedLayout,
+}: {
+  onUpload: (data:any) => void
+  onRelayout?: (layout: string) => void
+  selectedLayout: string
+  setSelectedLayout: (layout: string) => void
+}) {
+
   return (
     <Sidebar collapsible="none" className="w-64 min-w-64">
       <div className="px-4 py-3 border-b">
@@ -53,6 +75,30 @@ export function AppSidebar({onUpload}: {onUpload: (data:any) => void}) {
                   }
                 }}
               />
+            </div>
+
+            <div className="grid w-full max-w-sm items-center gap-2">
+              <Label htmlFor="layout-select">Select Layout</Label>
+              <Select value={selectedLayout} onValueChange={setSelectedLayout}>
+                <SelectTrigger id="layout-select">
+                  <SelectValue placeholder="Select layout..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="grid">Grid</SelectItem>
+                  <SelectItem value="cola">Cola</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                className="mt-2"
+                variant="default"
+                onClick={() => {
+                  if (selectedLayout) {
+                    onRelayout?.(selectedLayout)
+                  }
+                }}
+              >
+                Relayout
+              </Button>
             </div>
           </TabsContent>
 

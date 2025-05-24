@@ -94,7 +94,7 @@ export default class GraphBuilder {
 
   private static hidePrimitivesAndUpdateLabels(elements: any) {
     elements.nodes.forEach((node: any) => {
-      if (this.nodeHasLabels(node, ['Primitive']) || node.data.id.includes("java.lang.string")) {
+      if (this.nodeHasLabels(node, ['Primitive']) || node.data.id.includes("java.lang.String")) {
           node.data.hidden = true;
       }
 
