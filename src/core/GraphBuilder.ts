@@ -1,4 +1,6 @@
 import { detailedNodesLabel } from "@/const/const";
+import { GraphAbstractor } from "./GraphAbstractor";
+import { getNodeLabels, nodeHasLabels, getEdgeLabel, edgeHasLabel } from "@/utils/rawGraphUtils";
 
 export default class GraphBuilder {
 
@@ -6,7 +8,9 @@ export default class GraphBuilder {
 
     let newElements = elements
     if (this.isDetailedGraph(elements)){
-      
+      console.log("DETAILED")
+      const abstractor = new GraphAbstractor(elements);
+      newElements = abstractor.abstraction();
     }
 
     GraphBuilder.mergeChainedPackages(elements);
@@ -17,7 +21,7 @@ export default class GraphBuilder {
 
   private static isDetailedGraph(elements: any): boolean {
     const isDetailed = elements.nodes.some((node: any) => {
-      const labels = this.getNodeLabels(node);
+      const labels = getNodeLabels(node);
       return labels.some((label) => Object.values(detailedNodesLabel).includes(label))
     })
 
@@ -33,7 +37,7 @@ export default class GraphBuilder {
     
     const containsMap = new Map<string, string[]>();
     edges.forEach((edge: any) => {
-      if (this.edgeHasLabel(edge, 'contains')) {
+      if (edgeHasLabel(edge, 'contains')) {
         const children = containsMap.get(edge.data.source) || [];
         children.push(edge.data.target);
         containsMap.set(edge.data.source, children);
@@ -44,7 +48,7 @@ export default class GraphBuilder {
     const removedEdgeIds = new Set<string>();
 
     nodes.forEach((node: any) => {
-      if (!this.nodeHasLabels(node, ['Container'])) return;
+      if (!nodeHasLabels(node, ['Container'])) return;
 
       let chain = [node];
       let current = node;
@@ -54,7 +58,7 @@ export default class GraphBuilder {
         if (!children || children.length != 1) break;
 
         const child = nodeIdMap.get(children[0]);
-        if (!child || !this.nodeHasLabels(child, ['Container'])) break;
+        if (!child || !nodeHasLabels(child, ['Container'])) break;
 
         chain.push(child);
         current = child
@@ -71,7 +75,7 @@ export default class GraphBuilder {
           const edge = elements.edges.find((e:any) => {
             e.data.source === parent.data.id &&
             e.data.target === child.data.id &&
-            this.edgeHasLabel(e, 'contains')
+            edgeHasLabel(e, 'contains')
           })
 
           if (edge) removedEdgeIds.add(edge.data.id)
@@ -94,7 +98,7 @@ export default class GraphBuilder {
 
   private static hidePrimitivesAndUpdateLabels(elements: any) {
     elements.nodes.forEach((node: any) => {
-      if (this.nodeHasLabels(node, ['Primitive']) || node.data.id.includes("java.lang.String")) {
+      if (nodeHasLabels(node, ['Primitive']) || node.data.id.includes("java.lang.String")) {
           node.data.hidden = true;
       }
 
@@ -103,22 +107,5 @@ export default class GraphBuilder {
           node.data.label = name || shortname || simpleName || node.data.id;
       }
   })
-  }
-  
-  private static getNodeLabels(node: any): string[] {
-    return node.data.labels || [node.data.label] || [];
-  }
-
-  private static nodeHasLabels(node: any, labels: string[]) {
-      const nodeLabels = this.getNodeLabels(node);
-      return labels.every(label => nodeLabels.includes(label))
-  }
-
-  private static getEdgeLabel(edge: any): string {
-    return edge.data.label;
-  }
-
-  private static edgeHasLabel(edge:any, label: string): boolean {
-    return this.getEdgeLabel(edge) === label;
   }
 }

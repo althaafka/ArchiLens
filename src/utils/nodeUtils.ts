@@ -1,7 +1,7 @@
 import cytoscape from "cytoscape";
 
 export function getNodeLabels(node: cytoscape.NodeSingular): string[] {
-  return node.data('labels') || [node.data('label')] || [];
+  return node?.data('labels') || [node?.data('label')] || [];
 }
 
 export function nodeHasLabels(node: cytoscape.NodeSingular, labels: string[]): boolean {

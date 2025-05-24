@@ -3,7 +3,7 @@ import { AppSidebar } from "./app-sidebar"
 import { useEffect, useRef, useState } from "react"
 import { StylesheetCSS } from "cytoscape";
 import styleData from "../cy-style.json";
-import rawGraph from "../assets/jhotdraw_abstract.json"
+import rawGraph from "../assets/jhotdraw_detailed.json"
 const style: StylesheetCSS[] = styleData as unknown as StylesheetCSS[];
 import cytoscape from "cytoscape";
 import cola from "cytoscape-cola"

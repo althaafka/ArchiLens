@@ -50,7 +50,7 @@ export function AppSidebar({
             <TabsTrigger value="edges">Edges</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="general" className="mt-4 space-y-2">
+          <TabsContent value="general" className="mt-4 space-y-6">
           <div className="grid w-full max-w-sm items-center gap-2">
               <Label className="text-m" htmlFor="file-upload">Upload Graph</Label>
               <Input
@@ -80,7 +80,7 @@ export function AppSidebar({
             <div className="grid w-full max-w-sm items-center gap-2">
               <Label htmlFor="layout-select">Select Layout</Label>
               <Select value={selectedLayout} onValueChange={setSelectedLayout}>
-                <SelectTrigger id="layout-select">
+                <SelectTrigger id="layout-select" className="w-full">
                   <SelectValue placeholder="Select layout..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -89,7 +89,7 @@ export function AppSidebar({
                 </SelectContent>
               </Select>
               <Button
-                className="mt-2"
+                className="w-full"
                 variant="default"
                 onClick={() => {
                   if (selectedLayout) {
