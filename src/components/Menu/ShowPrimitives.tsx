@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { FormControlLabel, Switch, Box, Typography } from '@mui/material';
 
 const ShowPrimitives = ({ cyInstance }) => {
     const [showPrimitives, setShowPrimitives] = useState(false);
@@ -19,14 +20,15 @@ const ShowPrimitives = ({ cyInstance }) => {
     }, [showPrimitives, cyInstance]);
 
     return (
-        <label>
-            <input
-                type="checkbox"
-                checked={showPrimitives}
-                onChange={(e) => setShowPrimitives(e.target.checked)}
-            />
-            Show Primitive
-        </label>
+      <Box className="flex items-center justify-between">
+        <Typography variant="subtitle1">
+          Show Primitives
+        </Typography>
+        <Switch
+          checked={showPrimitives}
+          onChange={(e) => setShowPrimitives(e.target.checked)}
+        />
+      </Box>
     );
 };
 

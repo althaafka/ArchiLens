@@ -3,6 +3,14 @@ import ColoringLegend from './ColoringLegend';
 import { getScratch } from '../../../utils/utils';
 // import { nodeColoringTypes } from '../../../constants/nodeColoringData';
 import { camelCaseToWords } from '../../../utils/utils';
+import {
+  Box,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from '@mui/material';
 
 const NodeColoring = ({ cyInstance, analysisData}) => {
   const [coloring, setColoring] = useState("none");
@@ -49,26 +57,36 @@ const NodeColoring = ({ cyInstance, analysisData}) => {
   }, [categoriesVisibility, coloring, cyInstance]);
 
   return (
-    <div>
-      <h3>Node Coloring</h3>
-      <select value={coloring} onChange={(e) => setColoring(e.target.value)}>
-        <option key="none" value="none">None</option> 
-        {analysisData?.dimension?.map((dim) => ( 
-          <option key={dim.id} value={dim.id}>{camelCaseToWords(dim.properties.simpleName)}</option> 
-        ))}
-        {analysisData?.metric?.map((metric) => (
-          <option key={metric.id} value={metric.id}>{camelCaseToWords(metric.properties.simpleName)}</option>
-        ))}
-      </select>
-      {coloring !== "none" && !analysisData.metric.find(m => m.id == coloring) && (
-        <ColoringLegend 
-          coloring={coloring} 
+    <Box>
+      <Typography variant="subtitle1">Node Coloring</Typography>
+      <FormControl fullWidth size="small">
+        <Select
+          value={coloring}
+          onChange={(e) => setColoring(e.target.value)}
+        >
+          <MenuItem value="none">None</MenuItem>
+          {analysisData?.dimension?.map((dim) => (
+            <MenuItem key={dim.id} value={dim.id}>
+              {camelCaseToWords(dim.properties.simpleName)}
+            </MenuItem>
+          ))}
+          {analysisData?.metric?.map((metric) => (
+            <MenuItem key={metric.id} value={metric.id}>
+              {camelCaseToWords(metric.properties.simpleName)}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      {coloring !== "none" && !analysisData.metric.find((m) => m.id === coloring) && (
+        <ColoringLegend
+          coloring={coloring}
           analysisData={analysisData}
           categoriesVisibility={categoriesVisibility}
           setCategoriesVisibility={setCategoriesVisibility}
         />
       )}
-    </div>
+    </Box>
   );
 };
 

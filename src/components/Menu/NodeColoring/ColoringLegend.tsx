@@ -1,3 +1,15 @@
+import {
+  Box,
+  FormControlLabel,
+  Checkbox,
+  Typography,
+  Chip
+} from '@mui/material';
+import { Grid } from '@mui/material';
+
+
+
+
 const ColoringLegend = ({ 
     coloring, 
     analysisData,
@@ -16,30 +28,38 @@ const ColoringLegend = ({
 
 
   return (
-    <div className="legend-container">
-      <h4>Node Coloring Legend</h4>
-      <ul>
-        {/* {Object.entries(colorMap.get(coloring)).map(([key, color]) => ( */}
-        {Object.keys(analysisData.colorMap[dimensionId]).map(key => (
-          <li key={key} className="legend-item">
-              <input
-                type="checkbox"
+    <Box className="mt-2">
+      <Typography variant="subtitle1">
+        Node Coloring Legend
+      </Typography>
+
+      <Box className="flex flex-col">
+        {Object.keys(analysisData.colorMap[dimensionId] || {}).map((key) => {
+          const color = analysisData.colorMap[dimensionId][key] || '#F2F2F2';
+          const label =
+            analysisData.category.find((c) => c.id === key)?.properties.simpleName || key;
+
+          return (
+            <Box key={key} className="flex items-center">
+              <Checkbox
                 checked={categoriesVisibility[key] ?? true}
                 onChange={() => handleCheckboxChange(key)}
+                size="small"
               />
-            <span
-              className="legend-box"
-              style={{
-                backgroundColor: analysisData.colorMap[dimensionId][key] || "#F2F2F2",
-                border: `3px solid ${ "#5E5E5E"}`,
-              }}
-            />
-            {analysisData.category.find(c => c.id === key)?.properties.simpleName || key}
-          </li>
-        ))}
-      </ul>
-    </div>
+              <span
+                className="w-9 h-4.5 mr-2 rounded-sm border border-gray-600"
+                style={{ backgroundColor: color }}
+              />
+              <Typography variant="body2" className="text-sm text-gray-800">
+                {label}
+              </Typography>
+            </Box>
+          );
+        })}
+      </Box>
+    </Box>
   );
+  
 };
 
 export default ColoringLegend;

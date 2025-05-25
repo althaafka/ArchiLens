@@ -5,7 +5,12 @@ import Layout from './Layout';
 import FileUpload from './FileUpload'
 import ShowPrimitives from './ShowPrimitives'
 import NodeColoring from './NodeColoring/NodeColoring';
-import LevelManager from '../../core/LevelManager';
+import {
+  Switch, Box, Typography, Button, Divider, FormGroup, FormControlLabel, Checkbox
+} from '@mui/material';
+import DownloadIcon from '@mui/icons-material/Download';
+import { Tabs, Tab } from '@mui/material';
+
 
 const Menu = ({
   cyInstance,
@@ -14,6 +19,10 @@ const Menu = ({
   showStructure,
   setShowStructure
 }) => {
+
+  const [tabIndex, setTabIndex] = useState(0);
+  const handleTabChange = (_event, newValue) => setTabIndex(newValue);
+
 
   const [selectedEdges, setSelectedEdges] = useState(() => {
     return Object.values(edgesLabel).reduce((acc, edge) => {
@@ -61,47 +70,90 @@ const Menu = ({
   };
 
   return (
-    <div className="menu-bar">
-      <h1>ArchiLens</h1>
-      <hr />
-      <FileUpload setGraph={setGraph}/>
-      <hr />
-      <Layout cyInstance={cyInstance} analysisData={analysisData} showStructure={showStructure}/>
-      <hr />
-      <button onClick={downloadGraphAsPng}>Download Graph as PNG</button>
-      <hr />
-      <h2>Nodes</h2>
-      <ShowPrimitives cyInstance={cyInstance}/>
-      <hr />
-      <h2>Show Options</h2>
-      <label>
-        <input
-          type="checkbox"
-          checked={showStructure}
-          onChange={(e) => setShowStructure(e.target.checked)}
-        />
-        Show Structure Nodes
-      </label>
-      <h3>Coloring</h3>
-      <NodeColoring cyInstance={cyInstance} analysisData={analysisData}/>
-      <hr />
-      <h2>Relationships</h2>
-      <ul>
-        {Object.values(edgesLabel).map((type) => (
-          <li key={type}>
-            <label>
-              <input
-                type="checkbox"
-                name={type}
-                checked={selectedEdges[type]}
-                onChange={handleEdgeFilterChange}
+    <Box gap={1}>
+      <Typography className="text-center p-3" variant="h6">ArchiLens</Typography>
+      <Divider/>
+
+      <Tabs 
+        value={tabIndex} 
+        onChange={handleTabChange} 
+        variant="fullWidth"
+        sx={{
+          minHeight: 40,
+          '& .MuiTab-root': {
+            minHeight: 40,
+            minWidth: 40,
+            fontSize: '0.75rem',
+            padding: '4px 8px',
+            '&.Mui-selected': {
+              fontWeight: 'bold',
+            },
+          },
+        }}
+      >
+        <Tab label="General" />
+        <Tab label="Nodes" />
+        <Tab label="Edges" />
+      </Tabs>
+
+      {tabIndex==0 && (
+        <Box className="space-y-2 p-4">
+          <FileUpload setGraph={setGraph}/>
+
+          <Box display="flex" justifyContent="space-between" alignItems="center" className="my-2">
+            <Typography variant="subtitle1">Structure Visibility</Typography>
+            <Switch
+              checked={showStructure}
+              onChange={(e) => setShowStructure(e.target.checked)}
+            />
+          </Box>
+
+          <Layout cyInstance={cyInstance} analysisData={analysisData} showStructure={showStructure} />
+
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            onClick={downloadGraphAsPng}
+            startIcon={<DownloadIcon />}
+          >
+            Download Graph as PNG
+          </Button>
+        </Box>
+      )}
+
+      {tabIndex==1 && (
+        <Box className="space-y-2 p-4">
+          <ShowPrimitives cyInstance={cyInstance} />
+
+          <NodeColoring cyInstance={cyInstance} analysisData={analysisData} />
+        </Box>
+      )}
+
+      {tabIndex==2 && (
+        <Box className="space-y-2 p-4">
+          <Typography variant="subtitle1">Filter Edges</Typography>
+          <FormGroup>
+            {Object.values(edgesLabel).map((type) => (
+              <FormControlLabel
+                key={type}
+                control={
+                  <Checkbox
+                    name={type}
+                    checked={selectedEdges[type]}
+                    onChange={handleEdgeFilterChange}
+                    size="small"
+                  />
+                }
+                label={type}
               />
-              {type}
-            </label>
-          </li>
-        ))}
-      </ul>
-    </div>
+            ))}
+          </FormGroup>
+
+        </Box>
+      )}
+    
+    </Box>
   );
 };
 

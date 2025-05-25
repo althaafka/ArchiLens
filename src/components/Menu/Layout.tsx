@@ -4,6 +4,21 @@ import registerSemanticGridLayout from 'cytoscape.js-semanticGrid';
 import cytoscape from 'cytoscape';
 import { initGraph } from '../../utils/graphManagement';
 import AnalysisAspect from '../../utils/analysisAspect';
+
+import {
+  Box,
+  Typography,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Button,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
+  TextField,
+} from '@mui/material';
+
 registerSemanticGridLayout(cytoscape);
 
 
@@ -55,9 +70,6 @@ const Layout = ({ cyInstance, analysisData, showStructure }) => {
         yDimension: node => analysisAspect.getNodeCategory(node, yDimension, showStructure),
       };
 
-      // cyInstance.nodes().forEach(node => {
-      //   console.log(node.id(), "(",analysisAspect.getNodeCategory(node, xDimension, showStructure),",",analysisAspect.getNodeCategory(node, yDimension, showStructure),")")
-      // })
 
 
       if (xDimension !== "Dimension:Container" && !analysisAspect.isMetric(xDimension)) {
@@ -89,104 +101,122 @@ const Layout = ({ cyInstance, analysisData, showStructure }) => {
   };
 
   return (
-    <>
-      <h2>Layout</h2>
-      <select value={layout} onChange={(e) => setLayout(e.target.value)}>
-        {Object.entries(layoutTypes).map(([layoutKey, layoutValue]) => (
-          <option key={layoutKey} value={layoutKey}>
-            {layoutValue}
-          </option>
-        ))}
-      </select>
+    <Box className="mb-8">
+      <Typography variant="subtitle1">Layout</Typography>
+
+      <FormControl fullWidth size="small">
+        <Select  value={layout} onChange={(e) => setLayout(e.target.value)} displayEmpty>
+          {Object.entries(layoutTypes).map(([key, value]) => (
+            <MenuItem key={key} value={key}>{value}</MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
       {layout === "semanticGrid" && (
-        <div>
-          <br></br>
-          <h3>Semantic Grid Dimensions</h3>
-          <br></br>
-          <label>
-            X Dimension:
-            <select value={xDimension} onChange={(e) => setXDimension(e.target.value)}>
-              <option value="" disabled>Choose</option>
-              {analysisData.dimension
-                .map((dim) => (
-                  <option key={dim.id} value={dim.id}>
+        <Box className="space-y-2 mt-2">
+          <Typography variant="subtitle1">Semantic Grid Dimensions</Typography>
+
+          <Box display="flex" alignItems="center" gap={1}>
+            <Typography className="w-12 text-center">X</Typography>
+
+            <FormControl fullWidth size="small">
+              <Select
+                value={xDimension}
+                onChange={(e) => setXDimension(e.target.value)}
+                displayEmpty
+              >
+                {analysisData.dimension.map((dim) => (
+                  <MenuItem key={dim.id} value={dim.id}>
                     {dim.properties.simpleName || dim.id}
-                  </option>
+                  </MenuItem>
                 ))}
-              <option value="Dimension:Container" key="Dimension:Container">Container</option>
-              {analysisData.metric
-                .map((metric) => (
-                  <option key={metric.id} value={metric.id}>
-                  {metric.properties.simpleName || metric.id}
-                </option>
-                ))
-              }
-            </select>
-          </label>
-          {analysisData.metric.find((metric) => metric.id === xDimension) && (
-            <div>
-              <label>
-                X Range Step:
-                <input
-                  type="number"
-                  value={xRangeStep}
-                  onChange={(e) => setXRangeStep(Number(e.target.value))}
-                  min="0"
-                />
-              </label>
-            </div>
+                <MenuItem value="Dimension:Container">Container</MenuItem>
+                {analysisData.metric.map((metric) => (
+                  <MenuItem key={metric.id} value={metric.id}>
+                    {metric.properties.simpleName || metric.id}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+
+
+          {analysisData.metric.find((m) => m.id === xDimension) && (
+            <Box className="" display="flex" alignItems="center" gap={1}>
+              <Typography className="w-20 text-xs text-gray-500 text-center">Step</Typography>
+              <TextField
+                size="small"
+                type="number"
+                value={xRangeStep}
+                onChange={(e) => setXRangeStep(Number(e.target.value))}
+                inputProps={{ min: 0 }}
+                fullWidth
+              />
+            </Box>
           )}
-          <div></div>
-          <label>
-            Y Dimension:
-            <select value={yDimension} onChange={(e) => setYDimension(e.target.value)}>
-              <option value="" disabled>Choose</option>
-              {analysisData.dimension
-                .map((dim) => (
-                  <option key={dim.id} value={dim.id}>
+
+          <Box display="flex" alignItems="center" gap={1}>
+            <Typography className="w-12 text-center">Y</Typography>
+            <FormControl fullWidth size="small">
+             <Select
+               value={yDimension}
+               onChange={(e) => setYDimension(e.target.value)}
+               displayEmpty
+             >
+                {analysisData.dimension.map((dim) => (
+                  <MenuItem key={dim.id} value={dim.id}>
                     {dim.properties.simpleName || dim.id}
-                  </option>
+                  </MenuItem>
                 ))}
-              <option value="Dimension:Container" key="Dimension:Container">Container</option>
-              {analysisData.metric
-                .map((metric) => (
-                  <option key={metric.id} value={metric.id}>
-                  {metric.properties.simpleName || metric.id}
-                </option>
-                ))
-              }
-            </select>
-          </label>
-          {analysisData.metric.find((metric) => metric.id === yDimension) && (
-            <div>
-              <label>
-                Y Range Step:
-                <input
-                  type="number"
-                  value={yRangeStep}
-                  onChange={(e) => setYRangeStep(Number(e.target.value))}
-                  min="0"
+                <MenuItem value="Dimension:Container">Container</MenuItem>
+                {analysisData.metric.map((metric) => (
+                  <MenuItem key={metric.id} value={metric.id}>
+                    {metric.properties.simpleName || metric.id}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+                
+            {analysisData.metric.find((m) => m.id === yDimension) && (
+              <Box className="" display="flex" alignItems="center" gap={1}>
+              <Typography className="w-20 text-xs text-gray-500 text-center">Step</Typography>
+              <TextField
+                size="small"
+                type="number"
+                value={yRangeStep}
+                onChange={(e) => setYRangeStep(Number(e.target.value))}
+                inputProps={{ min: 1 }}
+                fullWidth
+              />
+            </Box>
+            )}
+
+          <FormGroup>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={hidePackages}
+                  onChange={(e) => setHidePackages(e.target.checked)}
                 />
-              </label>
-            </div>
-          )}
-          <br></br>
-          <label>
-            <input
-              type="checkbox"
-              checked={hidePackages}
-              onChange={(e) => setHidePackages(e.target.checked)}
+              }
+              label="Hide Package Nodes"
             />
-            Hide Package Nodes
-          </label>
-          <br></br>
-        </div>
+          </FormGroup>
+        </Box>
       )}
-      <button onClick={relayout} disabled={layout === "semanticGrid" && (!xDimension || !yDimension)}>
-        Relayout
-      </button>
-      
-    </>
+
+      <Box display="flex" justifyContent="flex-end" className="mt-2">
+        <Button
+          size="small"
+          variant="contained"
+          onClick={relayout}
+          disabled={layout === "semanticGrid" && (!xDimension || !yDimension)}
+        >
+          Relayout
+        </Button>
+      </Box>
+    </Box>
   );
 };
 

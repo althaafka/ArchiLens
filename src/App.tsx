@@ -12,6 +12,8 @@ import GraphSetup from './core/GraphSetup'
 import HeadlessProcessor from './core/HeadlessProcessor';
 import VisualProcessor from './core/VisualProcessor';
 
+import { Box, CssBaseline } from '@mui/material';
+
 cytoscape.use(cytoscapeCola);
 
 function App() {
@@ -75,17 +77,31 @@ function App() {
 
   return (
     <>
-    <div className="app-container">
-      {/* Cytoscape */}
-      <div className="canvas">
-        <div ref={cyRef} style={{ width: "100%", height: "100%" }} />
-      </div>
+      <CssBaseline />
+      <Box display="flex" height="100vh" overflow="hidden">
+        {/* Sidebar */}
+        <Box
+          width={280}
+          className="bg-white shadow-lg"
+          overflow="auto"
+        >
+          <Menu
+            cyInstance={cyInstance}
+            setGraph={setGraph}
+            analysisData={analysisData}
+            showStructure={showStructure}
+            setShowStructure={setShowStructure}
+          />
+        </Box>
 
-      {/* Menu Bar */}
-      <Menu cyInstance={cyInstance} setGraph={setGraph} analysisData={analysisData} showStructure={showStructure} setShowStructure={setShowStructure}/>
-    </div>
+        {/* Cytoscape Canvas */}
+        <Box flex={1} overflow="hidden">
+          <div ref={cyRef} className="w-full h-full" />
+        </Box>
+      </Box>
     </>
   );
+
 }
 
 export default App;
