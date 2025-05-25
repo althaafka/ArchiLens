@@ -28,13 +28,21 @@ const FileUpload = ({ setGraph }) => {
   };
 
   return (
-    <Box width="100%" display="flex" flexDirection="column" className="mb-3">
+    <Box 
+      className="mb-3" 
+      width="100%" 
+      display="flex" 
+      flexDirection="column"
+    >
       <Typography variant="subtitle1">Upload Graph</Typography>
 
       <Paper
         variant="outlined"
-        className="flex items-center w-full cursor-pointer"
+        className="flex items-center w-full cursor-pointer bg-stone-200"
         onClick={() => fileInputRef.current?.click()}
+        sx={{
+          bgcolor: 'secondary.main',
+        }}
       >
         <Typography
           variant="body2"

@@ -82,7 +82,7 @@ function App() {
         {/* Sidebar */}
         <Box
           width={280}
-          className="bg-white shadow-lg"
+          className="bg-stone-50 shadow-lg"
           overflow="auto"
         >
           <Menu

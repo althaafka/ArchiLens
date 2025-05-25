@@ -198,6 +198,7 @@ const Layout = ({ cyInstance, analysisData, showStructure }) => {
                 <Checkbox
                   checked={hidePackages}
                   onChange={(e) => setHidePackages(e.target.checked)}
+                  size="small"
                 />
               }
               label="Hide Package Nodes"

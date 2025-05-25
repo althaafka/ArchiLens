@@ -12,8 +12,8 @@ import {
   MenuItem,
 } from '@mui/material';
 
-const NodeColoring = ({ cyInstance, analysisData}) => {
-  const [coloring, setColoring] = useState("none");
+const NodeColoring = ({ cyInstance, analysisData, coloring, setColoring}) => {
+
   const [categoriesVisibility, setCategoriesVisibility] = useState({});
 
   // const [featureChanged, setFeatureChanged] = useState(null)

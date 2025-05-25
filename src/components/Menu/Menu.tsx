@@ -31,7 +31,8 @@ const Menu = ({
     }, {});
   });
 
-  // const [showStructure, setShowStructure] = useState(true)
+  const [coloring, setColoring] = useState("none");
+
   // Filter Edges
   const handleEdgeFilterChange = (event) => {
     const { name, checked } = event.target;
@@ -122,13 +123,15 @@ const Menu = ({
         </Box>
       )}
 
-      {tabIndex==1 && (
-        <Box className="space-y-2 p-4">
-          <ShowPrimitives cyInstance={cyInstance} />
-
-          <NodeColoring cyInstance={cyInstance} analysisData={analysisData} />
-        </Box>
-      )}
+      <Box hidden={tabIndex !== 1} className="space-y-2 p-4">
+        <ShowPrimitives cyInstance={cyInstance} />
+        <NodeColoring 
+          cyInstance={cyInstance} 
+          analysisData={analysisData} 
+          coloring={coloring}
+          setColoring={setColoring}
+        />
+      </Box>
 
       {tabIndex==2 && (
         <Box className="space-y-2 p-4">
