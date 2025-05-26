@@ -8,10 +8,11 @@ import styleData from "./cy-style.json";
 import rawGraph from "./assets/jpacman-v4-metric.json";
 import Menu from './components/Menu/Menu';
 const style: StylesheetCSS[] = styleData as unknown as StylesheetCSS[];
-import GraphSetup from './core/GraphSetup'
 import HeadlessProcessor from './core/HeadlessProcessor';
-import VisualProcessor from './core/VisualProcessor';
+import VisualProcessor from './core-old/VisualProcessor';
 import ElementDrawer from "./components/Menu/Drawer";
+import GraphManager from './core/GraphManager';
+import GraphPreProcessor from './core/GraphPreprocessor';
 
 import { Box, CssBaseline } from '@mui/material';
 
@@ -25,14 +26,14 @@ function App() {
   const [analysisData, setAnalysisData] = useState({});
   const [showStructure, setShowStructure] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
-const [selectedElement, setSelectedElement] = useState(null);
+  const [selectedElement, setSelectedElement] = useState(null);
 
   // Init cytoscape
   useEffect(() => {
     if (!cyRef.current) return;
     console.log("Initializing Cytoscape...");
 
-    const processedGraph = new GraphSetup(graph.elements).initialize();
+    const processedGraph = new GraphPreProcessor(graph.elements).initialize();
 
     const hcy = cytoscape({
       headless: true,
@@ -42,10 +43,13 @@ const [selectedElement, setSelectedElement] = useState(null);
         setHCyInstance(hcyInstance);
         const processor = new HeadlessProcessor(hcyInstance);
         const analysisData = processor.process(showStructure);
+        console.log("ANALYTIC DATA:", analysisData)
 
         setAnalysisData(analysisData);
         
         console.log("elements:", hcyInstance.json().elements);
+
+        const manager = GraphManager.getInstance().setAnalyticAspect(analysisData);
 
         if (cyRef.current) {
           const cy = cytoscape({
