@@ -11,6 +11,7 @@ const style: StylesheetCSS[] = styleData as unknown as StylesheetCSS[];
 import GraphSetup from './core/GraphSetup'
 import HeadlessProcessor from './core/HeadlessProcessor';
 import VisualProcessor from './core/VisualProcessor';
+import ElementDrawer from "./components/Menu/Drawer";
 
 import { Box, CssBaseline } from '@mui/material';
 
@@ -23,6 +24,8 @@ function App() {
   const [_, setHCyInstance] = useState(null);
   const [analysisData, setAnalysisData] = useState({});
   const [showStructure, setShowStructure] = useState(true);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+const [selectedElement, setSelectedElement] = useState(null);
 
   // Init cytoscape
   useEffect(() => {
@@ -60,11 +63,21 @@ function App() {
           } as any);
   
           cy.on('tap', 'node', (event) => {
+            setSelectedElement(event.target.data());
+            setDrawerOpen(true);
             console.log("Node clicked:", event.target.data());
           });
   
           cy.on('tap', 'edge', (event) => {
+            setSelectedElement(event.target.data());
+            setDrawerOpen(true);
             console.log("Edge clicked:", event.target.data());
+          });
+
+          cy.on("tap", (e) => {
+            if (e.target === cy) {
+              setDrawerOpen(false);
+            }
           });
         }
       }
@@ -98,6 +111,12 @@ function App() {
         <Box flex={1} overflow="hidden">
           <div ref={cyRef} className="w-full h-full" />
         </Box>
+
+        <ElementDrawer
+      open={drawerOpen}
+      onClose={() => setDrawerOpen(false)}
+      elementData={selectedElement}
+    />
       </Box>
     </>
   );

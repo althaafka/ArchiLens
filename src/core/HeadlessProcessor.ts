@@ -119,20 +119,20 @@ export default class HeadlessProcessor {
             dim.data('categories', orderedCategories);
         })
 
-        categories.forEach(cat => {
+        categories?.forEach(cat => {
             const categoriesMember = implementsEdges
                 .filter(edge => edge.data('target') === cat.id())
                 .map(edge => edge.data('source'));
             cat.data('members', categoriesMember);
         });
 
-        implementsEdges.forEach(edge => {
+        implementsEdges?.forEach(edge => {
             const node = this.cy.getElementById(edge.data('source'));
             if (!node.data('properties').dimension) {
                 node.data('properties').dimension = {};
             }
     
-            const dimId = composesEdges.filter(cEdge => edge.data('target') === cEdge.data('target'))[0].data('source');
+            const dimId = composesEdges.filter(cEdge => edge.data('target') === cEdge.data('target'))[0]?.data('source');
     
             if (!node.data('properties').dimension[dimId]) {
                 node.data('properties').dimension[dimId] = [];
@@ -147,7 +147,7 @@ export default class HeadlessProcessor {
             return !isExcluded && !labels.includes('Container') && labels.includes('Structure');
           });
           
-          dimensions.forEach(dim => {
+          dimensions?.forEach(dim => {
             const dimId = dim.id();
             allNodes.forEach(node => {
               if (!node.data('properties').dimension) {
