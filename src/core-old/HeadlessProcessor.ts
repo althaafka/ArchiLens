@@ -1,7 +1,7 @@
 import cytoscape from "cytoscape";
 import { counter, counterToPercentage, mergeCounters } from "../utils/utils";
 import { detailedNodesLabel } from "../constants/constants";
-import { getNodeLabels, nodeHasLabels } from "../utils/nodeUtils"
+import { nodeHasLabels } from "../utils/nodeUtils"
 import { getEdgeLabel, edgeHasLabel } from "../utils/edgeUtils"
 import { getEdgesByLabel, getNodesByLabel } from "../utils/graphUtils";
 

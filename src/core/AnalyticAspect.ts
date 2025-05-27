@@ -1,5 +1,6 @@
 import cytoscape from "cytoscape"
 import { getNodesByLabel, getEdgesByLabel } from "../utils/graphUtils";
+import { generateColorMap } from "../utils/colorUtils";
 
 export default class AnalyticAspect {
   public dimension: any;
@@ -41,19 +42,29 @@ export default class AnalyticAspect {
     cy.edges().filter(edge =>
         ["composes", "implements", "succeeds", "measures"].includes(edge.data('label'))
     ).remove();
+
+    this.generateColorMapDimensions();
   }
 
-  setColorMap(colorMap: any) {
-    this.colorMap = colorMap;
-  }
-
-  getAnalyticAspectTemp(){
+  public getAnalyticAspectTemp(){
     return {
       "dimension": this.dimension,
       "category": this.category,
       "metric": this.metric,
-      "composedDimension": this.composedDimension
+      "composedDimension": this.composedDimension,
+      "colorMap": this.colorMap
     }
   }
 
+  private generateColorMapDimensions(): void {
+    this.colorMap = {};
+    this.dimension.forEach((dim: any) => {
+      console.log("dim", dim)
+      this.colorMap[dim.id] = generateColorMap(dim.categories);
+    });
+  }
+
+  public isComposedDimension(dimId) {
+    return this.composedDimension.includes(dimId);
+  }
 }

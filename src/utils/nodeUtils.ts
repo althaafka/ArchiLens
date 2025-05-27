@@ -8,3 +8,7 @@ export function nodeHasLabels(node: cytoscape.NodeSingular, labels: string[]): b
   const nodeLabels = getNodeLabels(node);
   return labels.every(label => nodeLabels.includes(label))
 }
+
+export function isPureContainer(node: cytoscape.NodeSingular): boolean {
+  return nodeHasLabels(node, ['Container']) && !nodeHasLabels(node, ['Structure'])
+}

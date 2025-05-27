@@ -19,7 +19,7 @@ export default class HeadlessProcessor {
 
     new DimensionEnricher(this.cy).enrich();
     new MetricEnricher(this.cy).enrich();
-    new ComposedDimensionEnricher(this.cy).enrich();
+    new ComposedDimensionEnricher(this.cy, this.showStructure).enrich();
 
     const analyticAspect = new AnalyticAspect()
     analyticAspect.collectAnalyticAspect(this.cy);
@@ -30,7 +30,6 @@ export default class HeadlessProcessor {
     new EdgeLifter(this.cy).lift();
     new CleanUpProcessor(this.cy).clean();
     
-
     return analyticAspect.getAnalyticAspectTemp();
   }
 
@@ -41,5 +40,6 @@ export default class HeadlessProcessor {
         node.move({ parent: null });
       }
     });
-  }      
+  }   
+  
 }

@@ -97,31 +97,26 @@ const Menu = ({
         <Tab label="Edges" />
       </Tabs>
 
-      {tabIndex==0 && (
-        <Box className="space-y-2 p-4">
-          <FileUpload setGraph={setGraph}/>
-
-          <Box display="flex" justifyContent="space-between" alignItems="center" className="my-2">
-            <Typography variant="subtitle1">Structure Visibility</Typography>
-            <Switch
-              checked={showStructure}
-              onChange={(e) => setShowStructure(e.target.checked)}
-            />
-          </Box>
-
-          <Layout cyInstance={cyInstance} analysisData={analysisData} showStructure={showStructure} />
-
-          <Button
-            fullWidth
-            variant="contained"
-            color="primary"
-            onClick={downloadGraphAsPng}
-            startIcon={<DownloadIcon />}
-          >
-            Download Graph as PNG
-          </Button>
+      <Box hidden={tabIndex !== 0} className="space-y-2 p-4">
+        <FileUpload setGraph={setGraph}/>
+        <Box display="flex" justifyContent="space-between" alignItems="center" className="my-2">
+          <Typography variant="subtitle1">Structure Visibility</Typography>
+          <Switch
+            checked={showStructure}
+            onChange={(e) => setShowStructure(e.target.checked)}
+          />
         </Box>
-      )}
+        <Layout cyInstance={cyInstance} analysisData={analysisData} showStructure={showStructure} />
+        <Button
+          fullWidth
+          variant="contained"
+          color="primary"
+          onClick={downloadGraphAsPng}
+          startIcon={<DownloadIcon />}
+        >
+          Download Graph as PNG
+        </Button>
+      </Box>
 
       <Box hidden={tabIndex !== 1} className="space-y-2 p-4">
         <ShowPrimitives cyInstance={cyInstance} />
@@ -133,28 +128,26 @@ const Menu = ({
         />
       </Box>
 
-      {tabIndex==2 && (
-        <Box className="space-y-2 p-4">
-          <Typography variant="subtitle1">Filter Edges</Typography>
-          <FormGroup>
-            {Object.values(edgesLabel).map((type) => (
-              <FormControlLabel
-                key={type}
-                control={
-                  <Checkbox
-                    name={type}
-                    checked={selectedEdges[type]}
-                    onChange={handleEdgeFilterChange}
-                    size="small"
-                  />
-                }
-                label={type}
-              />
-            ))}
-          </FormGroup>
 
-        </Box>
-      )}
+      <Box hidden={tabIndex !== 2} className="space-y-2 p-4">
+        <Typography variant="subtitle1">Filter Edges</Typography>
+        <FormGroup>
+          {Object.values(edgesLabel).map((type) => (
+            <FormControlLabel
+              key={type}
+              control={
+                <Checkbox
+                  name={type}
+                  checked={selectedEdges[type]}
+                  onChange={handleEdgeFilterChange}
+                  size="small"
+                />
+              }
+              label={type}
+            />
+          ))}
+        </FormGroup>
+      </Box>
     
     </Box>
   );

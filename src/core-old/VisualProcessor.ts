@@ -1,4 +1,5 @@
-import { generateColorMap, addScratch, lightenHSLArray, lightenHSL, generateColorMetric } from '../utils/utils';
+import { addScratch } from '../utils/utils';
+import { generateColorMap, lightenHSLArray, lightenHSL, generateColorMetric } from '../utils/colorUtils';
 import cytoscape from 'cytoscape';
 
 export default class VisualProcessor {
@@ -37,7 +38,6 @@ export default class VisualProcessor {
     nodes.forEach((node) => {
       addScratch(node, 'style_none', {
         'background-color': 'hsl(0, 0%, 95%)',
-        // 'display': 'element',
         'background-fill': 'solid'
       });
     });
@@ -73,7 +73,6 @@ export default class VisualProcessor {
       addScratch(node, 'style_none', {
         'background-color': adjustedColor,
         'border-color': 'hsl(0, 0%, 35%)',
-        // 'display': 'element',
         'background-fill': 'solid'
       });
     });
@@ -170,11 +169,12 @@ export default class VisualProcessor {
                             // 'display': 'element',
                         })
                 }
-          } else {
-            addScratch(node, `style_${dim.id}`, {
-                // 'display': 'element',
-            });
-          }
+          } 
+          // else {
+          //   addScratch(node, `style_${dim.id}`, {
+          //       // 'display': 'element',
+          //   });
+          // }
         });
       } else {
                    const container = this.cy.nodes().filter(node => node.data('labels').includes("Container") && !node.data('labels').includes("Structure"));

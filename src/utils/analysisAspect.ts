@@ -70,6 +70,10 @@ export default class AnalysisAspect {
         return this.analysisData.metric.find((m) => m.id == metricId)? true: false;
     }
 
+    isComposedDimension(dimId) {
+        return this.analysisData.composedDimension.includes(dimId);
+    }
+
 }
 
 export class Metric {

@@ -9,7 +9,7 @@ import rawGraph from "./assets/jpacman-v4-metric.json";
 import Menu from './components/Menu/Menu';
 const style: StylesheetCSS[] = styleData as unknown as StylesheetCSS[];
 import HeadlessProcessor from './core/HeadlessProcessor';
-import VisualProcessor from './core-old/VisualProcessor';
+import VisualProcessor from './core/VisualProcessor';
 import ElementDrawer from "./components/Menu/Drawer";
 import GraphManager from './core/GraphManager';
 import GraphPreProcessor from './core/GraphPreprocessor';
@@ -49,7 +49,8 @@ function App() {
         
         console.log("elements:", hcyInstance.json().elements);
 
-        const manager = GraphManager.getInstance().setAnalyticAspect(analysisData);
+        const manager = GraphManager.getInstance()
+        manager.setAnalyticAspect(analysisData);
 
         if (cyRef.current) {
           const cy = cytoscape({
@@ -60,9 +61,13 @@ function App() {
             ready: (cyEvent) => {
               const cyInstance = cyEvent.cy;
               setCyInstance(cyInstance);
-
-              const visualizer = new VisualProcessor(cyInstance, analysisData);
+              const visualizer = new VisualProcessor(cyInstance, manager.getAnalyticAspect());
               visualizer.process();
+              console.log("BEFORE process(), nodes:", cyInstance.nodes().length);
+              visualizer.process();
+              console.log("AFTER process(), nodes:", cyInstance.nodes().length);
+
+
             },
           } as any);
   

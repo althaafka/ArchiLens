@@ -141,9 +141,11 @@ export class MetricEnricher {
 
 export class ComposedDimensionEnricher {
   private cy: cytoscape.Core;
+  private showStructure: boolean;
 
-  constructor(cy: cytoscape.Core) {
+  constructor(cy: cytoscape.Core, showStructure: boolean) {
     this.cy = cy
+    this.showStructure = showStructure
   }
 
   public enrich(): void {
@@ -172,6 +174,7 @@ export class ComposedDimensionEnricher {
     const dimensionIds = Array.from(new Set([...composedDimIds, ...simpleDimIds]));
 
     structures.forEach(structure => {
+      if (structure.id() === 'java.lang.String') return;
       const scriptEdges = hasScripts.filter(edge => edge.data('source') === structure.id());
       const scripts = scriptEdges.map(edge => this.cy.getElementById(edge.data('target')));
   
@@ -247,9 +250,9 @@ export class ComposedDimensionEnricher {
       });
   
       container.addClass('layers');
-      // if (this.showStructure){
+      if (this.showStructure){
         container.addClass('package')
-      // }
+      }
     });   
   }
 
