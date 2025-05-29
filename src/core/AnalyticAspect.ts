@@ -2,7 +2,7 @@ import cytoscape from "cytoscape"
 import { getNodesByLabel, getEdgesByLabel } from "../utils/graphUtils";
 import { generateColorMap } from "../utils/colorUtils";
 import { getCategoryName, getMaxCategory } from "../utils/analyticAspectUtils";
-import { getNodeParent } from "../utils/nodeUtils";
+import { getNodeParent, getNodeName } from "../utils/nodeUtils";
 
 export default class AnalyticAspect {
   public dimension: any;
@@ -10,10 +10,11 @@ export default class AnalyticAspect {
   public metric: any;
   public composedDimension: any;
   public colorMap: any;
+  public depth: any;
 
   constructor(){}
 
-  collectAnalyticAspect(cy: cytoscape.Core) {
+  collectAnalyticAspect(cy: cytoscape.Core, depthData) {
     const nodes = cy.nodes()
     const edges = cy.edges()
     const dimension = getNodesByLabel(nodes, 'Dimension')
@@ -37,6 +38,7 @@ export default class AnalyticAspect {
             .map(cEdge => cEdge.data('source'))
         )
     )
+    this.depth = depthData;
 
     cy.remove(dimension);
     cy.remove(category);
@@ -95,6 +97,10 @@ export default class AnalyticAspect {
 
   private getDimensionById(dimId: string) {
     return this.dimension.find((dim) => dim.id === dimId) || null;
+  }
+
+  public getContainerOrder(): string[] {
+    return this.depth.containerOrder;
   }
 
   public getCategoriesOrder(dimension: string): string[] {

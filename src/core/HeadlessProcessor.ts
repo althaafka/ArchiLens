@@ -1,5 +1,5 @@
 import cytoscape from "cytoscape";
-import { DimensionEnricher, MetricEnricher, ComposedDimensionEnricher } from "./Headless/Enricher";
+import { DimensionEnricher, MetricEnricher, ComposedDimensionEnricher, DepthEnricher } from "./Headless/Enricher";
 import { StructureHandler } from "./Headless/StructureHandler";
 import { EdgeLifter } from "./Headless/EdgeLifter";
 import { CleanUpProcessor } from "./Headless/CleanUpProcessor";
@@ -20,12 +20,14 @@ export default class HeadlessProcessor {
     new DimensionEnricher(this.cy).enrich();
     new MetricEnricher(this.cy).enrich();
     new ComposedDimensionEnricher(this.cy, this.showStructure).enrich();
-
-    const analyticAspect = new AnalyticAspect()
-    analyticAspect.collectAnalyticAspect(this.cy);
-
+    
+    
     const structureHandler = new StructureHandler(this.cy);
     this.showStructure ? structureHandler.handleParentChild() : structureHandler.hideStructure();
+    const depthData = new DepthEnricher(this.cy, this.showStructure).enrich();
+    
+    const analyticAspect = new AnalyticAspect()
+    analyticAspect.collectAnalyticAspect(this.cy, depthData);
 
     new EdgeLifter(this.cy).lift();
     new CleanUpProcessor(this.cy).clean();

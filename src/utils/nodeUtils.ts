@@ -1,5 +1,10 @@
 import cytoscape from "cytoscape";
 
+export function getNodeName(node: cytoscape.NodeSingular): string {
+  const { name, shortname, simpleName } = node.data('properties') || {};
+  return name || shortname || simpleName || node.id();
+}
+
 export function getNodeLabels(node: cytoscape.NodeSingular): string[] {
   return node?.data('labels') || [node?.data('label')] || [];
 }

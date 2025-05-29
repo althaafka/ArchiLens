@@ -1,7 +1,7 @@
-import cytoscape from "cytoscape";
+import cytoscape, { NodeSingular } from "cytoscape";
 import { getEdgesByLabel, getNodesByLabel } from "../../utils/graphUtils";
 import { edgeHasLabel } from "../../utils/edgeUtils";
-import { nodeHasLabels } from "../../utils/nodeUtils";
+import { nodeHasLabels, getNodeName } from "../../utils/nodeUtils";
 
 export class DimensionEnricher {
   private cy: cytoscape.Core;
@@ -278,4 +278,55 @@ export class ComposedDimensionEnricher {
       return acc;
     }, {});
   };
+}
+
+export class DepthEnricher {
+  private cy: cytoscape.Core;
+  private showStructure: boolean;
+
+  constructor(cy: cytoscape.Core, showStructure: boolean) {
+    this.cy = cy;
+    this.showStructure = showStructure;
+  }
+
+  public enrich(): {
+    depthData: { id: string; depth: number; labels: string[] }[];
+    containerOrder: string[];
+  } {
+    const roots = this.cy.nodes().roots().filter(root =>
+      nodeHasLabels(root, ['Container']) || nodeHasLabels(root, ['Structure'])
+    );
+
+    const visited = new Set<string>();
+    const depthData: { id: string; depth: number; labels: string[] }[] = [];
+    const containerOrder: string[] = [];
+
+    const assignDepth = (node: cytoscape.NodeSingular, depth: number) => {
+      if (
+        !node ||
+        visited.has(node.id()) ||
+        !(nodeHasLabels(node, ['Structure']) || nodeHasLabels(node, ['Container']))
+      ) return;
+
+      visited.add(node.id());
+
+      const properties = node.data('properties') || {};
+      properties.depth = depth;
+      node.data('properties', properties);
+
+      const labels = node.data('labels') || [];
+      depthData.push({ id: node.id(), depth, labels });
+
+      const isPureContainer = labels.includes("Container") && !labels.includes("Structure");
+      if (isPureContainer) {
+        containerOrder.push(getNodeName(node));
+      }
+
+      node.children().forEach(child => assignDepth(child, depth + 1));
+    };
+
+    roots.forEach(root => assignDepth(root, 1));
+
+    return { depthData, containerOrder };
+  }
 }

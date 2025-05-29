@@ -70,12 +70,16 @@ const Layout = ({ cyInstance, showStructure, analyticAspect }) => {
         layoutOptions.xCategories = analyticAspect.getCategoriesOrder(xDimension);
       } else if (analyticAspect.isMetric(xDimension)) {
         layoutOptions.rangeStep = {x: xRangeStep, y:null};
+      } else if (xDimension == 'Dimension:Container') {
+        layoutOptions.xCategories = analyticAspect.getContainerOrder()
       }
       
       if (yDimension !== "Dimension:Container" && !analyticAspect.isMetric(yDimension)) {
         layoutOptions.yCategories = analyticAspect.getCategoriesOrder(yDimension) ;
       } else if (analyticAspect.isMetric(yDimension)) {
         layoutOptions.rangeStep = {x: null, y: yRangeStep};
+      }  else if (yDimension == 'Dimension:Container') {
+        layoutOptions.yCategories = analyticAspect.getContainerOrder()
       }
       
       const layoutInstance = cyInstance.layout(layoutOptions);
