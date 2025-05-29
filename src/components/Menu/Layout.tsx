@@ -2,8 +2,7 @@ import { useState, useRef } from 'react';
 import { layoutTypes } from '../../constants/layoutData'
 import registerSemanticGridLayout from 'cytoscape.js-semanticGrid';
 import cytoscape from 'cytoscape';
-import { initGraph } from '../../utils/graphManagement';
-import AnalysisAspect from '../../utils/analysisAspect';
+import GraphManager from '../../core/GraphManager';
 
 import {
   Box,
@@ -22,7 +21,7 @@ import {
 registerSemanticGridLayout(cytoscape);
 
 
-const Layout = ({ cyInstance, analysisData, showStructure }) => {
+const Layout = ({ cyInstance, showStructure, analyticAspect }) => {
   const [layout, setLayout] = useState(layoutTypes.grid);
   const [xDimension, setXDimension] = useState('');
   const [yDimension, setYDimension] = useState('');
@@ -36,27 +35,24 @@ const Layout = ({ cyInstance, analysisData, showStructure }) => {
 
   const relayout = () => {
     if (!cyInstance) return;
-    const graph = initGraph(cyInstance);
-    const analysisAspect = new AnalysisAspect(analysisData);
 
+    const manager = GraphManager.getInstance()
     
     if (prevLayoutRef.current && typeof prevLayoutRef.current.destroy === 'function' && prevLayoutType == "semanticGrid") {
       prevLayoutRef.current.destroy();
     }
 
     if (prevLayoutType === 'semanticGrid' ) {
-      graph.unhidePackage(cyInstance);
+      manager.unhidePackage(cyInstance);
     }
+
+    console.log("LAYOUT", analyticAspect)
     
     setPrevLayoutType(layout);
     
     if (layout == "semanticGrid") {
       if (!xDimension || !yDimension) return;
       
-      // if (showStructure) {
-        hidePackages ? graph.hidePackage(cyInstance) : graph.unhidePackage(cyInstance);
-      // }
-
       const layoutOptions: {
         name: string;
         xDimension: (node: any) => string;
@@ -66,30 +62,30 @@ const Layout = ({ cyInstance, analysisData, showStructure }) => {
         rangeStep?: { x: number | null; y: number | null };
       } = {
         name: 'semanticGrid',
-        xDimension: node => analysisAspect.getNodeCategory(node, xDimension, showStructure),
-        yDimension: node => analysisAspect.getNodeCategory(node, yDimension, showStructure),
+        xDimension: node => analyticAspect.getNodeCategory(node, xDimension, showStructure),
+        yDimension: node => analyticAspect.getNodeCategory(node, yDimension, showStructure),
       };
-
-
-
-      if (xDimension !== "Dimension:Container" && !analysisAspect.isMetric(xDimension)) {
-        layoutOptions.xCategories = analysisAspect.getCategoriesOrder(xDimension);
-      } else if (analysisAspect.isMetric(xDimension)) {
+      
+      if (xDimension !== "Dimension:Container" && !analyticAspect.isMetric(xDimension)) {
+        layoutOptions.xCategories = analyticAspect.getCategoriesOrder(xDimension);
+      } else if (analyticAspect.isMetric(xDimension)) {
         layoutOptions.rangeStep = {x: xRangeStep, y:null};
       }
-
-
-      if (yDimension !== "Dimension:Container" && !analysisAspect.isMetric(yDimension)) {
-        layoutOptions.yCategories = analysisAspect.getCategoriesOrder(yDimension) ;
-      } else if (analysisAspect.isMetric(yDimension)) {
+      
+      if (yDimension !== "Dimension:Container" && !analyticAspect.isMetric(yDimension)) {
+        layoutOptions.yCategories = analyticAspect.getCategoriesOrder(yDimension) ;
+      } else if (analyticAspect.isMetric(yDimension)) {
         layoutOptions.rangeStep = {x: null, y: yRangeStep};
       }
-
+      
       const layoutInstance = cyInstance.layout(layoutOptions);
       prevLayoutRef.current = layoutInstance;
-
+      
       layoutInstance.run();
-
+      
+      if (showStructure) {
+        hidePackages ? manager.hidePackage(cyInstance) : manager.unhidePackage(cyInstance);
+      }
     } else {
       cyInstance.layout({
         name: layout,
@@ -125,13 +121,13 @@ const Layout = ({ cyInstance, analysisData, showStructure }) => {
                 onChange={(e) => setXDimension(e.target.value)}
                 displayEmpty
               >
-                {analysisData.dimension.map((dim) => (
+                {analyticAspect.dimension.map((dim) => (
                   <MenuItem key={dim.id} value={dim.id}>
                     {dim.properties.simpleName || dim.id}
                   </MenuItem>
                 ))}
                 <MenuItem value="Dimension:Container">Container</MenuItem>
-                {analysisData.metric.map((metric) => (
+                {analyticAspect.metric.map((metric) => (
                   <MenuItem key={metric.id} value={metric.id}>
                     {metric.properties.simpleName || metric.id}
                   </MenuItem>
@@ -141,7 +137,7 @@ const Layout = ({ cyInstance, analysisData, showStructure }) => {
           </Box>
 
 
-          {analysisData.metric.find((m) => m.id === xDimension) && (
+          {analyticAspect.metric.find((m) => m.id === xDimension) && (
             <Box className="" display="flex" alignItems="center" gap={1}>
               <Typography className="w-20 text-xs text-gray-500 text-center">Step</Typography>
               <TextField
@@ -163,13 +159,13 @@ const Layout = ({ cyInstance, analysisData, showStructure }) => {
                onChange={(e) => setYDimension(e.target.value)}
                displayEmpty
              >
-                {analysisData.dimension.map((dim) => (
+                {analyticAspect.dimension.map((dim) => (
                   <MenuItem key={dim.id} value={dim.id}>
                     {dim.properties.simpleName || dim.id}
                   </MenuItem>
                 ))}
                 <MenuItem value="Dimension:Container">Container</MenuItem>
-                {analysisData.metric.map((metric) => (
+                {analyticAspect.metric.map((metric) => (
                   <MenuItem key={metric.id} value={metric.id}>
                     {metric.properties.simpleName || metric.id}
                   </MenuItem>
@@ -178,7 +174,7 @@ const Layout = ({ cyInstance, analysisData, showStructure }) => {
             </FormControl>
           </Box>
                 
-            {analysisData.metric.find((m) => m.id === yDimension) && (
+            {analyticAspect.metric.find((m) => m.id === yDimension) && (
               <Box className="" display="flex" alignItems="center" gap={1}>
               <Typography className="w-20 text-xs text-gray-500 text-center">Step</Typography>
               <TextField

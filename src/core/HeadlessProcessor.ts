@@ -30,7 +30,7 @@ export default class HeadlessProcessor {
     new EdgeLifter(this.cy).lift();
     new CleanUpProcessor(this.cy).clean();
     
-    return analyticAspect.getAnalyticAspectTemp();
+    return [analyticAspect, analyticAspect.getAnalyticAspectTemp()];
   }
 
   private flattenParentChild(): void {

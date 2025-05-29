@@ -12,12 +12,12 @@ import { Grid } from '@mui/material';
 
 const ColoringLegend = ({ 
     coloring, 
-    analysisData,
+    analyticAspect,
     categoriesVisibility, 
     setCategoriesVisibility, 
   }) => {
   
-    const dimensionId = analysisData.dimension.find(d => d.id === coloring)?.id;
+    const dimensionId = analyticAspect.dimension.find(d => d.id === coloring)?.id;
 
     const handleCheckboxChange = (key) => {
       setCategoriesVisibility((prev) => ({
@@ -34,10 +34,10 @@ const ColoringLegend = ({
       </Typography>
 
       <Box className="flex flex-col">
-        {Object.keys(analysisData.colorMap[dimensionId] || {}).map((key) => {
-          const color = analysisData.colorMap[dimensionId][key] || '#F2F2F2';
+        {Object.keys(analyticAspect.colorMap[dimensionId] || {}).map((key) => {
+          const color = analyticAspect.colorMap[dimensionId][key] || '#F2F2F2';
           const label =
-            analysisData.category.find((c) => c.id === key)?.properties.simpleName || key;
+            analyticAspect.category.find((c) => c.id === key)?.properties.simpleName || key;
 
           return (
             <Box key={key} className="flex items-center">

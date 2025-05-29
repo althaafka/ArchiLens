@@ -10,12 +10,13 @@ import {
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import { Tabs, Tab } from '@mui/material';
+import GraphManager from '../../core/GraphManager';
 
 
 const Menu = ({
   cyInstance,
   setGraph,
-  analysisData,
+  analyticAspect,
   showStructure,
   setShowStructure
 }) => {
@@ -106,7 +107,7 @@ const Menu = ({
             onChange={(e) => setShowStructure(e.target.checked)}
           />
         </Box>
-        <Layout cyInstance={cyInstance} analysisData={analysisData} showStructure={showStructure} />
+        <Layout cyInstance={cyInstance} analyticAspect={analyticAspect} showStructure={showStructure} />
         <Button
           fullWidth
           variant="contained"
@@ -122,7 +123,7 @@ const Menu = ({
         <ShowPrimitives cyInstance={cyInstance} />
         <NodeColoring 
           cyInstance={cyInstance} 
-          analysisData={analysisData} 
+          analyticAspect={analyticAspect} 
           coloring={coloring}
           setColoring={setColoring}
         />

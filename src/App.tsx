@@ -23,7 +23,7 @@ function App() {
   const [graph, setGraph] = useState(rawGraph);
   const [cyInstance, setCyInstance] = useState(null);
   const [_, setHCyInstance] = useState(null);
-  const [analysisData, setAnalysisData] = useState({});
+  const [analyticAspect, setAnalyticAspect] = useState({});
   const [showStructure, setShowStructure] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedElement, setSelectedElement] = useState(null);
@@ -43,14 +43,15 @@ function App() {
         setHCyInstance(hcyInstance);
         const processor = new HeadlessProcessor(hcyInstance);
         const analysisData = processor.process(showStructure);
-        console.log("ANALYTIC DATA:", analysisData)
+        console.log("ANALYTIC DATA:", analysisData[0])
 
-        setAnalysisData(analysisData);
+        setAnalyticAspect(analysisData[0]);
         
         console.log("elements:", hcyInstance.json().elements);
 
         const manager = GraphManager.getInstance()
-        manager.setAnalyticAspect(analysisData);
+        manager.setAnalyticAspect(analysisData[0]);
+        console.log(analysisData[0])
 
         if (cyRef.current) {
           const cy = cytoscape({
@@ -63,11 +64,6 @@ function App() {
               setCyInstance(cyInstance);
               const visualizer = new VisualProcessor(cyInstance, manager.getAnalyticAspect());
               visualizer.process();
-              console.log("BEFORE process(), nodes:", cyInstance.nodes().length);
-              visualizer.process();
-              console.log("AFTER process(), nodes:", cyInstance.nodes().length);
-
-
             },
           } as any);
   
@@ -110,7 +106,7 @@ function App() {
           <Menu
             cyInstance={cyInstance}
             setGraph={setGraph}
-            analysisData={analysisData}
+            analyticAspect={analyticAspect}
             showStructure={showStructure}
             setShowStructure={setShowStructure}
           />

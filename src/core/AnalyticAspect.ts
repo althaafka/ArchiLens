@@ -1,6 +1,8 @@
 import cytoscape from "cytoscape"
 import { getNodesByLabel, getEdgesByLabel } from "../utils/graphUtils";
 import { generateColorMap } from "../utils/colorUtils";
+import { getCategoryName, getMaxCategory } from "../utils/analyticAspectUtils";
+import { getNodeParent } from "../utils/nodeUtils";
 
 export default class AnalyticAspect {
   public dimension: any;
@@ -66,5 +68,41 @@ export default class AnalyticAspect {
 
   public isComposedDimension(dimId) {
     return this.composedDimension.includes(dimId);
+  }
+
+  public isMetric(metricId) {
+    return this.metric.find((m) => m.id == metricId)? true: false
+  }
+
+  public getNodeCategory(node, dimension: string, showStructure = true): string{
+      if (!node.data().labels.includes("Structure") && showStructure) return null;
+      if (!node.data().labels.includes("Structure")) {
+          const composed = node.data('properties').composedDimension?.[dimension];
+          if (!composed) return null;
+          const categoryName = getCategoryName(getMaxCategory(composed), dimension)
+          return categoryName
+      }
+      if (dimension == 'Dimension:Container') {
+          const container = getNodeParent(node);
+          return container? container.data().properties.simpleName || container.id() : null;
+      }
+      if (this.isMetric(dimension)) {
+          return node?.data().properties?.metric?.[dimension]
+      }
+      const composed = node?.data().properties?.dimension?.[dimension];
+      return composed ? getCategoryName(composed[0], dimension) : "-";
+  }
+
+  private getDimensionById(dimId: string) {
+    return this.dimension.find((dim) => dim.id === dimId) || null;
+  }
+
+  public getCategoriesOrder(dimension: string): string[] {
+    if (dimension == 'Dimension:Container') return null;
+    const rawCat = this.getDimensionById(dimension).categories
+    const catOrder = rawCat.map((cat) => {
+        return this.category.find((c) => c.id === cat)?.properties?.simpleName || "-"
+    })
+    return catOrder;
   }
 }

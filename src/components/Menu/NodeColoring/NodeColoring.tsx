@@ -12,20 +12,18 @@ import {
   MenuItem,
 } from '@mui/material';
 
-const NodeColoring = ({ cyInstance, analysisData, coloring, setColoring}) => {
+const NodeColoring = ({ cyInstance, analyticAspect, coloring, setColoring}) => {
 
   const [categoriesVisibility, setCategoriesVisibility] = useState({});
-
-  // const [featureChanged, setFeatureChanged] = useState(null)
 
   useEffect(() => {
     if (!cyInstance) return;
 
 
-    if (!analysisData.metric.find(m => m.id == coloring)) {
+    if (!analyticAspect.metric?.find(m => m.id == coloring)) {
       let catVis = {};
       if (coloring != "none"){
-        catVis = Object.keys(analysisData.colorMap[coloring]).reduce((acc, key) => {
+        catVis = Object?.keys(analyticAspect?.colorMap[coloring]).reduce((acc, key) => {
           acc[key] = true;
           return acc;
         }, {})
@@ -47,10 +45,10 @@ const NodeColoring = ({ cyInstance, analysisData, coloring, setColoring}) => {
 
   useEffect(() => {
     if (!cyInstance || coloring === "none") return;
-    if (analysisData.metric.find(m => m.id == coloring)) return;
+    if (analyticAspect.metric.find(m => m.id == coloring)) return;
 
     cyInstance.nodes(n => n.data("labels")?.includes("Structure")).forEach((node) => {
-      const categoriesIds = analysisData.composedDimension.includes(coloring)? Object.keys(node.data('properties').composedDimension?.[coloring] || {}) : (node?.data('properties')?.dimension?.[coloring] || []);
+      const categoriesIds = analyticAspect.composedDimension.includes(coloring)? Object.keys(node.data('properties').composedDimension?.[coloring] || {}) : (node?.data('properties')?.dimension?.[coloring] || []);
       const isVisible = categoriesIds.some((id) => categoriesVisibility[id])
       node.style('display', isVisible ? 'element' : 'none');
     })
@@ -65,12 +63,12 @@ const NodeColoring = ({ cyInstance, analysisData, coloring, setColoring}) => {
           onChange={(e) => setColoring(e.target.value)}
         >
           <MenuItem value="none">None</MenuItem>
-          {analysisData?.dimension?.map((dim) => (
+          {analyticAspect?.dimension?.map((dim) => (
             <MenuItem key={dim.id} value={dim.id}>
               {camelCaseToWords(dim.properties.simpleName)}
             </MenuItem>
           ))}
-          {analysisData?.metric?.map((metric) => (
+          {analyticAspect?.metric?.map((metric) => (
             <MenuItem key={metric.id} value={metric.id}>
               {camelCaseToWords(metric.properties.simpleName)}
             </MenuItem>
@@ -78,10 +76,10 @@ const NodeColoring = ({ cyInstance, analysisData, coloring, setColoring}) => {
         </Select>
       </FormControl>
 
-      {coloring !== "none" && !analysisData.metric.find((m) => m.id === coloring) && (
+      {coloring !== "none" && !analyticAspect.metric.find((m) => m.id === coloring) && (
         <ColoringLegend
           coloring={coloring}
-          analysisData={analysisData}
+          analyticAspect={analyticAspect}
           categoriesVisibility={categoriesVisibility}
           setCategoriesVisibility={setCategoriesVisibility}
         />
