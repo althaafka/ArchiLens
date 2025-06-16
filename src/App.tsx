@@ -13,6 +13,7 @@ import VisualProcessor from './core/VisualProcessor';
 import ElementDrawer from "./components/Menu/Drawer";
 import GraphManager from './core/GraphManager';
 import GraphPreProcessor from './core/GraphPreprocessor';
+import { isSemanticGridEl } from './utils/graphUtils';
 
 import { Box, CssBaseline } from '@mui/material';
 
@@ -43,15 +44,14 @@ function App() {
         setHCyInstance(hcyInstance);
         const processor = new HeadlessProcessor(hcyInstance);
         const analysisData = processor.process(showStructure);
-        console.log("ANALYTIC DATA:", analysisData[0])
 
-        setAnalyticAspect(analysisData[0]);
+        setAnalyticAspect(analysisData);
         
         console.log("elements:", hcyInstance.json().elements);
 
         const manager = GraphManager.getInstance()
-        manager.setAnalyticAspect(analysisData[0]);
-        console.log(analysisData[0])
+        manager.setAnalyticAspect(analysisData);
+        console.log(analysisData)
 
         if (cyRef.current) {
           const cy = cytoscape({
@@ -68,15 +68,17 @@ function App() {
           } as any);
   
           cy.on('tap', 'node', (event) => {
+            console.log("Node clicked:", event.target.data());
+            if (isSemanticGridEl(event.target)) return;
             setSelectedElement(event.target.data());
             setDrawerOpen(true);
-            console.log("Node clicked:", event.target.data());
           });
   
           cy.on('tap', 'edge', (event) => {
+            console.log("Edge clicked:", event.target.data());
+            if (isSemanticGridEl(event.target)) return;
             setSelectedElement(event.target.data());
             setDrawerOpen(true);
-            console.log("Edge clicked:", event.target.data());
           });
 
           cy.on("tap", (e) => {

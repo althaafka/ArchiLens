@@ -4,6 +4,7 @@ import { StructureHandler } from "./Headless/StructureHandler";
 import { EdgeLifter } from "./Headless/EdgeLifter";
 import { CleanUpProcessor } from "./Headless/CleanUpProcessor";
 import AnalyticAspect from "./AnalyticAspect";
+import {getRoot} from "../utils/graphUtils"
 
 export default class HeadlessProcessor {
   private cy: cytoscape.Core;
@@ -29,10 +30,31 @@ export default class HeadlessProcessor {
     const analyticAspect = new AnalyticAspect()
     analyticAspect.collectAnalyticAspect(this.cy, depthData);
 
-    new EdgeLifter(this.cy).lift();
+    // const edgelifter = new EdgeLifter(this.cy)
+    // edgelifter.lift(3);
+    // edgelifter.unlift(3)
+    
     new CleanUpProcessor(this.cy).clean();
     
-    return [analyticAspect, analyticAspect.getAnalyticAspectTemp()];
+    return analyticAspect;
+  }
+
+  private filterAndLiftContainer(container: cytoscape.NodeSingular): void {
+    const children = container.children();
+    console.log("CHILD")
+    children.forEach(child => console.log(child.data()))
+
+    const childIds = new Set(children.map(n => n.id()));
+
+    // 2. Hide all nodes that are not children of the container
+    this.cy.nodes().forEach(node => {
+      if (!childIds.has(node.id()) && node.id() != container.id()) {
+        node.remove();
+      }
+    });
+
+    // buat supaya edges naik ke anak container semua dengan yang memiliki label sama maka weight nya akan ditambah
+
   }
 
   private flattenParentChild(): void {

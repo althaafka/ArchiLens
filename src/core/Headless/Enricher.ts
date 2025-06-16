@@ -1,5 +1,5 @@
 import cytoscape, { NodeSingular } from "cytoscape";
-import { getEdgesByLabel, getNodesByLabel } from "../../utils/graphUtils";
+import { getEdgesByLabel, getNodesByLabel, getRoot } from "../../utils/graphUtils";
 import { edgeHasLabel } from "../../utils/edgeUtils";
 import { nodeHasLabels, getNodeName } from "../../utils/nodeUtils";
 
@@ -292,14 +292,14 @@ export class DepthEnricher {
   public enrich(): {
     depthData: { id: string; depth: number; labels: string[] }[];
     containerOrder: string[];
+    maxDepth: number;
   } {
-    const roots = this.cy.nodes().roots().filter(root =>
-      nodeHasLabels(root, ['Container']) || nodeHasLabels(root, ['Structure'])
-    );
+    const roots = getRoot(this.cy)
 
     const visited = new Set<string>();
     const depthData: { id: string; depth: number; labels: string[] }[] = [];
     const containerOrder: string[] = [];
+    let maxDepth = 0;
 
     const assignDepth = (node: cytoscape.NodeSingular, depth: number) => {
       if (
@@ -317,6 +317,8 @@ export class DepthEnricher {
       const labels = node.data('labels') || [];
       depthData.push({ id: node.id(), depth, labels });
 
+      if (depth > maxDepth) maxDepth = depth
+
       const isPureContainer = labels.includes("Container") && !labels.includes("Structure");
       if (isPureContainer) {
         containerOrder.push(getNodeName(node));
@@ -327,6 +329,6 @@ export class DepthEnricher {
 
     roots.forEach(root => assignDepth(root, 1));
 
-    return { depthData, containerOrder };
+    return { depthData, containerOrder, maxDepth };
   }
 }

@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { layoutTypes } from '../../constants/layoutData'
 import registerSemanticGridLayout from 'cytoscape.js-semanticGrid';
 import cytoscape from 'cytoscape';
@@ -17,11 +17,12 @@ import {
   Checkbox,
   TextField,
 } from '@mui/material';
+import { EdgeLifter } from '../../core/Headless/EdgeLifter';
 
 registerSemanticGridLayout(cytoscape);
 
 
-const Layout = ({ cyInstance, showStructure, analyticAspect }) => {
+const Layout = ({ cyInstance, showStructure, analyticAspect, onLayoutChange, onHidePackagesChange, onLiftEdgeChange }) => {
   const [layout, setLayout] = useState(layoutTypes.grid);
   const [xDimension, setXDimension] = useState('');
   const [yDimension, setYDimension] = useState('');
@@ -32,6 +33,12 @@ const Layout = ({ cyInstance, showStructure, analyticAspect }) => {
   const prevLayoutRef = useRef(null)
   const [prevLayoutType, setPrevLayoutType] = useState(null);
 
+  useEffect(() => {
+    onLayoutChange?.(layout);
+  }, [layout]);
+  useEffect(() => {
+    onHidePackagesChange?.(hidePackages);
+  }, [hidePackages]);
 
   const relayout = () => {
     if (!cyInstance) return;
@@ -42,14 +49,14 @@ const Layout = ({ cyInstance, showStructure, analyticAspect }) => {
       prevLayoutRef.current.destroy();
     }
 
-    if (prevLayoutType === 'semanticGrid' ) {
+    if (prevLayoutType === 'semanticGrid' && showStructure ) {
       manager.unhidePackage(cyInstance);
     }
 
     console.log("LAYOUT", analyticAspect)
     
     setPrevLayoutType(layout);
-    
+
     if (layout == "semanticGrid") {
       if (!xDimension || !yDimension) return;
       
@@ -88,7 +95,14 @@ const Layout = ({ cyInstance, showStructure, analyticAspect }) => {
       layoutInstance.run();
       
       if (showStructure) {
-        hidePackages ? manager.hidePackage(cyInstance) : manager.unhidePackage(cyInstance);
+        if (hidePackages) {
+          const edgelifter = new EdgeLifter(cyInstance)
+          edgelifter.unlift(analyticAspect?.depth?.maxDepth)
+          manager.hidePackage(cyInstance)
+          onLiftEdgeChange?.(analyticAspect?.depth?.maxDepth)
+        } else {
+          manager.unhidePackage(cyInstance)
+        }
       }
     } else {
       cyInstance.layout({

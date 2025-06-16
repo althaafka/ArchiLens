@@ -1,6 +1,7 @@
 import cytoscape from "cytoscape";
 import { isPureContainer, removeChildRelation, addChildRelation } from "../utils/nodeUtils";
 import { edgeHasLabel } from "../utils/edgeUtils";
+import { EdgeLifter } from "./Headless/EdgeLifter";
 
 
 export default class GraphManager {

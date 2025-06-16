@@ -116,7 +116,10 @@ export default class GraphAbstractor {
                           id: `${source}-${target}-${newLabel}`,
                           source: source,
                           target: target,
-                          label: newLabel
+                          label: newLabel,
+                          properties: {
+                            weight: 1
+                          }
                       }
                   });
               });
