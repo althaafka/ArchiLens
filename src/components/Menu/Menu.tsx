@@ -16,7 +16,7 @@ import { IconButton, Tooltip } from '@mui/material';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { isSemanticGridEl } from '../../utils/graphUtils';
-
+import NodeFilterTree from './NodeFilterTree';
 
 
 const Menu = ({
@@ -181,8 +181,9 @@ const Menu = ({
           coloring={coloring}
           setColoring={setColoring}
         />
+          <Typography variant="subtitle1">Node Visibility</Typography>
+  <NodeFilterTree cyInstance={cyInstance} />
       </Box>
-
 
       <Box hidden={tabIndex !== 2} className="space-y-2 p-4">
         {/* Opsi Lift/Unlift by Depth */}
