@@ -293,12 +293,14 @@ export class DepthEnricher {
     depthData: { id: string; depth: number; labels: string[] }[];
     containerOrder: string[];
     maxDepth: number;
+    containerIds: string[]
   } {
     const roots = getRoot(this.cy)
 
     const visited = new Set<string>();
     const depthData: { id: string; depth: number; labels: string[] }[] = [];
     const containerOrder: string[] = [];
+    const containerIds: string[]=[];
     let maxDepth = 0;
 
     const assignDepth = (node: cytoscape.NodeSingular, depth: number) => {
@@ -322,6 +324,7 @@ export class DepthEnricher {
       const isPureContainer = labels.includes("Container") && !labels.includes("Structure");
       if (isPureContainer) {
         containerOrder.push(getNodeName(node));
+        containerIds.push(node.id())
       }
 
       node.children().forEach(child => assignDepth(child, depth + 1));
@@ -329,6 +332,6 @@ export class DepthEnricher {
 
     roots.forEach(root => assignDepth(root, 1));
 
-    return { depthData, containerOrder, maxDepth };
+    return { depthData, containerOrder, maxDepth, containerIds };
   }
 }

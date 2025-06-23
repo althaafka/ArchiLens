@@ -17,6 +17,7 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { isSemanticGridEl } from '../../utils/graphUtils';
 import NodeFilterTree from './NodeFilterTree';
+import ContainerSelector from './ContainerSelector';
 
 
 const Menu = ({
@@ -154,6 +155,7 @@ const Menu = ({
             onChange={(e) => setShowStructure(e.target.checked)}
           />
         </Box>
+        <ContainerSelector cyInstance={cyInstance} analyticAspect={analyticAspect} filterEdgeDisplay={filterEdgeDisplay}></ContainerSelector>
         <Layout 
           cyInstance={cyInstance} 
           analyticAspect={analyticAspect} 

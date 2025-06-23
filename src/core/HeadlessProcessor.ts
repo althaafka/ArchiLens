@@ -31,9 +31,11 @@ export default class HeadlessProcessor {
     analyticAspect.collectAnalyticAspect(this.cy, depthData);
 
     // const edgelifter = new EdgeLifter(this.cy)
-    // edgelifter.lift(3);
-    // edgelifter.unlift(3)
-    
+    // const node = this.cy.getElementById("nl.tudelft.jpacman.level")
+    // const level = node.data("properties").depth
+    // edgelifter.lift(4, level+1)
+    // this.filterAndLiftContainer(node)
+
     new CleanUpProcessor(this.cy).clean();
     
     return analyticAspect;
@@ -41,20 +43,34 @@ export default class HeadlessProcessor {
 
   private filterAndLiftContainer(container: cytoscape.NodeSingular): void {
     const children = container.children();
-    console.log("CHILD")
     children.forEach(child => console.log(child.data()))
 
-    const childIds = new Set(children.map(n => n.id()));
+    const getAncestors = (node: cytoscape.NodeSingular): cytoscape.NodeSingular[] => {
+      const ancestors: cytoscape.NodeSingular[] = [];
+      let current = node;
 
-    // 2. Hide all nodes that are not children of the container
+      while (current.parent().nonempty()) {
+        const parent = current.parent()[0];
+        ancestors.push(parent);
+        current = parent;
+      }
+
+      return ancestors;
+    };
+
+    const visibleNodes = new Set<string>([
+      container.id(),
+      ...children.map(n => n.id()),
+      ...getAncestors(container).map(n => n.id()),
+    ]);
+
+    console.log("VISIBLE NODES:", visibleNodes)
+
     this.cy.nodes().forEach(node => {
-      if (!childIds.has(node.id()) && node.id() != container.id()) {
-        node.remove();
+      if (!visibleNodes.has(node.id())) {
+        node.remove()
       }
     });
-
-    // buat supaya edges naik ke anak container semua dengan yang memiliki label sama maka weight nya akan ditambah
-
   }
 
   private flattenParentChild(): void {

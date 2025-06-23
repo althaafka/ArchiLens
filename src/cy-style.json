@@ -3,6 +3,8 @@
       "selector": "node",
       "style": {
         "shape": "round-rectangle",
+        "min-width": "10px",
+        "min-height": "8px",
         "height": "8px",
         "width": "label",
         "padding": "16px",

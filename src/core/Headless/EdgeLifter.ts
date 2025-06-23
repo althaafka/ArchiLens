@@ -93,8 +93,14 @@ export class EdgeLifter {
     liftedEdges.remove();
   }
 
+  public lift(maxDepth, level) {
+    for (let d = maxDepth; d >= level; d--) {
+      this.liftEdges(d);
+    }
+  }
+
   public liftEdges(level) {
-    console.log("LIFTEDGES", level)
+    console.log("LIFT EDGES..", level)
     // console.log("Edge semantic grid sebelum");
     // this.cy.edges().forEach(e => {
     //   if (isSemanticGridEl(e)) {
