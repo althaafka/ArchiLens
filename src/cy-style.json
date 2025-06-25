@@ -13,7 +13,7 @@
         "text-valign": "center",
         "text-halign": "center",
         "background-color": "#f2f2f2",
-        "border-width": "3",
+        "border-width": "1.5px",
         "border-color": "#5E5E5E",
         "box-radius": "5px"
 
@@ -26,7 +26,7 @@
         "text-valign": "top",
         "text-halign": "center",
         "padding": "16px",
-        "border-width": "3px",
+        "border-width": "2px",
         "border-color": "#5E5E5E",
         "background-color": "#f2f2f2"
       }
@@ -47,7 +47,64 @@
         "color": "#000",
         "edge-text-rotation": "autorotate",
         "arrow-scale": 1,
-        "min-zoomed-font-size": "6px"
+        "min-zoomed-font-size": "8px",
+        "width": "data(properties.weight)"
+      }
+    },
+    {
+      "selector": "edge[label = 'calls']",
+      "style": {
+        "line-fill": "linear-gradient",
+        "line-gradient-stop-colors": ["#00203E", "#A8E8CA"]
+      }
+    },
+    {
+      "selector": "edge[label = 'accepts']",
+      "style": {
+        "line-fill": "linear-gradient",
+        "line-gradient-stop-colors": ["#476B55", "#E9ED7B"]
+      }
+    },
+    {
+      "selector": "edge[label = 'holds']",
+      "style": {
+        "line-fill": "linear-gradient",
+        "line-gradient-stop-colors": ["#AD2A2A", "#FFF200"]
+      }
+    },
+    {
+      "selector": "edge[label = 'accesses']",
+      "style": {
+        "line-fill": "linear-gradient",
+        "line-gradient-stop-colors": ["#4D5282", "#FDFF75"]
+      }
+    },
+        {
+      "selector": "edge[label = 'specializes']",
+      "style": {
+        "line-fill": "linear-gradient",
+        "line-gradient-stop-colors": ["#630063", "#00BBFF"]
+      }
+    },
+    {
+      "selector": "edge[label = 'constructs']",
+      "style": {
+        "line-fill": "linear-gradient",
+        "line-gradient-stop-colors": ["#0066FF", "#FAB300"]
+      }
+    },
+    {
+      "selector": "edge[label = 'returns']",
+      "style": {
+        "line-fill": "linear-gradient",
+        "line-gradient-stop-colors": ["#424242", "#FF008C"]
+      }
+    },
+            {
+      "selector": "edge[label = 'contains']",
+      "style": {
+        "line-fill": "linear-gradient",
+        "line-gradient-stop-colors": ["#3B3B3B", "#9C9C9C"]
       }
     }
   ]

@@ -88,7 +88,10 @@ export default class GraphAbstractor {
                   id: `${source}-${edge.data.target}-${newLabel}`,
                   source: source,
                   target: edge.data.target,
-                  label: newLabel
+                  label: newLabel,
+                  properties: {
+                    "weight": 1
+                  }
               }
           });
         });

@@ -46,10 +46,21 @@ const ColoringLegend = ({
                 onChange={() => handleCheckboxChange(key)}
                 size="small"
               />
-              <span
+                      <Box
+          sx={{
+            width: 35,
+            height: 20,
+            borderRadius: '4px',
+            background: color,
+            border: '1px solid #ccc',
+            marginRight: 1,
+            flexShrink: 0,
+          }}
+        />
+              {/* <span
                 className="w-9 h-4.5 mr-2 rounded-sm border border-gray-600"
                 style={{ backgroundColor: color }}
-              />
+              /> */}
               <Typography variant="body2" className="text-sm text-gray-800">
                 {label}
               </Typography>

@@ -9,20 +9,45 @@ export function generateColorMap(labels) {
     return colorMap;
 }
 
-export function generateColorMetric(minVal, maxVal, val) {
-    const startHue = 3;
-    const endHue = 255;
-
-    if (isNaN(val) || val == null) return "#f2f2f2";
-    if (maxVal === minVal) return `hsl(${startHue}, 30%, 60%)`;
-
-    const ratio = (val - minVal) / (maxVal - minVal);
-    const clampedRatio = Math.max(0, Math.min(1, ratio));
-
-    const hue = startHue + (endHue - startHue) * clampedRatio;
-
-    return `hsl(${hue}, 67%, 60%)`;
+function hexToRgb(hex: any) {
+  hex = hex.replace('#', '');
+  if (hex.length === 3) {
+    hex = hex.split('').map(h => h + h).join('');
+  }
+  const bigint = parseInt(hex, 16);
+  return [
+    (bigint >> 16) & 255,  // R
+    (bigint >> 8) & 255,   // G
+    bigint & 255           // B
+  ];
 }
+
+function rgbToHex([r, g, b]: any) {
+  return (
+    '#' +
+    [r, g, b]
+      .map(c => Math.round(c).toString(16).padStart(2, '0'))
+      .join('')
+  );
+}
+
+export function generateColorMetric(minVal, maxVal, val) {
+  const startColor = hexToRgb('#F2F2F2'); // light grayish
+  const endColor = hexToRgb('#3387CC');   // darker gray
+
+  if (isNaN(val) || val == null) return "#f2f2f2";
+  if (maxVal === minVal) return rgbToHex(startColor);
+
+  const ratio = Math.max(0, Math.min(1, (val - minVal) / (maxVal - minVal)));
+
+  const interpolated = startColor.map((start, i) => {
+    const end = endColor[i];
+    return start + (end - start) * ratio;
+  });
+
+  return rgbToHex(interpolated);
+}
+
 
 const generateColor = (index, total) => {
   const hue = (index * (360 / total)) % 360;
