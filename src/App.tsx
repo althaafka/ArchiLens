@@ -6,6 +6,8 @@ import { StylesheetCSS } from "cytoscape";
 import styleData from "./cy-style.json";
 // import rawGraph from "./assets/jpacman-v3-dim.json";
 import rawGraph from "./assets/jpacman-v4-metric.json";
+
+// import rawGraph from "./assets/JHotDraw-5.1-output-v3c 3 (1).json";
 import Menu from './components/Menu/Menu';
 const style: StylesheetCSS[] = styleData as unknown as StylesheetCSS[];
 import HeadlessProcessor from './core/HeadlessProcessor';

@@ -21,6 +21,7 @@ export class DimensionEnricher {
     const dimensions = getNodesByLabel(nodes, 'Dimension');
     const categories = getNodesByLabel(nodes, 'Category');
 
+
     dimensions?.forEach(dim => {
       const composesCategories = composesEdges
         .filter(edge => edge.data('source') === dim.id())
@@ -78,11 +79,22 @@ export class DimensionEnricher {
     
     dimensions?.forEach(dim => {
       const dimId = dim.id();
+      let isOnlyComposed = true
       allNodes.forEach(node => {
         if (!node.data('properties').dimension) {
           node.data('properties').dimension = {};
         }
-    
+        const hasCategory = node?.data('properties')?.dimension[dimId];
+        if (hasCategory) {
+          isOnlyComposed = false
+        }
+      })
+      allNodes.forEach(node => {
+        if (isOnlyComposed) {
+          node.data('properties').dimension[dimId] = []
+          return;
+        }
+        
         const hasCategory = node.data('properties').dimension[dimId];
     
         if (!hasCategory || hasCategory.length === 0) {

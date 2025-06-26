@@ -91,8 +91,14 @@ export default class AnalyticAspect {
       if (this.isMetric(dimension)) {
           return node?.data().properties?.metric?.[dimension]
       }
-      const composed = node?.data().properties?.dimension?.[dimension];
-      return composed ? getCategoryName(composed[0], dimension) : "-";
+      const simpleDim = node?.data().properties?.dimension?.[dimension];
+      if (!simpleDim || simpleDim.length == 0) {
+        const composed = node.data('properties').composedDimension?.[dimension];
+        if (!composed) return "-"
+        const categoryName = getCategoryName(getMaxCategory(composed), dimension)
+        return categoryName
+      }
+      return getCategoryName(simpleDim[0], dimension) || "-";
   }
 
   private getDimensionById(dimId: string) {
