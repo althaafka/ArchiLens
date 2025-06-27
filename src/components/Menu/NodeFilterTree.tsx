@@ -12,6 +12,16 @@ const NodeFilterTree = ({ cyInstance }) => {
   const handleToggle = (id, checked) => {
     const node = cyInstance.getElementById(id);
     node.style({ display: checked ? 'element' : 'none' });
+    const parent = node.parent();
+    if (parent.nonempty()) {
+
+        parent.style({
+          display: 'element',
+          opcity: 0.3,
+          width: 50,
+          height: 30
+        });
+      }
     setVisibleNodes(prev => ({ ...prev, [id]: checked }));
   };
 

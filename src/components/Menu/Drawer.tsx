@@ -23,6 +23,7 @@ const ElementDrawer = ({ open, onClose, elementData }) => {
   const renderPropertyList = (props: Record<string, any>) => (
     <Box className="space-y-3 text-sm text-stone-700">
       {Object.entries(props).map(([key, val]) => (
+        (key != "composedDimension" && key != 'dimension') &&
         <Box key={key}>
           <Typography
             variant="subtitle2"

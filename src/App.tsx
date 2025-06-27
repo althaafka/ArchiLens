@@ -2,6 +2,8 @@ import { useRef, useState, useEffect } from 'react';
 import './App.css';
 import cytoscape from "cytoscape";
 import cytoscapeCola from "cytoscape-cola";
+import cytoscapeKlay from 'cytoscape-klay';
+import cytoscapeFcose from 'cytoscape-fcose';
 import { StylesheetCSS } from "cytoscape";
 import styleData from "./cy-style.json";
 // import rawGraph from "./assets/jpacman-v3-dim.json";
@@ -20,6 +22,8 @@ import { isSemanticGridEl } from './utils/graphUtils';
 import { Box, CssBaseline } from '@mui/material';
 
 cytoscape.use(cytoscapeCola);
+cytoscape.use(cytoscapeKlay)
+cytoscape.use(cytoscapeFcose)
 
 function App() {
   const cyRef = useRef<HTMLDivElement>(null);
