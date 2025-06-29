@@ -10,7 +10,7 @@ export default class GraphPreProcessor {
 
     // Abstractize if the graph is detailed
     if (GraphPreProcessor.isDetailedGraph(processedElements)) {
-      processedElements = new GraphAbstractor(processedElements).transform();
+      processedElements = GraphAbstractor.transform(processedElements);
     }
 
     // Merge chained container, hide primitives, change node name
