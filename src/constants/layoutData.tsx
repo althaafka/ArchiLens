@@ -3,5 +3,6 @@ export const layoutTypes = {
     "cola": "Cola",
     "semanticGrid": "Semantic Grid",
     "klay": "Klay",
-    "fcose": "FCose"
+    "fcose": "FCose",
+    "dagre": "Dagre"
 }

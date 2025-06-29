@@ -1,17 +1,19 @@
 import { useRef, useState, useEffect } from 'react';
 import './App.css';
+
+// Cytoscape and layout library
 import cytoscape from "cytoscape";
 import cytoscapeCola from "cytoscape-cola";
 import cytoscapeKlay from 'cytoscape-klay';
 import cytoscapeFcose from 'cytoscape-fcose';
+import cytoscapeDagre from 'cytoscape-dagre';
+
 import { StylesheetCSS } from "cytoscape";
 import styleData from "./cy-style.json";
-// import rawGraph from "./assets/jpacman-v3-dim.json";
 import rawGraph from "./assets/jpacman-v4-metric.json";
-
 // import rawGraph from "./assets/JHotDraw-5.1-output-v3c 3 (1).json";
+
 import Menu from './components/Menu/Menu';
-const style: StylesheetCSS[] = styleData as unknown as StylesheetCSS[];
 import HeadlessProcessor from './core/HeadlessProcessor';
 import VisualProcessor from './core/VisualProcessor';
 import ElementDrawer from "./components/Menu/Drawer";
@@ -22,8 +24,11 @@ import { isSemanticGridEl } from './utils/graphUtils';
 import { Box, CssBaseline } from '@mui/material';
 
 cytoscape.use(cytoscapeCola);
-cytoscape.use(cytoscapeKlay)
-cytoscape.use(cytoscapeFcose)
+cytoscape.use(cytoscapeKlay);
+cytoscape.use(cytoscapeFcose);
+cytoscape.use(cytoscapeDagre);
+
+const style: StylesheetCSS[] = styleData as unknown as StylesheetCSS[];
 
 function App() {
   const cyRef = useRef<HTMLDivElement>(null);
@@ -35,12 +40,10 @@ function App() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedElement, setSelectedElement] = useState(null);
 
-  // Init cytoscape
   useEffect(() => {
     if (!cyRef.current) return;
-    console.log("Initializing Cytoscape...");
 
-    const processedGraph = new GraphPreProcessor(graph.elements).initialize();
+    const processedGraph = GraphPreProcessor.initialize(graph.elements);
 
     const hcy = cytoscape({
       headless: true,
@@ -52,8 +55,6 @@ function App() {
         const analysisData = processor.process(showStructure);
 
         setAnalyticAspect(analysisData);
-        
-        console.log("elements:", hcyInstance.json().elements);
 
         const manager = GraphManager.getInstance()
         manager.setAnalyticAspect(analysisData);
@@ -126,10 +127,10 @@ function App() {
         </Box>
 
         <ElementDrawer
-      open={drawerOpen}
-      onClose={() => setDrawerOpen(false)}
-      elementData={selectedElement}
-    />
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          elementData={selectedElement}
+        />
       </Box>
     </>
   );

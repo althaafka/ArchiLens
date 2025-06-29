@@ -30,7 +30,6 @@ const ContainerSelector = ({ cyInstance, analyticAspect, filterEdgeDisplay }) =>
     edgelifter.unlift(analyticAspect.depth.maxDepth)
 
     if (containerId === '') {
-      console.log("ASd")
       cyInstance.nodes().forEach(node => {
         if (node.id() == "nl.tudelft.jpacman.ui") console.log("CONTAINER")
         if (!(nodeHasLabels(node, ["Structure"]) || nodeHasLabels(node, ["Container"])) || node.id() == "java.lang.String") return;
@@ -44,10 +43,12 @@ const ContainerSelector = ({ cyInstance, analyticAspect, filterEdgeDisplay }) =>
     edgelifter.lift(analyticAspect.depth.maxDepth, level+1)
     filterAndLiftContainer(node)
     filterEdgeDisplay()
+    console.log(cyInstance.getElementById("nl.tudelft.jpacman").style())
   };
 
   function filterAndLiftContainer(container: cytoscape.NodeSingular): void {
     const children = container.children();
+    console.log("CHILDREN of", container.id())
     children.forEach(child => console.log(child.id()))
 
     const getAncestors = (node: cytoscape.NodeSingular): cytoscape.NodeSingular[] => {
@@ -73,11 +74,13 @@ const ContainerSelector = ({ cyInstance, analyticAspect, filterEdgeDisplay }) =>
 
     cyInstance.nodes().forEach(node => {
       if (visibleNodes.has(node.id())) {
-        if (node.id() == "nl.tudelft.jpacman.ui") console.log("CONTAINER", node.id())
+        console.log("-", node.id())
+        // if (node.id() == "nl.tudelft.jpacman.ui") console.log("CONTAINER", node.id())
         node.style('display', 'element');
-        node.style('min-width', "10px");
-        node.style('min-height', "10px");
-        console.log(node.style())
+        if (node.isParent()) {
+          node.style('width', "50px");
+          node.style('height', "30px");
+        }
       } else {
         node.style('display', 'none');
       }
