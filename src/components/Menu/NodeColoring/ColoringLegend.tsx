@@ -35,7 +35,7 @@ const ColoringLegend = ({
 
       <Box className="flex flex-col">
         {Object.keys(analyticAspect.colorMap[dimensionId] || {}).map((key) => {
-          const color = analyticAspect.colorMap[dimensionId][key] || '#F2F2F2';
+          const color = analyticAspect.colorMap[dimensionId][key] || '#Fafaf9';
           const label =
             analyticAspect.category.find((c) => c.id === key)?.properties.simpleName || key;
 

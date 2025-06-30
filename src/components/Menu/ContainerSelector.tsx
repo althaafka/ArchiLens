@@ -78,8 +78,8 @@ const ContainerSelector = ({ cyInstance, analyticAspect, filterEdgeDisplay }) =>
         // if (node.id() == "nl.tudelft.jpacman.ui") console.log("CONTAINER", node.id())
         node.style('display', 'element');
         if (node.isParent()) {
-          node.style('width', "50px");
-          node.style('height', "30px");
+          node.style('width', "40px");
+          node.style('height', "16px");
         }
       } else {
         node.style('display', 'none');

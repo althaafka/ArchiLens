@@ -4,7 +4,7 @@ export function generateColorMap(labels) {
     labels?.forEach((label, i) => { 
         colorMap[label] = generateColor(i, labels.length);
     });
-    colorMap["-"] = "#f2f2f2";
+    colorMap["-"] = "#fafaf9";
 
     return colorMap;
 }
@@ -16,9 +16,9 @@ function hexToRgb(hex: any) {
   }
   const bigint = parseInt(hex, 16);
   return [
-    (bigint >> 16) & 255,  // R
-    (bigint >> 8) & 255,   // G
-    bigint & 255           // B
+    (bigint >> 16) & 255,
+    (bigint >> 8) & 255,
+    bigint & 255
   ];
 }
 
@@ -32,10 +32,10 @@ function rgbToHex([r, g, b]: any) {
 }
 
 export function generateColorMetric(minVal, maxVal, val) {
-  const startColor = hexToRgb('#F2F2F2'); // light grayish
-  const endColor = hexToRgb('#3387CC');   // darker gray
+  const startColor = hexToRgb('#Fafaf9');
+  const endColor = hexToRgb('#3387CC');
 
-  if (isNaN(val) || val == null) return "#f2f2f2";
+  if (isNaN(val) || val == null) return "#fafaf9";
   if (maxVal === minVal) return rgbToHex(startColor);
 
   const ratio = Math.max(0, Math.min(1, (val - minVal) / (maxVal - minVal)));
@@ -74,7 +74,26 @@ export const generateBgColors = (colorMap) => {
 
 export function lightenHSLArray(hslArray) {
   return hslArray.map(hsl => {
-      if (hsl === "#f2f2f2") return "#e6e6e6";
+      if (hsl === "#fafaf9") return "#e6e6e6";
       return lightenHSL(hsl, 15);
   })
+}
+
+export function interpolateHexColor(color1: string, color2: string, factor: number): string {
+  let c1 = parseInt(color1.slice(1), 16);
+  let c2 = parseInt(color2.slice(1), 16);
+
+  const r1 = (c1 >> 16) & 0xff;
+  const g1 = (c1 >> 8) & 0xff;
+  const b1 = c1 & 0xff;
+
+  const r2 = (c2 >> 16) & 0xff;
+  const g2 = (c2 >> 8) & 0xff;
+  const b2 = c2 & 0xff;
+
+  const r = Math.round(r1 + (r2 - r1) * factor);
+  const g = Math.round(g1 + (g2 - g1) * factor);
+  const b = Math.round(b1 + (b2 - b1) * factor);
+
+  return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
 }
