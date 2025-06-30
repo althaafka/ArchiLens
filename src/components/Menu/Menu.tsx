@@ -31,7 +31,7 @@ const Menu = ({
 
   const [tabIndex, setTabIndex] = useState(0);
   const handleTabChange = (_event, newValue) => setTabIndex(newValue);
-  const [liftDepth, setLiftDepth] = useState(4);
+  const [liftDepth, setLiftDepth] = useState(analyticAspect?.depth?.maxDepth);
 
   const [currentLayout, setCurrentLayout] = useState('grid');
   const [hidePackages, setHidePackages] = useState(false);
@@ -103,6 +103,7 @@ const Menu = ({
 
   useEffect(() => {
     filterEdgeDisplay();
+    setLiftDepth(analyticAspect?.depth?.maxDepth)
   }, [selectedEdges, cyInstance]);
 
   const downloadGraphAsPng = () => {
