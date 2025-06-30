@@ -35,6 +35,7 @@ const Menu = ({
 
   const [currentLayout, setCurrentLayout] = useState('grid');
   const [hidePackages, setHidePackages] = useState(false);
+  const [containerFocus, setContainerFocus] = useState('');
 
   const handleLayoutChange = (layout) => setCurrentLayout(layout);
   const handleHidePackagesChange = (hide) => setHidePackages(hide);
@@ -53,7 +54,6 @@ const Menu = ({
 
   const minDepth = 2;
   const maxDepth = analyticAspect?.depth?.maxDepth ?? 2;
-  // console.log("MAX DEPTH CHECK:",  maxDepth)
 
 
   const handleLift = () => {
@@ -61,7 +61,6 @@ const Menu = ({
     const lifter = new EdgeLifter(cyInstance)
     cyInstance.batch(() => {
       lifter.liftEdges(liftDepth);
-      // console.log("LIFT", liftDepth)
       filterEdgeDisplay();
     });
     
@@ -105,6 +104,10 @@ const Menu = ({
     filterEdgeDisplay();
     setLiftDepth(analyticAspect?.depth?.maxDepth)
   }, [selectedEdges, cyInstance]);
+
+  useEffect(() => {
+    if (containerFocus == "") setLiftDepth(analyticAspect?.depth?.maxDepth)
+  }, [containerFocus])
 
   const downloadGraphAsPng = () => {
     if (!cyInstance) return;
@@ -157,7 +160,14 @@ const Menu = ({
             onChange={(e) => setShowStructure(e.target.checked)}
           />
         </Box>
-        <ContainerSelector cyInstance={cyInstance} analyticAspect={analyticAspect} filterEdgeDisplay={filterEdgeDisplay}></ContainerSelector>
+        <ContainerSelector 
+          cyInstance={cyInstance} 
+          analyticAspect={analyticAspect} 
+          filterEdgeDisplay={filterEdgeDisplay}
+          selectedContainer={containerFocus}
+          setSelectedContainer={setContainerFocus}
+        >
+        </ContainerSelector>
         <Layout 
           cyInstance={cyInstance} 
           analyticAspect={analyticAspect} 
@@ -196,7 +206,7 @@ const Menu = ({
           <IconButton
               onClick={handleLift}
               color="primary"
-              disabled={liftDepth <= minDepth || (currentLayout === 'semanticGrid' && hidePackages) || !showStructure}
+              disabled={liftDepth <= minDepth || (currentLayout === 'semanticGrid' && hidePackages) || !showStructure || containerFocus !== ""}
               size="large"
             >
             <ArrowUpwardIcon />
@@ -207,7 +217,7 @@ const Menu = ({
           <IconButton
             onClick={handleUnlift}
             color="primary"
-            disabled={liftDepth >= maxDepth || (currentLayout === 'semanticGrid' && hidePackages) || !showStructure}
+            disabled={liftDepth >= maxDepth || (currentLayout === 'semanticGrid' && hidePackages) || !showStructure || containerFocus !== ""}
             size="large"
           >
             <ArrowDownwardIcon />

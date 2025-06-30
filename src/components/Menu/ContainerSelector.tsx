@@ -10,9 +10,8 @@ import {
 } from '@mui/material';
 import { nodeHasLabels } from '../../utils/nodeUtils';
 
-const ContainerSelector = ({ cyInstance, analyticAspect, filterEdgeDisplay }) => {
+const ContainerSelector = ({ cyInstance, analyticAspect, filterEdgeDisplay, selectedContainer, setSelectedContainer }) => {
   const [containers, setContainers] = useState([]);
-  const [selectedContainer, setSelectedContainer] = useState('');
 
   useEffect(() => {
     if (!cyInstance) return;
