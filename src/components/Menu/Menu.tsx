@@ -36,12 +36,13 @@ const Menu = ({
   const [currentLayout, setCurrentLayout] = useState('grid');
   const [hidePackages, setHidePackages] = useState(false);
   const [containerFocus, setContainerFocus] = useState('');
+  // const [graphVersion, setGraphVersion] = useState(0);
+    const [categoriesVisibility, setCategoriesVisibility] = useState({});
 
   const handleLayoutChange = (layout) => setCurrentLayout(layout);
   const handleHidePackagesChange = (hide) => setHidePackages(hide);
   const handleLiftChange = (liftDepth) => setLiftDepth(liftDepth);
 
-  // const forceDisableLift = currentLayout === 'semanticGrid' && hidePackages;
 
   const [selectedEdges, setSelectedEdges] = useState(() => {
     return Object.values(edgesLabel).reduce((acc, edge) => {
@@ -160,14 +161,6 @@ const Menu = ({
             onChange={(e) => setShowStructure(e.target.checked)}
           />
         </Box>
-        <ContainerSelector 
-          cyInstance={cyInstance} 
-          analyticAspect={analyticAspect} 
-          filterEdgeDisplay={filterEdgeDisplay}
-          selectedContainer={containerFocus}
-          setSelectedContainer={setContainerFocus}
-        >
-        </ContainerSelector>
         <Layout 
           cyInstance={cyInstance} 
           analyticAspect={analyticAspect} 
@@ -194,9 +187,24 @@ const Menu = ({
           analyticAspect={analyticAspect} 
           coloring={coloring}
           setColoring={setColoring}
+          categoriesVisibility={categoriesVisibility}
+          setCategoriesVisibility={setCategoriesVisibility}
+          containerFocus={containerFocus}
         />
-          <Typography variant="subtitle1">Node Visibility</Typography>
-  <NodeFilterTree cyInstance={cyInstance} />
+        <ContainerSelector 
+          cyInstance={cyInstance} 
+          analyticAspect={analyticAspect} 
+          filterEdgeDisplay={filterEdgeDisplay}
+          selectedContainer={containerFocus}
+          setSelectedContainer={setContainerFocus}
+        >
+        </ContainerSelector>
+        <Typography variant="subtitle1">Node Visibility</Typography>
+        <NodeFilterTree 
+          cyInstance={cyInstance} 
+          categoriesVisibility={categoriesVisibility} 
+          containerFocus={containerFocus}
+        />
       </Box>
 
       <Box hidden={tabIndex !== 2} className="space-y-2 p-4">

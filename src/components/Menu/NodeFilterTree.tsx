@@ -3,26 +3,45 @@ import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { ExpandMore, ChevronRight } from '@mui/icons-material';
 import { Checkbox, FormControlLabel } from '@mui/material';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {  nodeHasLabels } from '../../utils/nodeUtils';
 
-const NodeFilterTree = ({ cyInstance }) => {
-  const [visibleNodes, setVisibleNodes] = useState({});
+const NodeFilterTree = ({ cyInstance, categoriesVisibility, containerFocus }) => {
+  const [checkedMap, setCheckedMap] = useState({});
+
+  useEffect(() => {
+    if (!cyInstance) return;
+    const newCheckedMap = {};
+    cyInstance.nodes().forEach(node => {
+      newCheckedMap[node.id()] = node.style('display') !== 'none';
+    });
+    setCheckedMap(newCheckedMap);
+    console.log("FILTER TREE:", newCheckedMap)
+  }, [categoriesVisibility, cyInstance]);
 
   const handleToggle = (id, checked) => {
+    console.log(handleToggle)
     const node = cyInstance.getElementById(id);
+    console.log(id, checked)
     node.style({ display: checked ? 'element' : 'none' });
+    // if (!checked){
+    //   node.addClass('hidden')
+    // } else {
+    //   node.removeClass('hidden')
+    // }
     const parent = node.parent();
     if (parent.nonempty()) {
-
+        // parent.removeClass('hidden')
         parent.style({
           display: 'element',
-          opcity: 0.3,
+          opcity: 1,
           width: 50,
           height: 30
         });
-      }
-    setVisibleNodes(prev => ({ ...prev, [id]: checked }));
+        setCheckedMap(prev => ({ ...prev, [parent.id()]: true }));
+    }
+
+    setCheckedMap(prev => ({ ...prev, [id]: checked }));
   };
 
   const buildTreeData = (cy) => {
@@ -50,13 +69,16 @@ const NodeFilterTree = ({ cyInstance }) => {
     return Object.values(tree);
   };
 
-const renderTree = (nodeData) => (
+const renderTree = (nodeData) => {
+  const isChecked = checkedMap[nodeData.id] ?? true;
+
+  return (
   <TreeItem key={nodeData.id} itemId={nodeData.id} label={
     <FormControlLabel
       control={
         <Checkbox
           size="small"
-          checked={visibleNodes[nodeData.id] ?? true}
+          checked={isChecked}
           onChange={(e) => handleToggle(nodeData.id, e.target.checked)}
           onClick={(e) => e.stopPropagation()}
         />
@@ -66,7 +88,8 @@ const renderTree = (nodeData) => (
   }>
     {nodeData.children?.map(child => renderTree(child))}
   </TreeItem>
-);
+  )
+}
 
   const treeData = buildTreeData(cyInstance);
 

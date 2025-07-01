@@ -34,6 +34,7 @@ const ContainerSelector = ({ cyInstance, analyticAspect, filterEdgeDisplay, sele
         if (!(nodeHasLabels(node, ["Structure"]) || nodeHasLabels(node, ["Container"])) || node.id() == "java.lang.String") return;
         if (nodeHasLabels(node, ["Container"])) console.log("Harusnya ke display")
         node.style('display', 'element');
+        node.removeClass('hidden')
       });
       filterEdgeDisplay();
       return;
@@ -68,23 +69,33 @@ const ContainerSelector = ({ cyInstance, analyticAspect, filterEdgeDisplay, sele
       ...children.map(n => n.id()),
       ...getAncestors(container).map(n => n.id()),
     ]);
+    console.log("VISIBLE NODE", visibleNodes)
 
-    console.log("VISIBLE NODES:", visibleNodes)
 
     cyInstance.nodes().forEach(node => {
       if (visibleNodes.has(node.id())) {
-        console.log("-", node.id())
-        // if (node.id() == "nl.tudelft.jpacman.ui") console.log("CONTAINER", node.id())
         node.style('display', 'element');
+        node.removeClass('hidden')
         if (node.isParent()) {
-          node.style('width', "40px");
-          node.style('height', "16px");
+          if (node.id() == "nl.tudelft.jpacman.level") console.log("height dan width sudah diubah")
+          console.log(node.data('label')
+          )
+          // node.style('width', '40px');
+          // node.style('height', '16px');
         }
       } else {
         node.style('display', 'none');
+        node.addClass('hidden')
       }
     });
-    }
+    cyInstance.style().update();
+
+    const node = cyInstance.getElementById("nl.tudelft.jpacman.level")
+    console.log("----nl.tudelft.jpacman.level")
+    console.log(node.style())
+    console.log(node.boundingBox())
+
+  }
 
   return (
     <Box>

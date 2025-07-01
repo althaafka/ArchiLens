@@ -59,6 +59,10 @@ const Layout = ({ cyInstance, showStructure, analyticAspect, onLayoutChange, onH
 
     if (layout == "semanticGrid") {
       if (!xDimension || !yDimension) return;
+      console.log("-----SEMANTIC-----")
+      cyInstance.nodes().forEach(node=>{
+        console.log(node.data('label'), analyticAspect.getNodeCategory(node,xDimension, showStructure))
+      })
       
       const layoutOptions: {
         name: string;

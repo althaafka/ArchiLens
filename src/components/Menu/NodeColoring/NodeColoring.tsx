@@ -12,13 +12,25 @@ import {
   MenuItem,
 } from '@mui/material';
 
-const NodeColoring = ({ cyInstance, analyticAspect, coloring, setColoring}) => {
-
-  const [categoriesVisibility, setCategoriesVisibility] = useState({});
+const NodeColoring = ({ cyInstance, analyticAspect, coloring, setColoring, categoriesVisibility, setCategoriesVisibility, containerFocus}) => {
 
   useEffect(() => {
     if (!cyInstance) return;
+    if (!analyticAspect.metric?.find(m => m.id == coloring)) {
+      let catVis = {};
+      if (coloring != "none"){
+        catVis = Object?.keys(analyticAspect?.colorMap[coloring]).reduce((acc, key) => {
+          acc[key] = true;
+          return acc;
+        }, {})
+      }
+      setCategoriesVisibility(catVis);
+    }
+    
+  }, [containerFocus])
 
+  useEffect(() => {
+    if (!cyInstance) return;
 
     if (!analyticAspect.metric?.find(m => m.id == coloring)) {
       let catVis = {};
@@ -29,7 +41,6 @@ const NodeColoring = ({ cyInstance, analyticAspect, coloring, setColoring}) => {
         }, {})
       }
       setCategoriesVisibility(catVis);
-
     }
     
     cyInstance.nodes().forEach((node) => {
@@ -39,6 +50,9 @@ const NodeColoring = ({ cyInstance, analyticAspect, coloring, setColoring}) => {
       if (style) {
         node.style(style);
       }
+      if (node.hasClass('hidden')) {
+        node.style('display', 'none');
+      }
     });
 
   }, [coloring, cyInstance]);
@@ -46,12 +60,17 @@ const NodeColoring = ({ cyInstance, analyticAspect, coloring, setColoring}) => {
   useEffect(() => {
     if (!cyInstance || coloring === "none") return;
     if (analyticAspect.metric.find(m => m.id == coloring)) return;
-
     cyInstance.nodes(n => n.data("labels")?.includes("Structure")).forEach((node) => {
       const categoriesIds = analyticAspect.composedDimension.includes(coloring)? Object.keys(node.data('properties').composedDimension?.[coloring] || {}) : (node?.data('properties')?.dimension?.[coloring] || []);
       const isVisible = categoriesIds.some((id) => categoriesVisibility[id])
-      node.style('display', isVisible ? 'element' : 'none');
+      if (node.hasClass('hidden')) {
+        node.style('display', 'none');
+      } else {
+        node.style('display', isVisible ? 'element' : 'none');
+        // if (!isVisible) node.addClass('hidden')
+      }
     })
+    // setGraphVersion(v=> v+1)
   }, [categoriesVisibility, coloring, cyInstance]);
 
   return (

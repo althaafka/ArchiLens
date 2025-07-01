@@ -28,7 +28,9 @@
         "padding": "14px",
         "border-width": "1px",
         "border-color": "#171717",
-        "background-color": "#fafaf9"
+        "background-color": "#fafaf9",
+        "width": "50px",
+        "height": "30px"
       }
     },
     {
