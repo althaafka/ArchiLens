@@ -78,15 +78,6 @@ export default class AnalyticAspect {
 
   public getNodeCategory(node, dimension: string, showStructure = true): string{
       if (!node.data().labels.includes("Structure") && showStructure) {
-        if (node.data().labels.includes("Container")) {
-          const hasVisibleChild = node.children().some(child => child.style('display') !== 'none');
-          if (!hasVisibleChild) {
-            const composed = node.data('properties').composedDimension?.[dimension];
-            if (!composed) return null;
-            const categoryName = getCategoryName(getMaxCategory(composed), dimension)
-            return categoryName
-          }
-        }
         return null;
       }
       if (!node.data().labels.includes("Structure")) {
