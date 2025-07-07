@@ -1,5 +1,5 @@
 import cytoscape from "cytoscape";
-import { getEdgesByLabel, getNodesByLabel, getRoot } from "../../utils/graphUtils";
+import { getEdgesByLabel, getNodesByLabel, getRoots } from "../../utils/graphUtils";
 import { edgeHasLabel } from "../../utils/edgeUtils";
 import { nodeHasLabels, getNodeName } from "../../utils/nodeUtils";
 
@@ -305,9 +305,9 @@ export class DepthEnricher {
     depthData: { id: string; depth: number; labels: string[] }[];
     containerOrder: string[];
     maxDepth: number;
-    containerIds: string[]
+    containerIds: string[];
   } {
-    const roots = getRoot(this.cy)
+    const roots = getRoots(this.cy)
 
     const visited = new Set<string>();
     const depthData: { id: string; depth: number; labels: string[] }[] = [];

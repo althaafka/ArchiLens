@@ -58,7 +58,7 @@ export class StructureHandler {
     });
   }
 
-  public hideStructure(): void {
+  public hideStructure(): any {
     console.log("HIDE STRUCTURE");
   
     const structureNodes = getNodesByLabel(this.cy.nodes(), "Structure");
@@ -104,10 +104,12 @@ export class StructureHandler {
     this.cy.remove(structureNodes);
     this.cy.add(Object.values(redirectedEdges));
     console.log("REDIRECTED EDGE:", redirectedEdges)
+    return containsMap
   }
 
-  private buildContainsMap(): Map<string, Set<string>> {
+  private buildContainsMap(): any {
     const map = new Map<string, Set<string>>();
+    const simpleNameMap = new Map<string, Set<string>>()
     this.cy.edges().forEach(edge => {
       if (edge.data('label') !== 'contains') return;
   
@@ -116,6 +118,8 @@ export class StructureHandler {
   
       if (!map.has(target)) map.set(target, new Set());
       map.get(target)?.add(source);
+
+      if (!simpleNameMap.has(target)) simpleNameMap.set(target, new Set());
     });
     return map;
   }

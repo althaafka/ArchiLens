@@ -10,11 +10,11 @@ export function getNodesByLabel(nodes: cytoscape.NodeCollection, label: string):
     return nodes.filter(node => nodeHasLabels(node, [label]))
 }
 
-export function getRoot(cy: cytoscape.Core): cytoscape.NodeSingular {
-    const root = cy.nodes().orphans().filter(root =>
+export function getRoots(cy: cytoscape.Core): cytoscape.NodeSingular {
+    const roots = cy.nodes().orphans().filter(root =>
       (nodeHasLabels(root, ['Container']) || nodeHasLabels(root, ['Structure'])) && root.id()!="java.lang.String"
-    )[0]
-    return root
+    )
+    return roots
 }
 
 export function isSemanticGridEl(el) {

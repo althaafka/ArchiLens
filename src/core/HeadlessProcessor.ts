@@ -21,7 +21,12 @@ export default class HeadlessProcessor {
     new ComposedDimensionEnricher(this.cy, this.showStructure, "").enrich();
     
     const structureHandler = new StructureHandler(this.cy);
-    this.showStructure ? structureHandler.handleParentChild() : structureHandler.hideStructure();
+    let containsMap
+    if (this.showStructure) {
+      structureHandler.handleParentChild()
+    } else {
+      containsMap = structureHandler.hideStructure();
+    }
     const depthData = new DepthEnricher(this.cy).enrich();
 
     if (showStructure && containerFocus != "") {
@@ -30,7 +35,7 @@ export default class HeadlessProcessor {
     }
     
     const analyticAspect = new AnalyticAspect()
-    analyticAspect.collectAnalyticAspect(this.cy, depthData);
+    analyticAspect.collectAnalyticAspect(this.cy, depthData, containsMap);
 
     // const edgelifter = new EdgeLifter(this.cy)
     // const node = this.cy.getElementById("nl.tudelft.jpacman.level")

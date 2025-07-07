@@ -2,7 +2,7 @@ import cytoscape from "cytoscape"
 import { getNodesByLabel, getEdgesByLabel } from "../utils/graphUtils";
 import { generateColorMap } from "../utils/colorUtils";
 import { getCategoryName, getMaxCategory } from "../utils/analyticAspectUtils";
-import { getNodeParent } from "../utils/nodeUtils";
+import { getNodeParent, getNodeName } from "../utils/nodeUtils";
 
 export default class AnalyticAspect {
   public dimension: any;
@@ -11,19 +11,20 @@ export default class AnalyticAspect {
   public composedDimension: any;
   public colorMap: any;
   public depth: any;
+  public containsMap: any
 
   constructor(){}
 
-  collectAnalyticAspect(cy: cytoscape.Core, depthData) {
+  collectAnalyticAspect(cy: cytoscape.Core, depthData, containsMap) {
     const nodes = cy.nodes()
     const edges = cy.edges()
     const dimension = getNodesByLabel(nodes, 'Dimension')
     const category = getNodesByLabel(nodes, 'Category')
     const metric = getNodesByLabel(nodes, 'Metric')
 
-    this.dimension =  dimension.map(node => node.data()), 
-    this.category = category.map(node => node.data()),
-    this.metric = metric.map(node => node.data()),
+    this.dimension =  dimension.map(node => node.data());
+    this.category = category.map(node => node.data());
+    this.metric = metric.map(node => node.data());
     this.composedDimension = Array.from(
         new Set(
             getEdgesByLabel(edges, 'composes')
@@ -39,6 +40,23 @@ export default class AnalyticAspect {
         )
     )
     this.depth = depthData;
+    const transformedContainsMap = new Map();
+
+  if (containsMap) {
+    for (const [childId, parentIdSet] of containsMap.entries()) {
+      const simpleNameSet = new Set<string>();
+  
+      for (const parentId of parentIdSet) {
+        const parentNode = cy.getElementById(parentId);
+        const simpleName = getNodeName(parentNode)
+        simpleNameSet.add(simpleName);
+      }
+  
+      transformedContainsMap.set(childId, simpleNameSet);
+    }
+  
+    this.containsMap = transformedContainsMap;
+  }
 
     cy.remove(dimension);
     cy.remove(category);
@@ -85,6 +103,12 @@ export default class AnalyticAspect {
       if (hasVisibleChild) return null
     }
     if (dimension == "Dimension:Container") {
+      if (!showStructure) {
+        const container = this.containsMap.get(node.id())
+        if (!container) return "-"
+        const firstContainerId = [...container][0]
+        return firstContainerId? firstContainerId: "-";
+      }
       const container = getNodeParent(node);
       return container? container.data().properties.simpleName || container.id() : null;
     }
