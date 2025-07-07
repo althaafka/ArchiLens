@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { EdgeLifter } from '../../core/Headless/EdgeLifter';
 import {
   Box,
   FormControl,
-  InputLabel,
   MenuItem,
   Select,
   Typography
@@ -21,29 +20,30 @@ const ContainerSelector = ({ cyInstance, analyticAspect, filterEdgeDisplay, sele
   }, [cyInstance]);
 
   const handleChange = (event) => {
-    const containerId = event.target.value;
-    setSelectedContainer(containerId);
-    const node = cyInstance.getElementById(containerId)
-    const level = node?.data("properties")?.depth
-    const edgelifter = new EdgeLifter(cyInstance)
-    edgelifter.unlift(analyticAspect.depth.maxDepth)
+    setSelectedContainer(event.target.value)
+    // const containerId = event.target.value;
+    // setSelectedContainer(containerId);
+    // const node = cyInstance.getElementById(containerId)
+    // const level = node?.data("properties")?.depth
+    // const edgelifter = new EdgeLifter(cyInstance)
+    // edgelifter.unlift(analyticAspect.depth.maxDepth)
 
-    if (containerId === '') {
-      cyInstance.nodes().forEach(node => {
-        if (node.id() == "nl.tudelft.jpacman.ui") console.log("CONTAINER")
-        if (!(nodeHasLabels(node, ["Structure"]) || nodeHasLabels(node, ["Container"])) || node.id() == "java.lang.String") return;
-        if (nodeHasLabels(node, ["Container"])) console.log("Harusnya ke display")
-        node.style('display', 'element');
-        node.removeClass('hidden')
-      });
-      filterEdgeDisplay();
-      return;
-    }
+    // if (containerId === '') {
+    //   cyInstance.nodes().forEach(node => {
+    //     if (node.id() == "nl.tudelft.jpacman.ui") console.log("CONTAINER")
+    //     if (!(nodeHasLabels(node, ["Structure"]) || nodeHasLabels(node, ["Container"])) || node.id() == "java.lang.String") return;
+    //     if (nodeHasLabels(node, ["Container"])) console.log("Harusnya ke display")
+    //     node.style('display', 'element');
+    //     node.removeClass('hidden')
+    //   });
+    //   filterEdgeDisplay();
+    //   return;
+    // }
 
-    edgelifter.lift(analyticAspect.depth.maxDepth, level+1)
-    filterAndLiftContainer(node)
-    filterEdgeDisplay()
-    console.log(cyInstance.getElementById("nl.tudelft.jpacman").style())
+    // edgelifter.lift(analyticAspect.depth.maxDepth, level+1)
+    // filterAndLiftContainer(node)
+    // filterEdgeDisplay()
+    // console.log(cyInstance.getElementById("nl.tudelft.jpacman").style())
   };
 
   function filterAndLiftContainer(container: cytoscape.NodeSingular): void {

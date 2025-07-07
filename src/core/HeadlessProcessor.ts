@@ -1,10 +1,8 @@
 import cytoscape from "cytoscape";
 import { DimensionEnricher, MetricEnricher, ComposedDimensionEnricher, DepthEnricher } from "./Headless/Enricher";
 import { StructureHandler } from "./Headless/StructureHandler";
-import { EdgeLifter } from "./Headless/EdgeLifter";
 import { CleanUpProcessor } from "./Headless/CleanUpProcessor";
 import AnalyticAspect from "./AnalyticAspect";
-import {getRoot} from "../utils/graphUtils"
 
 export default class HeadlessProcessor {
   private cy: cytoscape.Core;
@@ -13,19 +11,23 @@ export default class HeadlessProcessor {
     this.cy = cy;
   }
   
-  public process(showStructure: boolean): any {
+  public process(showStructure: boolean, containerFocus: string): any {
     this.showStructure = showStructure;
 
     this.flattenParentChild();
 
     new DimensionEnricher(this.cy).enrich();
     new MetricEnricher(this.cy).enrich();
-    new ComposedDimensionEnricher(this.cy, this.showStructure).enrich();
-    
+    new ComposedDimensionEnricher(this.cy, this.showStructure, "").enrich();
     
     const structureHandler = new StructureHandler(this.cy);
     this.showStructure ? structureHandler.handleParentChild() : structureHandler.hideStructure();
-    const depthData = new DepthEnricher(this.cy, this.showStructure).enrich();
+    const depthData = new DepthEnricher(this.cy).enrich();
+
+    if (showStructure && containerFocus != "") {
+      console.log("CONTAINER FOCUS", containerFocus)
+      structureHandler.handleContainerFocus(containerFocus, depthData)
+    }
     
     const analyticAspect = new AnalyticAspect()
     analyticAspect.collectAnalyticAspect(this.cy, depthData);
@@ -41,37 +43,37 @@ export default class HeadlessProcessor {
     return analyticAspect;
   }
 
-  private filterAndLiftContainer(container: cytoscape.NodeSingular): void {
-    const children = container.children();
-    children.forEach(child => console.log(child.data()))
+  // private filterAndLiftContainer(container: cytoscape.NodeSingular): void {
+  //   const children = container.children();
+  //   children.forEach(child => console.log(child.data()))
 
-    const getAncestors = (node: cytoscape.NodeSingular): cytoscape.NodeSingular[] => {
-      const ancestors: cytoscape.NodeSingular[] = [];
-      let current = node;
+  //   const getAncestors = (node: cytoscape.NodeSingular): cytoscape.NodeSingular[] => {
+  //     const ancestors: cytoscape.NodeSingular[] = [];
+  //     let current = node;
 
-      while (current.parent().nonempty()) {
-        const parent = current.parent()[0];
-        ancestors.push(parent);
-        current = parent;
-      }
+  //     while (current.parent().nonempty()) {
+  //       const parent = current.parent()[0];
+  //       ancestors.push(parent);
+  //       current = parent;
+  //     }
 
-      return ancestors;
-    };
+  //     return ancestors;
+  //   };
 
-    const visibleNodes = new Set<string>([
-      container.id(),
-      ...children.map(n => n.id()),
-      ...getAncestors(container).map(n => n.id()),
-    ]);
+  //   const visibleNodes = new Set<string>([
+  //     container.id(),
+  //     ...children.map(n => n.id()),
+  //     ...getAncestors(container).map(n => n.id()),
+  //   ]);
 
-    console.log("VISIBLE NODES:", visibleNodes)
+  //   console.log("VISIBLE NODES:", visibleNodes)
 
-    this.cy.nodes().forEach(node => {
-      if (!visibleNodes.has(node.id())) {
-        node.remove()
-      }
-    });
-  }
+  //   this.cy.nodes().forEach(node => {
+  //     if (!visibleNodes.has(node.id())) {
+  //       node.remove()
+  //     }
+  //   });
+  // }
 
   private flattenParentChild(): void {
     console.log("FLATTEN PARENT-CHILD")

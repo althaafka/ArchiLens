@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import ColoringLegend from './ColoringLegend';
 import { getScratch } from '../../../utils/utils';
 // import { nodeColoringTypes } from '../../../constants/nodeColoringData';
@@ -7,27 +7,26 @@ import {
   Box,
   Typography,
   FormControl,
-  InputLabel,
   Select,
   MenuItem,
 } from '@mui/material';
 
-const NodeColoring = ({ cyInstance, analyticAspect, coloring, setColoring, categoriesVisibility, setCategoriesVisibility, containerFocus}) => {
+const NodeColoring = ({ cyInstance, analyticAspect, coloring, setColoring, categoriesVisibility, setCategoriesVisibility}) => {
 
-  useEffect(() => {
-    if (!cyInstance) return;
-    if (!analyticAspect.metric?.find(m => m.id == coloring)) {
-      let catVis = {};
-      if (coloring != "none"){
-        catVis = Object?.keys(analyticAspect?.colorMap[coloring]).reduce((acc, key) => {
-          acc[key] = true;
-          return acc;
-        }, {})
-      }
-      setCategoriesVisibility(catVis);
-    }
+  // useEffect(() => {
+  //   if (!cyInstance) return;
+  //   if (!analyticAspect.metric?.find(m => m.id == coloring)) {
+  //     let catVis = {};
+  //     if (coloring != "none"){
+  //       catVis = Object?.keys(analyticAspect?.colorMap[coloring]).reduce((acc, key) => {
+  //         acc[key] = true;
+  //         return acc;
+  //       }, {})
+  //     }
+  //     setCategoriesVisibility(catVis);
+  //   }
     
-  }, [containerFocus])
+  // }, [containerFocus])
 
   useEffect(() => {
     if (!cyInstance) return;

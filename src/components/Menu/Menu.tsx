@@ -6,13 +6,12 @@ import FileUpload from './FileUpload'
 import ShowPrimitives from './ShowPrimitives'
 import NodeColoring from './NodeColoring/NodeColoring';
 import {
-  Switch, Box, Typography, Button, Divider, FormGroup, FormControlLabel, Checkbox
+  Switch, Box, Typography, Button, Divider, FormGroup, Checkbox
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import { Tabs, Tab } from '@mui/material';
-import GraphManager from '../../core/GraphManager';
 import { EdgeLifter } from '../../core/Headless/EdgeLifter';
-import { IconButton, Tooltip } from '@mui/material';
+import { IconButton } from '@mui/material';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { isSemanticGridEl } from '../../utils/graphUtils';
@@ -26,7 +25,9 @@ const Menu = ({
   setGraph,
   analyticAspect,
   showStructure,
-  setShowStructure
+  setShowStructure,
+  containerFocus,
+  setContainerFocus
 }) => {
 
   const [tabIndex, setTabIndex] = useState(0);
@@ -35,9 +36,9 @@ const Menu = ({
 
   const [currentLayout, setCurrentLayout] = useState('grid');
   const [hidePackages, setHidePackages] = useState(false);
-  const [containerFocus, setContainerFocus] = useState('');
+  // const [containerFocus, setContainerFocus] = useState('');
   // const [graphVersion, setGraphVersion] = useState(0);
-    const [categoriesVisibility, setCategoriesVisibility] = useState({});
+  const [categoriesVisibility, setCategoriesVisibility] = useState({});
 
   const handleLayoutChange = (layout) => setCurrentLayout(layout);
   const handleHidePackagesChange = (hide) => setHidePackages(hide);
@@ -161,6 +162,14 @@ const Menu = ({
             onChange={(e) => setShowStructure(e.target.checked)}
           />
         </Box>
+        <ContainerSelector 
+          cyInstance={cyInstance} 
+          analyticAspect={analyticAspect} 
+          filterEdgeDisplay={filterEdgeDisplay}
+          selectedContainer={containerFocus}
+          setSelectedContainer={setContainerFocus}
+        >
+        </ContainerSelector>
         <Layout 
           cyInstance={cyInstance} 
           analyticAspect={analyticAspect} 
@@ -189,21 +198,11 @@ const Menu = ({
           setColoring={setColoring}
           categoriesVisibility={categoriesVisibility}
           setCategoriesVisibility={setCategoriesVisibility}
-          containerFocus={containerFocus}
         />
-        <ContainerSelector 
-          cyInstance={cyInstance} 
-          analyticAspect={analyticAspect} 
-          filterEdgeDisplay={filterEdgeDisplay}
-          selectedContainer={containerFocus}
-          setSelectedContainer={setContainerFocus}
-        >
-        </ContainerSelector>
         <Typography variant="subtitle1">Node Visibility</Typography>
         <NodeFilterTree 
           cyInstance={cyInstance} 
-          categoriesVisibility={categoriesVisibility} 
-          containerFocus={containerFocus}
+          categoriesVisibility={categoriesVisibility}
         />
       </Box>
 

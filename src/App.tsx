@@ -39,6 +39,7 @@ function App() {
   const [showStructure, setShowStructure] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedElement, setSelectedElement] = useState(null);
+  const [containerFocus, setContainerFocus] = useState("");
 
   useEffect(() => {
     if (!cyRef.current) return;
@@ -52,7 +53,7 @@ function App() {
         const hcyInstance = event.cy;
         setHCyInstance(hcyInstance);
         const processor = new HeadlessProcessor(hcyInstance);
-        const analysisData = processor.process(showStructure);
+        const analysisData = processor.process(showStructure, containerFocus);
 
         setAnalyticAspect(analysisData);
 
@@ -100,7 +101,7 @@ function App() {
     return () => {
       hcy.destroy();
     };
-  }, [graph, showStructure]);
+  }, [graph, showStructure, containerFocus]);
 
   return (
     <>
@@ -118,6 +119,8 @@ function App() {
             analyticAspect={analyticAspect}
             showStructure={showStructure}
             setShowStructure={setShowStructure}
+            containerFocus={containerFocus}
+            setContainerFocus={setContainerFocus}
           />
         </Box>
 

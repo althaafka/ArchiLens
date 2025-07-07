@@ -1,12 +1,11 @@
 // components/NodeFilterTree.jsx
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
-import { ExpandMore, ChevronRight } from '@mui/icons-material';
 import { Checkbox, FormControlLabel } from '@mui/material';
 import { useState, useEffect } from 'react';
 import {  nodeHasLabels } from '../../utils/nodeUtils';
 
-const NodeFilterTree = ({ cyInstance, categoriesVisibility, containerFocus }) => {
+const NodeFilterTree = ({ cyInstance, categoriesVisibility }) => {
   const [checkedMap, setCheckedMap] = useState({});
 
   useEffect(() => {

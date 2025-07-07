@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FormControlLabel, Switch, Box, Typography } from '@mui/material';
+import { Switch, Box, Typography } from '@mui/material';
 
 const ShowPrimitives = ({ cyInstance }) => {
     const [showPrimitives, setShowPrimitives] = useState(false);

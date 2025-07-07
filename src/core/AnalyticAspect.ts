@@ -2,7 +2,7 @@ import cytoscape from "cytoscape"
 import { getNodesByLabel, getEdgesByLabel } from "../utils/graphUtils";
 import { generateColorMap } from "../utils/colorUtils";
 import { getCategoryName, getMaxCategory } from "../utils/analyticAspectUtils";
-import { getNodeParent, getNodeName } from "../utils/nodeUtils";
+import { getNodeParent } from "../utils/nodeUtils";
 
 export default class AnalyticAspect {
   public dimension: any;
@@ -63,7 +63,6 @@ export default class AnalyticAspect {
   private generateColorMapDimensions(): void {
     this.colorMap = {};
     this.dimension.forEach((dim: any) => {
-      console.log("dim", dim)
       this.colorMap[dim.id] = generateColorMap(dim.categories);
     });
   }
@@ -77,30 +76,54 @@ export default class AnalyticAspect {
   }
 
   public getNodeCategory(node, dimension: string, showStructure = true): string{
-      if (!node.data().labels.includes("Structure") && showStructure) {
-        return null;
-      }
-      if (!node.data().labels.includes("Structure")) {
-          const composed = node.data('properties').composedDimension?.[dimension];
-          if (!composed) return null;
-          const categoryName = getCategoryName(getMaxCategory(composed), dimension)
-          return categoryName
-      }
-      if (dimension == 'Dimension:Container') {
-          const container = getNodeParent(node);
-          return container? container.data().properties.simpleName || container.id() : null;
-      }
-      if (this.isMetric(dimension)) {
-          return node?.data().properties?.metric?.[dimension]
-      }
-      const simpleDim = node?.data().properties?.dimension?.[dimension];
-      if (!simpleDim || simpleDim.length == 0) {
+    if (!node.data().labels.includes("Structure") && !node.data().labels.includes("Container")) {
+      return null
+    }
+    if (node.data().labels.includes("Container")){
+      const hasVisibleChild = node.children().some(child => child.visible());
+      console.log("has visible child", hasVisibleChild)
+      if (hasVisibleChild) return null
+    }
+    if (dimension == "Dimension:Container") {
+      const container = getNodeParent(node);
+      return container? container.data().properties.simpleName || container.id() : null;
+    }
+    if (this.isMetric(dimension)) {
+      return node?.data().properties?.metric?.[dimension]
+    }
+    const simpleDim = node?.data().properties?.dimension?.[dimension];
+    if (!simpleDim || simpleDim.length == 0){
         const composed = node.data('properties').composedDimension?.[dimension];
         if (!composed) return "-"
         const categoryName = getCategoryName(getMaxCategory(composed), dimension)
         return categoryName
-      }
-      return getCategoryName(simpleDim[0], dimension) || "-";
+    }
+    return getCategoryName(simpleDim[0], dimension) || "-";
+
+      // if (!node.data().labels.includes("Structure") && showStructure) {
+      //   return null;
+      // }
+      // if (!node.data().labels.includes("Structure")) {
+      //     const composed = node.data('properties').composedDimension?.[dimension];
+      //     if (!composed) return null;
+      //     const categoryName = getCategoryName(getMaxCategory(composed), dimension)
+      //     return categoryName
+      // }
+      // if (dimension == 'Dimension:Container') {
+      //     const container = getNodeParent(node);
+      //     return container? container.data().properties.simpleName || container.id() : null;
+      // }
+      // if (this.isMetric(dimension)) {
+      //     return node?.data().properties?.metric?.[dimension]
+      // }
+      // const simpleDim = node?.data().properties?.dimension?.[dimension];
+      // if (!simpleDim || simpleDim.length == 0) {
+      //   const composed = node.data('properties').composedDimension?.[dimension];
+      //   if (!composed) return "-"
+      //   const categoryName = getCategoryName(getMaxCategory(composed), dimension)
+      //   return categoryName
+      // }
+      // return getCategoryName(simpleDim[0], dimension) || "-";
   }
 
   private getDimensionById(dimId: string) {

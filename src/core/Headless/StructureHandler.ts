@@ -2,6 +2,7 @@ import cytoscape from "cytoscape";
 import { edgeHasLabel, getEdgeLabel } from "../../utils/edgeUtils";
 import { nodeHasLabels } from "../../utils/nodeUtils";
 import { getNodesByLabel } from "../../utils/graphUtils";
+import { EdgeLifter } from "./EdgeLifter";
 
 export class StructureHandler {
   private cy: cytoscape.Core;
@@ -73,11 +74,7 @@ export class StructureHandler {
         }
         const sourceContainer = this.getContainerFromContainsMap(containsMap, sourceNode.id());
         const targetContainer = this.getContainerFromContainsMap(containsMap, targetNode.id());
-        // Jika salah satu tidak ditemukan, skip
-        console.log("----------")
-        console.log(edge.data())
-        console.log(sourceNode.id(), sourceContainer);
-        console.log(targetNode.id(), targetContainer)
+
         if (!sourceContainer || !targetContainer || sourceContainer === targetContainer) return;
         const label = getEdgeLabel(edge)
         const key = `${sourceContainer}-${label}-${targetContainer}`;
@@ -134,5 +131,43 @@ export class StructureHandler {
       }
     }
     return null;
+  }
+
+  public handleContainerFocus(containerId: string, depthData: any): void {
+    const containsMap = this.buildContainsMap()
+    console.log("CONTAINS MAP:", containsMap)
+
+    const node = this.cy.getElementById(containerId);
+    const level = node?.data("properties")?.depth;
+
+    const edgeLifter = new EdgeLifter(this.cy)
+    console.log("Depth data:", depthData)
+    edgeLifter.lift(depthData.maxDepth, level+1)
+
+    const children = node.children().map(child => child.id());
+    console.log("CHILD:", children)
+
+    const parents = this.getAllParent(node)
+
+    const removedNodes = this.cy.nodes().filter(node => {
+      const hasLabel = nodeHasLabels(node, ['Container']) || nodeHasLabels(node, ["Structure"])
+      const isChild = children.includes(node.id())
+      const isParent = parents.includes(node.id())
+      return node.id()!=containerId && hasLabel && !isChild && !isParent
+    })
+
+    this.cy.remove(removedNodes);
+    console.log("Container focus result:")
+    this.cy.nodes().forEach(node => console.log(node.id()))
+  }
+
+  public getAllParent(node: cytoscape.NodeSingular): string[] {
+    const parents = []
+    let current = node.parent();
+    while(current.nonempty()) {
+      parents.push(current[0].id());
+      current = current.parent();
+    }
+    return parents;
   }
 }

@@ -1,6 +1,5 @@
 import cytoscape from "cytoscape";
-import { edgeHasLabel, getEdgeLabel } from "../../utils/edgeUtils";
-import { isSemanticGridEl } from "../../utils/graphUtils";
+import { getEdgeLabel } from "../../utils/edgeUtils";
 
 export class EdgeLifter {
   private cy: cytoscape.Core;
@@ -58,14 +57,14 @@ export class EdgeLifter {
       return edgesMap;
   }
   
-  private getParentWithDepth(depth, node){
-    let parent = node
-    while (parent.data('properties').depth > depth) {
-      parent = parent.parent();
-    }
-    if (parent.data('properties').depth < depth) return null
-    return parent
-  }
+  // private getParentWithDepth(depth, node){
+  //   let parent = node
+  //   while (parent.data('properties').depth > depth) {
+  //     parent = parent.parent();
+  //   }
+  //   if (parent.data('properties').depth < depth) return null
+  //   return parent
+  // }
 
   public unlift(maxDepth) {
     for (let d = 2; d <= maxDepth; d++) {

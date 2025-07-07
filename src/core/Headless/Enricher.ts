@@ -1,4 +1,4 @@
-import cytoscape, { NodeSingular } from "cytoscape";
+import cytoscape from "cytoscape";
 import { getEdgesByLabel, getNodesByLabel, getRoot } from "../../utils/graphUtils";
 import { edgeHasLabel } from "../../utils/edgeUtils";
 import { nodeHasLabels, getNodeName } from "../../utils/nodeUtils";
@@ -154,10 +154,12 @@ export class MetricEnricher {
 export class ComposedDimensionEnricher {
   private cy: cytoscape.Core;
   private showStructure: boolean;
+  private containerFocus: string;
 
-  constructor(cy: cytoscape.Core, showStructure: boolean) {
+  constructor(cy: cytoscape.Core, showStructure: boolean, containerFocus: string) {
     this.cy = cy
     this.showStructure = showStructure
+    this.containerFocus = containerFocus
   }
 
   public enrich(): void {
@@ -262,7 +264,7 @@ export class ComposedDimensionEnricher {
       });
   
       container.addClass('layers');
-      if (this.showStructure){
+      if (this.showStructure && this.containerFocus == ""){
         container.addClass('package')
       }
     });   
@@ -294,11 +296,9 @@ export class ComposedDimensionEnricher {
 
 export class DepthEnricher {
   private cy: cytoscape.Core;
-  private showStructure: boolean;
 
-  constructor(cy: cytoscape.Core, showStructure: boolean) {
+  constructor(cy: cytoscape.Core) {
     this.cy = cy;
-    this.showStructure = showStructure;
   }
 
   public enrich(): {
