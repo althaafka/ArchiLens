@@ -222,12 +222,14 @@ export class ComposedDimensionEnricher {
 
       structure.addClass('layers');
     });
-  
+
     const containers = nodes.filter(
       node => node.data('labels')?.includes('Container') && !node.data('labels')?.includes('Structure')
     );
 
-    containers.forEach(container => {
+    const sortedContainers = this.sortContainersByDepth(containers)
+
+    sortedContainers.forEach(container => {
       const contains = container.outgoers().filter(e => e.isEdge() && e.data('label') === 'contains');
       const classes = contains.targets().filter(t => t.data('labels')?.includes('Structure'));
       const subContainers = contains.targets().filter(t => t.data('labels')?.includes('Container'));
@@ -243,10 +245,12 @@ export class ComposedDimensionEnricher {
         const layerCounters = classes.map(c => {
           const fromComposed = c.data('properties')?.composedDimension?.[dimensionId];
           if (fromComposed) {
-            return this.counterToPercentage(fromComposed);
+            // return this.counterToPercentage(fromComposed);
+            return fromComposed;
           }
           const fromSimple = c.data('properties')?.dimension?.[dimensionId] || [];
-          return this.counterToPercentage(this.counter(fromSimple));
+          // return this.counterToPercentage(this.counter(fromSimple));
+          return this.counter(fromSimple);
         });
   
         composedDimension[dimensionId].push(...layerCounters);
@@ -254,7 +258,8 @@ export class ComposedDimensionEnricher {
         subContainers.forEach(subContainer => {
           const subData = subContainer.data('properties')?.composedDimension?.[dimensionId];
           if (subData) {
-            composedDimension[dimensionId].push(this.counterToPercentage(subData));
+            // composedDimension[dimensionId].push(this.counterToPercentage(subData));
+            composedDimension[dimensionId].push(subData);
           }
         });
       });
@@ -292,6 +297,27 @@ export class ComposedDimensionEnricher {
       return acc;
     }, {});
   };
+
+  private sortContainersByDepth(containers) {
+    const depths = new Map<String, number>();
+
+    const getDepth = (node) => {
+      if (depths.has(node.id())) return depths.get(node.id())!;
+
+      const incomingContainers = node.incomers('edge[label = "contains"]').sources()
+        .filter(n => n.data('labels')?.includes('Container') && !n.data('labels')?.includes('Structure'));
+
+      const parentDepths = incomingContainers.map(parent => getDepth(parent));
+      const depth = parentDepths.length > 0 ? Math.max(...parentDepths) + 1 : 0;
+
+      depths.set(node.id(), depth);
+      return depth;
+    };
+
+    containers.forEach(container => getDepth(container));
+
+    return containers.sort((a, b) => depths.get(b.id())! - depths.get(a.id())!).toArray();
+  }
 }
 
 export class DepthEnricher {

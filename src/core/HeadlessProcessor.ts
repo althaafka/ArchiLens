@@ -30,18 +30,11 @@ export default class HeadlessProcessor {
     const depthData = new DepthEnricher(this.cy).enrich();
 
     if (showStructure && containerFocus != "") {
-      console.log("CONTAINER FOCUS", containerFocus)
       structureHandler.handleContainerFocus(containerFocus, depthData)
     }
     
     const analyticAspect = new AnalyticAspect()
     analyticAspect.collectAnalyticAspect(this.cy, depthData, containsMap);
-
-    // const edgelifter = new EdgeLifter(this.cy)
-    // const node = this.cy.getElementById("nl.tudelft.jpacman.level")
-    // const level = node.data("properties").depth
-    // edgelifter.lift(4, level+1)
-    // this.filterAndLiftContainer(node)
 
     new CleanUpProcessor(this.cy).clean();
     
