@@ -44,7 +44,8 @@ function App() {
   useEffect(() => {
     if (!cyRef.current) return;
 
-    const processedGraph = GraphPreProcessor.initialize(graph.elements);
+    const clonedGraph = JSON.parse(JSON.stringify(graph.elements));
+    const processedGraph = GraphPreProcessor.initialize(clonedGraph);
 
     const hcy = cytoscape({
       headless: true,
