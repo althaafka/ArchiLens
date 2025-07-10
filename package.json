@@ -24,7 +24,7 @@
     "cytoscape-dagre": "^2.5.0",
     "cytoscape-fcose": "^2.2.0",
     "cytoscape-klay": "^3.1.4",
-    "cytoscape.js-semanticgrid": "file:../cytoscape.js-semanticGrid/cytoscape.js-semanticgrid-1.0.1.tgz",
+    "cytoscape.js-semanticgrid": "file:../cytoscape.js-semanticGrid/cytoscape.js-semanticgrid-1.0.2.tgz",
     "file-saver": "^2.0.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

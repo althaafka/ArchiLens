@@ -105,9 +105,9 @@ export default class AnalyticAspect {
     if (dimension == "Dimension:Container") {
       if (!showStructure) {
         const container = this.containsMap.get(node.id())
-        if (!container) return "-"
+        if (!container) return "root"
         const firstContainerId = [...container][0]
-        return firstContainerId? firstContainerId: "-";
+        return firstContainerId? firstContainerId: "root";
       }
       const container = getNodeParent(node);
       return container? container.data().properties.simpleName || container.id() : null;

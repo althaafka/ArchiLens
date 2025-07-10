@@ -81,7 +81,12 @@ const Layout = ({ cyInstance, showStructure, analyticAspect, onLayoutChange, onH
       } else if (analyticAspect.isMetric(xDimension)) {
         layoutOptions.rangeStep = {x: xRangeStep, y:null};
       } else if (xDimension == 'Dimension:Container') {
-        layoutOptions.xCategories = analyticAspect.getContainerOrder()
+        const containerOrder = analyticAspect.getContainerOrder();
+        if (showStructure){
+          layoutOptions.xCategories = containerOrder
+        } else {
+          layoutOptions.xCategories = ["root", ...containerOrder]
+        }
       }
       
       if (yDimension !== "Dimension:Container" && !analyticAspect.isMetric(yDimension)) {
@@ -89,7 +94,12 @@ const Layout = ({ cyInstance, showStructure, analyticAspect, onLayoutChange, onH
       } else if (analyticAspect.isMetric(yDimension)) {
         layoutOptions.rangeStep = {x: null, y: yRangeStep};
       }  else if (yDimension == 'Dimension:Container') {
-        layoutOptions.yCategories = analyticAspect.getContainerOrder()
+        const containerOrder = analyticAspect.getContainerOrder();
+        if (showStructure){
+          layoutOptions.yCategories = containerOrder
+        } else {
+          layoutOptions.yCategories = ["root", ...containerOrder]
+        }
       }
       
       const layoutInstance = cyInstance.layout(layoutOptions);
