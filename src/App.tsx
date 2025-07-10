@@ -53,9 +53,8 @@ function App() {
       ready: (event) => {
         const hcyInstance = event.cy;
         setHCyInstance(hcyInstance);
-        const processor = new HeadlessProcessor(hcyInstance);
-        const analysisData = processor.process(showStructure, containerFocus);
-
+        const analysisData = HeadlessProcessor.process(hcyInstance, showStructure, containerFocus);
+        
         setAnalyticAspect(analysisData);
 
         const manager = GraphManager.getInstance()
