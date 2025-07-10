@@ -12,7 +12,6 @@ export class StructureHandler {
   }
 
   public handleParentChild() {
-    console.log("HANDLE PARENT-CHILD")
     const containsMap = new Map<string, string[]>();
   
     this.cy.edges().forEach(edge => {
@@ -59,8 +58,6 @@ export class StructureHandler {
   }
 
   public hideStructure(): any {
-    console.log("HIDE STRUCTURE");
-  
     const structureNodes = getNodesByLabel(this.cy.nodes(), "Structure");
   
     const connectedEdges = structureNodes.connectedEdges();
@@ -97,13 +94,9 @@ export class StructureHandler {
             redirectedEdges[key].data.properties.weight += 1;
         }
     })
-    // console.log("EDGES MAP:", edgesMap)
     console.log("CONTAINS MAP:", containsMap)
-  
-    // this.cy.remove(connectedEdges);
     this.cy.remove(structureNodes);
     this.cy.add(Object.values(redirectedEdges));
-    console.log("REDIRECTED EDGE:", redirectedEdges)
     return containsMap
   }
 
@@ -161,7 +154,6 @@ export class StructureHandler {
     })
 
     this.cy.remove(removedNodes);
-    console.log("Container focus result:")
     this.cy.nodes().forEach(node => console.log(node.id()))
   }
 

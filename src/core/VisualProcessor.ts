@@ -55,43 +55,25 @@ export default class VisualProcessor {
       maxDepth = Math.max(maxDepth, depth);
     });
     const minColor = '#f5f5f4';
-const maxColor = '#d6d3d1';
+    const maxColor = '#d6d3d1';
 
-containers.forEach((node) => {
-  let depth = 0;
-  let current = node;
-  while (current.parent().length > 0) {
-    depth++;
-    current = current.parent().first();
-  }
-
-  const ratio = maxDepth === 0 ? 0 : depth / maxDepth;
-  const adjustedColor = interpolateHexColor(maxColor, minColor, ratio);
-
-  addScratch(node, 'style_none', {
-    'background-color': adjustedColor,
-    'border-color': DEFAULT_BORDER_COLOR,
-    'background-fill': 'solid'
-  });
-});
-
-    // const minLightness = 80;
-    // const maxLightness = 92;
-    // containers.forEach((node) => {
-    //   let depth = 0;
-    //   let current = node;
-    //   while (current.parent().length > 0) {
-    //     depth++;
-    //     current = current.parent().first();
-    //   }
-    //   const lightness = minLightness + ((maxLightness - minLightness) / maxDepth) * depth;
-    //   const adjustedColor = `hsl(0, 0%, ${lightness}%)`;
-    //   addScratch(node, 'style_none', {
-    //     'background-color': adjustedColor,
-    //     'border-color': DEFAULT_BORDER_COLOR,
-    //     'background-fill': 'solid'
-    //   });
-    // });
+    containers.forEach((node) => {
+      let depth = 0;
+      let current = node;
+      while (current.parent().length > 0) {
+        depth++;
+        current = current.parent().first();
+      }
+    
+      const ratio = maxDepth === 0 ? 0 : depth / maxDepth;
+      const adjustedColor = interpolateHexColor(maxColor, minColor, ratio);
+    
+      addScratch(node, 'style_none', {
+        'background-color': adjustedColor,
+        'border-color': DEFAULT_BORDER_COLOR,
+        'background-fill': 'solid'
+      });
+    });
   }
   
   private setDimensionNodeStyle(): void {
@@ -159,8 +141,6 @@ containers.forEach((node) => {
         });
     })
   }
-  
-
 
   private setMetricNodeStyle(): void {
     this.data.metric?.forEach(metric => {
