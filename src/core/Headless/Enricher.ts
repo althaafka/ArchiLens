@@ -4,15 +4,10 @@ import { edgeHasLabel } from "../../utils/edgeUtils";
 import { nodeHasLabels, getNodeName } from "../../utils/nodeUtils";
 
 export class DimensionEnricher {
-  private cy: cytoscape.Core;
 
-  constructor(cy: cytoscape.Core) {
-    this.cy = cy
-  }
-
-  public enrich(): void {
-    const edges = this.cy.edges();
-    const nodes = this.cy.nodes();
+  public static enrich(cy: cytoscape.Core): void {
+    const edges = cy.edges();
+    const nodes = cy.nodes();
 
     const composesEdges = getEdgesByLabel(edges, 'composes');
     const implementsEdges = getEdgesByLabel(edges, 'implements');
@@ -20,7 +15,6 @@ export class DimensionEnricher {
     
     const dimensions = getNodesByLabel(nodes, 'Dimension');
     const categories = getNodesByLabel(nodes, 'Category');
-
 
     dimensions?.forEach(dim => {
       const composesCategories = composesEdges
@@ -56,7 +50,7 @@ export class DimensionEnricher {
     });
 
     implementsEdges?.forEach(edge => {
-      const node = this.cy.getElementById(edge.data('source'));
+      const node = cy.getElementById(edge.data('source'));
       if (!node.data('properties').dimension) {
         node.data('properties').dimension = {};
       }
@@ -70,7 +64,7 @@ export class DimensionEnricher {
       node.data('properties').dimension[dimId].push(edge.data('target'));
     });
 
-    const allNodes = this.cy.nodes().filter(node => {
+    const allNodes = cy.nodes().filter(node => {
       const id = node.id();
       const isExcluded = id === 'java.lang.String';
       const labels = node.data('labels') || [];
@@ -106,15 +100,9 @@ export class DimensionEnricher {
 }
 
 export class MetricEnricher {
-  private cy: cytoscape.Core;
-
-  constructor(cy: cytoscape.Core) {
-    this.cy = cy
-  }
-
-  public enrich(): void {
-    const edges = this.cy.edges();
-    const nodes = this.cy.nodes();
+  public static enrich(cy: cytoscape.Core): void {
+    const edges = cy.edges();
+    const nodes = cy.nodes();
 
     const measuresEdges = getEdgesByLabel(edges, 'measures');
     const metrics = getNodesByLabel(nodes, 'Metric');
@@ -129,7 +117,7 @@ export class MetricEnricher {
       let maxVal = -Infinity;
       let minVal = Infinity;
       measuredNode.forEach(([nodeId, value]) => {
-          const node = this.cy.getElementById(nodeId)
+          const node = cy.getElementById(nodeId)
           if (maxVal < value) maxVal = value
           if (minVal > value) minVal = value
 
@@ -152,19 +140,10 @@ export class MetricEnricher {
 }
 
 export class ComposedDimensionEnricher {
-  private cy: cytoscape.Core;
-  private showStructure: boolean;
-  private containerFocus: string;
 
-  constructor(cy: cytoscape.Core, showStructure: boolean, containerFocus: string) {
-    this.cy = cy
-    this.showStructure = showStructure
-    this.containerFocus = containerFocus
-  }
-
-  public enrich(): void {
-    const edges = this.cy.edges();
-    const nodes = this.cy.nodes();
+  public static enrich(cy: cytoscape.Core, showStructure: boolean, containerFocus: string): void {
+    const edges = cy.edges();
+    const nodes = cy.nodes();
 
     const structures = getNodesByLabel(nodes, 'Structure');
     const hasScripts = getEdgesByLabel(edges, 'hasScript');
@@ -178,7 +157,7 @@ export class ComposedDimensionEnricher {
           edgeHasLabel(edge, 'implements') && edge.data('target') === categoryId
         );
         return relatedImpls.some(iEdge => {
-          const sourceNode = this.cy.getElementById(iEdge.data('source'));
+          const sourceNode = cy.getElementById(iEdge.data('source'));
           return nodeHasLabels(sourceNode, ['Scripts']) || nodeHasLabels(sourceNode, ['Operation']);
         });
       })
@@ -190,7 +169,7 @@ export class ComposedDimensionEnricher {
     structures.forEach(structure => {
       if (structure.id() === 'java.lang.String') return;
       const scriptEdges = hasScripts.filter(edge => edge.data('source') === structure.id());
-      const scripts = scriptEdges.map(edge => this.cy.getElementById(edge.data('target')));
+      const scripts = scriptEdges.map(edge => cy.getElementById(edge.data('target')));
   
       const composedDimension: Record<string, string[]> = {};
   
@@ -269,18 +248,18 @@ export class ComposedDimensionEnricher {
       });
   
       container.addClass('layers');
-      if (this.showStructure && this.containerFocus == ""){
+      if (showStructure && containerFocus == ""){
         container.addClass('package')
       }
     });   
   }
 
-  private counter = (arr) => arr.reduce((acc, val) => {
+  private static counter = (arr) => arr.reduce((acc, val) => {
     acc[val] = (acc[val] || 0) + 1;
     return acc;
   }, {});
 
-  private counterToPercentage(counter: Record<string, number>) {
+  private static counterToPercentage(counter: Record<string, number>) {
       const total = Object.values(counter).reduce((sum, count) => sum + count, 0);
       const result: Record<string, number> = {};
       for (const key in counter) {
@@ -289,7 +268,7 @@ export class ComposedDimensionEnricher {
       return result;
   }
 
-  private mergeCounters = (counters) => {
+  private static mergeCounters = (counters) => {
     return counters.reduce((acc, counter) => {
       Object.entries(counter).forEach(([key, val]) => {
         acc[key] = (acc[key] || 0) + val;
@@ -298,7 +277,7 @@ export class ComposedDimensionEnricher {
     }, {});
   };
 
-  private sortContainersByDepth(containers) {
+  private static sortContainersByDepth(containers) {
     const depths = new Map<String, number>();
 
     const getDepth = (node) => {
@@ -321,19 +300,13 @@ export class ComposedDimensionEnricher {
 }
 
 export class DepthEnricher {
-  private cy: cytoscape.Core;
-
-  constructor(cy: cytoscape.Core) {
-    this.cy = cy;
-  }
-
-  public enrich(): {
+  public static enrich(cy: cytoscape.Core): {
     depthData: { id: string; depth: number; labels: string[] }[];
     containerOrder: string[];
     maxDepth: number;
     containerIds: string[];
   } {
-    const roots = getRoots(this.cy)
+    const roots = getRoots(cy)
 
     const visited = new Set<string>();
     const depthData: { id: string; depth: number; labels: string[] }[] = [];

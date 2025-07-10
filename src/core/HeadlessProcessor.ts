@@ -8,9 +8,9 @@ export default class HeadlessProcessor {
 
   public static process(cy: cytoscape.Core, showStructure: boolean, containerFocus: string): any {
 
-    new DimensionEnricher(cy).enrich();
-    new MetricEnricher(cy).enrich();
-    new ComposedDimensionEnricher(cy, showStructure, "").enrich();
+    DimensionEnricher.enrich(cy);
+    MetricEnricher.enrich(cy);
+    ComposedDimensionEnricher.enrich(cy, showStructure, "");
     
     const structureHandler = new StructureHandler(cy);
     let containsMap
@@ -19,7 +19,7 @@ export default class HeadlessProcessor {
     } else {
       containsMap = structureHandler.hideStructure();
     }
-    const depthData = new DepthEnricher(cy).enrich();
+    const depthData = DepthEnricher.enrich(cy);
 
     if (showStructure && containerFocus != "") {
       structureHandler.handleContainerFocus(containerFocus, depthData)
