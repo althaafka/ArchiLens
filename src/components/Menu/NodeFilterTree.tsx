@@ -1,7 +1,7 @@
 // components/NodeFilterTree.jsx
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
-import { Checkbox, FormControlLabel } from '@mui/material';
+import { Checkbox, FormControlLabel, Typography } from '@mui/material';
 import { useState, useEffect } from 'react';
 import {  nodeHasLabels } from '../../utils/nodeUtils';
 
@@ -72,6 +72,7 @@ const renderTree = (nodeData) => {
   const isChecked = checkedMap[nodeData.id] ?? true;
 
   return (
+  <><Typography variant="subtitle1">Node Visibility</Typography>
   <TreeItem key={nodeData.id} itemId={nodeData.id} label={
     <FormControlLabel
       control={
@@ -87,6 +88,7 @@ const renderTree = (nodeData) => {
   }>
     {nodeData.children?.map(child => renderTree(child))}
   </TreeItem>
+  </>
   )
 }
 
