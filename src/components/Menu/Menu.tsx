@@ -101,21 +101,6 @@ const Menu = ({
     setMaxDepth(analyticAspect?.depth?.maxDepth ?? 2);
   }, [cyInstance]);
 
-  const downloadGraphAsPng = () => {
-    if (!cyInstance) return;
-    const pngData = cyInstance.png({ full: true });
-    const byteString = atob(pngData.split(',')[1]);
-    const arrayBuffer = new ArrayBuffer(byteString.length);
-    const uint8Array = new Uint8Array(arrayBuffer);
-
-    for (let i = 0; i < byteString.length; i++) {
-      uint8Array[i] = byteString.charCodeAt(i);
-    }
-
-    const blob = new Blob([uint8Array], { type: 'image/png' });
-    saveAs(blob, 'graph.png');
-  };
-
   return (
     <Box gap={1}>
       <Typography className="text-center p-3" variant="h6">ArchiLens</Typography>
@@ -156,8 +141,6 @@ const Menu = ({
         handleLayoutChange={handleLayoutChange}
         handleHidePackagesChange={handleHidePackagesChange}
         handleLiftChange={handleLiftChange}
-        downloadGraphAsPng={downloadGraphAsPng}
-        filterEdgeDisplay={filterEdgeDisplay}
       />
 
       <TabNodes

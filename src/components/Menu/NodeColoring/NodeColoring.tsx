@@ -13,21 +13,6 @@ import {
 
 const NodeColoring = ({ cyInstance, analyticAspect, coloring, setColoring, categoriesVisibility, setCategoriesVisibility}) => {
 
-  // useEffect(() => {
-  //   if (!cyInstance) return;
-  //   if (!analyticAspect.metric?.find(m => m.id == coloring)) {
-  //     let catVis = {};
-  //     if (coloring != "none"){
-  //       catVis = Object?.keys(analyticAspect?.colorMap[coloring]).reduce((acc, key) => {
-  //         acc[key] = true;
-  //         return acc;
-  //       }, {})
-  //     }
-  //     setCategoriesVisibility(catVis);
-  //   }
-    
-  // }, [containerFocus])
-
   useEffect(() => {
     if (!cyInstance) return;
 
@@ -66,10 +51,8 @@ const NodeColoring = ({ cyInstance, analyticAspect, coloring, setColoring, categ
         node.style('display', 'none');
       } else {
         node.style('display', isVisible ? 'element' : 'none');
-        // if (!isVisible) node.addClass('hidden')
       }
     })
-    // setGraphVersion(v=> v+1)
   }, [categoriesVisibility, coloring, cyInstance]);
 
   return (

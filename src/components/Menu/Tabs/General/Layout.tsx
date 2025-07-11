@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
-import { layoutTypes } from '../../constants/layoutData'
+import { layoutTypes } from '../../../../constants/layoutData'
 import registerSemanticGridLayout from 'cytoscape.js-semanticGrid';
 import cytoscape from 'cytoscape';
-import GraphManager from '../../core/GraphManager';
+import { isPureContainer, removeChildRelation, addChildRelation } from "../../../../utils/nodeUtils";
+import { edgeHasLabel } from "../../../../utils/edgeUtils";
 
 import {
   Box,
@@ -16,7 +17,7 @@ import {
   Checkbox,
   TextField,
 } from '@mui/material';
-import { EdgeLifter } from '../../core/Headless/EdgeLifter';
+import { EdgeLifter } from '../../../../core/Headless/EdgeLifter';
 
 registerSemanticGridLayout(cytoscape);
 
@@ -39,29 +40,61 @@ const Layout = ({ cyInstance, showStructure, analyticAspect, onLayoutChange, onH
     onHidePackagesChange?.(hidePackages);
   }, [hidePackages]);
 
+  const hidePackage = () => {
+    cyInstance.nodes().forEach((node) => {
+      const isPackage = isPureContainer(node);
+      if (isPackage) {
+        removeChildRelation(node)
+        node.style('display', 'none');
+      }
+    })
+  }
+
+  const unhidePackage = () => {
+    const containsMap = new Map<string, Set<string>>();
+    cyInstance.edges().forEach((edge) => {
+      if (!edgeHasLabel(edge, "contains")) return;
+
+      if (!containsMap.has(edge.data().source)){
+        containsMap.set(edge.data().source, new Set())
+      }
+      containsMap.get(edge.data().source)?.add(edge.data().target)
+    })
+
+    cyInstance.nodes().forEach((node) => {
+      if (isPureContainer(node)) {
+        node.style('display', 'element');
+  
+        const children = containsMap.get(node.id());
+  
+        if (children) {
+          children?.forEach((childId) => {
+            const childNode = cyInstance.getElementById(childId);
+            if (childNode && childNode.length > 0) {
+              addChildRelation(node, childNode);
+            }
+          });
+        }
+      }
+    })
+  }
+
   const relayout = () => {
     if (!cyInstance) return;
 
-    const manager = GraphManager.getInstance()
     
     if (prevLayoutRef.current && typeof prevLayoutRef.current.destroy === 'function' && prevLayoutType == "semanticGrid") {
       prevLayoutRef.current.destroy();
     }
 
     if (prevLayoutType === 'semanticGrid' && showStructure ) {
-      manager.unhidePackage(cyInstance);
+      unhidePackage();
     }
-
-    console.log("LAYOUT", analyticAspect)
     
     setPrevLayoutType(layout);
 
     if (layout == "semanticGrid") {
       if (!xDimension || !yDimension) return;
-      console.log("-----SEMANTIC-----")
-      cyInstance.nodes().forEach(node=>{
-        console.log(node.data('label'), analyticAspect.getNodeCategory(node,xDimension, showStructure))
-      })
       
       const layoutOptions: {
         name: string;
@@ -111,10 +144,10 @@ const Layout = ({ cyInstance, showStructure, analyticAspect, onLayoutChange, onH
         if (hidePackages) {
           const edgelifter = new EdgeLifter(cyInstance)
           edgelifter.unlift(analyticAspect?.depth?.maxDepth)
-          manager.hidePackage(cyInstance)
+          hidePackage()
           onLiftEdgeChange?.(analyticAspect?.depth?.maxDepth)
         } else {
-          manager.unhidePackage(cyInstance)
+          unhidePackage()
         }
       }
     } else {

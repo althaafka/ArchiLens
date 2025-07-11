@@ -1,9 +1,11 @@
 import React from 'react';
 import { Box, Button, Divider, Switch, Typography } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
-import FileUpload from '../FileUpload';
-import Layout from '../Layout';
-import ContainerSelector from '../ContainerSelector';
+import FileUpload from './General/FileUpload';
+import Layout from './General/Layout';
+import ContainerSelector from './General/ContainerSelector';
+import StructureVisibility from './General/StructureVisibility';
+import DownloadGraph from './General/DownloadGraph';
 
 const TabGeneral = ({
   hidden,
@@ -16,27 +18,24 @@ const TabGeneral = ({
   setContainerFocus,
   handleLayoutChange,
   handleHidePackagesChange,
-  handleLiftChange,
-  downloadGraphAsPng,
-  filterEdgeDisplay
+  handleLiftChange
 }) => {
   return (
     <Box hidden={hidden} className="space-y-2 p-4">
       <FileUpload setGraph={setGraph} />
-      <Box display="flex" justifyContent="space-between" alignItems="center" className="my-2">
-        <Typography variant="subtitle1">Structure Visibility</Typography>
-        <Switch
-          checked={showStructure}
-          onChange={(e) => setShowStructure(e.target.checked)}
-        />
-      </Box>
+
+      <StructureVisibility 
+        showStructure={showStructure} 
+        setShowStructure={setShowStructure}
+      />
+
       <ContainerSelector
         cyInstance={cyInstance}
         analyticAspect={analyticAspect}
-        filterEdgeDisplay={filterEdgeDisplay}
         selectedContainer={containerFocus}
         setSelectedContainer={setContainerFocus}
       />
+
       <Layout
         cyInstance={cyInstance}
         analyticAspect={analyticAspect}
@@ -45,15 +44,8 @@ const TabGeneral = ({
         onHidePackagesChange={handleHidePackagesChange}
         onLiftEdgeChange={handleLiftChange}
       />
-      <Button
-        fullWidth
-        variant="contained"
-        color="primary"
-        onClick={downloadGraphAsPng}
-        startIcon={<DownloadIcon />}
-      >
-        Download Graph as PNG
-      </Button>
+
+      <DownloadGraph cyInstance={cyInstance} />
     </Box>
   );
 };
