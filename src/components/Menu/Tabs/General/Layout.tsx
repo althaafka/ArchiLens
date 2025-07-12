@@ -17,7 +17,7 @@ import {
   Checkbox,
   TextField,
 } from '@mui/material';
-import { EdgeLifter } from '../../../../core/Headless/EdgeLifter';
+import { EdgeLifter } from '../../../../core/EdgeLifter';
 
 registerSemanticGridLayout(cytoscape);
 

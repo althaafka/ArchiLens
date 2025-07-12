@@ -17,7 +17,6 @@ import Menu from './components/Menu/Menu';
 import HeadlessProcessor from './core/HeadlessProcessor';
 import VisualProcessor from './core/VisualProcessor';
 import ElementDrawer from "./components/Menu/Drawer";
-import GraphManager from './core/GraphManager';
 import GraphPreProcessor from './core/GraphPreprocessor';
 import { isSemanticGridEl } from './utils/graphUtils';
 
@@ -57,8 +56,6 @@ function App() {
         
         setAnalyticAspect(analysisData);
 
-        const manager = GraphManager.getInstance()
-        manager.setAnalyticAspect(analysisData);
         console.log(analysisData)
 
         if (cyRef.current) {
@@ -70,7 +67,7 @@ function App() {
             ready: (cyEvent) => {
               const cyInstance = cyEvent.cy;
               setCyInstance(cyInstance);
-              const visualizer = new VisualProcessor(cyInstance, manager.getAnalyticAspect());
+              const visualizer = new VisualProcessor(cyInstance, analysisData);
               visualizer.process();
             },
           } as any);

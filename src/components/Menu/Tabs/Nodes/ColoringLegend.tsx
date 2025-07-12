@@ -4,9 +4,6 @@ import {
   Typography,
 } from '@mui/material';
 
-
-
-
 const ColoringLegend = ({ 
     coloring, 
     analyticAspect,

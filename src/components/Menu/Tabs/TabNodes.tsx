@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 import ShowPrimitives from './Nodes/ShowPrimitives';
 import NodeColoring from './Nodes/NodeColoring';
-import NodeFilterTree from '../NodeFilterTree';
+import NodeFilterTree from './Nodes/NodeFilterTree';
 
 const TabNodes = ({
   hidden,

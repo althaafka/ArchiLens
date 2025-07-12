@@ -2,7 +2,7 @@ import cytoscape from "cytoscape";
 import { edgeHasLabel, getEdgeLabel } from "../../utils/edgeUtils";
 import { nodeHasLabels } from "../../utils/nodeUtils";
 import { getNodesByLabel } from "../../utils/graphUtils";
-import { EdgeLifter } from "./EdgeLifter";
+import { EdgeLifter } from "../EdgeLifter";
 
 export class StructureHandler {
   private cy: cytoscape.Core;

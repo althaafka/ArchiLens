@@ -3,7 +3,7 @@ import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { Checkbox, FormControlLabel, Typography } from '@mui/material';
 import { useState, useEffect } from 'react';
-import {  nodeHasLabels } from '../../utils/nodeUtils';
+import {  nodeHasLabels } from '../../../../utils/nodeUtils';
 
 const NodeFilterTree = ({ cyInstance, categoriesVisibility }) => {
   const [checkedMap, setCheckedMap] = useState({});
@@ -15,22 +15,15 @@ const NodeFilterTree = ({ cyInstance, categoriesVisibility }) => {
       newCheckedMap[node.id()] = node.style('display') !== 'none';
     });
     setCheckedMap(newCheckedMap);
-    console.log("FILTER TREE:", newCheckedMap)
   }, [categoriesVisibility, cyInstance]);
 
   const handleToggle = (id, checked) => {
     console.log(handleToggle)
     const node = cyInstance.getElementById(id);
-    console.log(id, checked)
     node.style({ display: checked ? 'element' : 'none' });
-    // if (!checked){
-    //   node.addClass('hidden')
-    // } else {
-    //   node.removeClass('hidden')
-    // }
+
     const parent = node.parent();
     if (parent.nonempty()) {
-        // parent.removeClass('hidden')
         parent.style({
           display: 'element',
           opcity: 1,
