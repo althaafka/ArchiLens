@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { edgesLabel } from '../../constants/constants';
-import { saveAs } from 'file-saver';
 import {
   Box, Typography, Divider
 } from '@mui/material';

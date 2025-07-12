@@ -259,14 +259,14 @@ export class ComposedDimensionEnricher {
     return acc;
   }, {});
 
-  private static counterToPercentage(counter: Record<string, number>) {
-      const total = Object.values(counter).reduce((sum, count) => sum + count, 0);
-      const result: Record<string, number> = {};
-      for (const key in counter) {
-          result[key] = total ? counter[key] / total : 0;
-      }
-      return result;
-  }
+  // private static counterToPercentage(counter: Record<string, number>) {
+  //     const total = Object.values(counter).reduce((sum, count) => sum + count, 0);
+  //     const result: Record<string, number> = {};
+  //     for (const key in counter) {
+  //         result[key] = total ? counter[key] / total : 0;
+  //     }
+  //     return result;
+  // }
 
   private static mergeCounters = (counters) => {
     return counters.reduce((acc, counter) => {

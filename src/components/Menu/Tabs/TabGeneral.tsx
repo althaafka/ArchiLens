@@ -1,6 +1,4 @@
-import React from 'react';
-import { Box, Button, Divider, Switch, Typography } from '@mui/material';
-import DownloadIcon from '@mui/icons-material/Download';
+import { Box } from '@mui/material';
 import FileUpload from './General/FileUpload';
 import Layout from './General/Layout';
 import ContainerSelector from './General/ContainerSelector';
