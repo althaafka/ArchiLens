@@ -3,7 +3,7 @@ import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { Checkbox, FormControlLabel, Typography } from '@mui/material';
 import { useState, useEffect } from 'react';
-import {  nodeHasLabels } from '../../../../utils/nodeUtils';
+import {  nodeHasLabels } from '../../../utils/nodeUtils';
 
 const NodeFilterTree = ({ cyInstance, categoriesVisibility }) => {
   const [checkedMap, setCheckedMap] = useState({});
@@ -65,7 +65,7 @@ const renderTree = (nodeData) => {
   const isChecked = checkedMap[nodeData.id] ?? true;
 
   return (
-  <><Typography variant="subtitle1">Node Visibility</Typography>
+  <>
   <TreeItem key={nodeData.id} itemId={nodeData.id} label={
     <FormControlLabel
       control={

@@ -8,6 +8,12 @@ export default class HeadlessProcessor {
 
   public static process(cy: cytoscape.Core, showStructure: boolean, containerFocus: string): any {
 
+    const edges = cy.edges().filter(e => 
+      e.data('label') === "calls" &&
+      (e.data('source') === "nl.tudelft.jpacman.Launcher" || e.data('target') === "nl.tudelft.jpacman.Launcher")
+    );
+    console.log("launcher edges headless", edges);
+
     DimensionEnricher.enrich(cy);
     MetricEnricher.enrich(cy);
     ComposedDimensionEnricher.enrich(cy, showStructure, "");
@@ -29,6 +35,9 @@ export default class HeadlessProcessor {
     analyticAspect.collectAnalyticAspect(cy, depthData, containsMap);
 
     new CleanUpProcessor(cy).clean();
+    // const edges = cy.edges().filter(e => e.data('label')=="calls" && (e.data('source') == "nl.​tudelft.​jpacman.​Launcher" || e.data('target') == "nl.​tudelft.​jpacman.​​Launcher"))
+    // console.log("launcher edges", edges)
+
     
     return analyticAspect;
   }

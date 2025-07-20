@@ -10,13 +10,14 @@ import cytoscapeDagre from 'cytoscape-dagre';
 
 import { StylesheetCSS } from "cytoscape";
 import styleData from "./cy-style.json";
-import rawGraph from "./assets/jpacman-v4-metric.json";
+// import rawGraph from "./assets/jpacman-v4-metric.json";
+import rawGraph from "./assets/jpacman-test.json";
 // import rawGraph from "./assets/JHotDraw-5.1-output-v3c 3 (1).json";
 
-import Menu from './components/Menu/Menu';
+import Menu from './components/Menu';
 import HeadlessProcessor from './core/HeadlessProcessor';
 import VisualProcessor from './core/VisualProcessor';
-import ElementDrawer from "./components/Menu/Drawer";
+import ElementDrawer from "./components/Drawer";
 import GraphPreProcessor from './core/GraphPreprocessor';
 import { isSemanticGridEl } from './utils/graphUtils';
 
@@ -55,8 +56,6 @@ function App() {
         const analysisData = HeadlessProcessor.process(hcyInstance, showStructure, containerFocus);
         
         setAnalyticAspect(analysisData);
-
-        console.log(analysisData)
 
         if (cyRef.current) {
           const cy = cytoscape({

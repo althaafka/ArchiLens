@@ -1,4 +1,5 @@
-const fs = require("fs");
+import fs from "fs";
+
 
 // Dimention: stereotypes, role stereotypes, layer, dependencyProfile
 
@@ -10,8 +11,18 @@ graphs.edges = graphs.edges.filter(edge => edge.data.label != "implements");
 graphs.nodes = graphs.nodes.filter(node => !node.data.labels.includes("Grouping"))
 
 // Cat order
-let stereotypesOrder = []
-let rsOrder = []
+let stereotypesOrder = [
+]
+
+let rsOrder = [
+    "User Interfacer",
+    "Coordinator",
+    "Controller",
+    "Service Provider",
+    "Structurer",
+    "Information Holder"
+]
+
 let layerOrder = [
     'UI',
     'Presentation Layer',
@@ -20,21 +31,26 @@ let layerOrder = [
     'Logic',
     'Data',
 ]
-let dpOrder = []
+let dpOrder = [
+    "outbound",
+    "transit",
+    "inbound",
+    "hidden"
+]
 
 graphs.nodes.forEach(node => {
     if (node.data.properties.stereotype && !stereotypesOrder.includes(node.data.properties.stereotype)){
         stereotypesOrder.push(node.data.properties.stereotype)
     }
-    if (node.data.properties.roleStereotype && !rsOrder.includes(node.data.properties.roleStereotype)){
-        rsOrder.push(node.data.properties.roleStereotype)
-    }
+    // if (node.data.properties.roleStereotype && !rsOrder.includes(node.data.properties.roleStereotype)){
+    //     rsOrder.push(node.data.properties.roleStereotype)
+    // }
     // if (node.data.properties.layer && !layerOrder.includes(node.data.properties.layer)){
     //     layerOrder.push(node.data.properties.layer)
     // }    
-    if (node.data.properties.dependencyProfile && !dpOrder.includes(node.data.properties.dependencyProfile)){
-        dpOrder.push(node.data.properties.dependencyProfile)
-    }
+    // if (node.data.properties.dependencyProfile && !dpOrder.includes(node.data.properties.dependencyProfile)){
+    //     dpOrder.push(node.data.properties.dependencyProfile)
+    // }
 })
 
 const stereotypeDimensionId = "Dimension:Stereotypes";
@@ -158,13 +174,11 @@ createImplementEdges("RoleStereotypes", rsOrder, "roleStereotype");
 createImplementEdges("ArchitecturalLayer", layerOrder, "layer");
 createImplementEdges("DependencyProfile", dpOrder, "dependencyProfile");
 
-
-
 console.log(stereotypesOrder);
 console.log(rsOrder)
 console.log(layerOrder)
 console.log(dpOrder)
 
 // Save the modified graph
-fs.writeFileSync("./integration/result/jpacman-v3-dim.json", JSON.stringify({elements: graphs}, null, 2));
+fs.writeFileSync("./integration/result/jpacman-dim-test.json", JSON.stringify({elements: graphs}, null, 2));
 console.log("Graph with dimensions saved successfully!");

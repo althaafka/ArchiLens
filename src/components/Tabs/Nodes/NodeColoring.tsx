@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import ColoringLegend from './ColoringLegend';
-import { getScratch } from '../../../../utils/utils';
+import { getScratch } from '../../../utils/utils';
 // import { nodeColoringTypes } from '../../../constants/nodeColoringData';
-import { camelCaseToWords } from '../../../../utils/utils';
+import { camelCaseToWords } from '../../../utils/utils';
 import {
   Box,
   Typography,

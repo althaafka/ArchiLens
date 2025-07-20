@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
-import { layoutTypes } from '../../../../constants/layoutData'
+import { layoutTypes } from '../../../constants/layoutConstants'
 import registerSemanticGridLayout from 'cytoscape.js-semanticGrid';
 import cytoscape from 'cytoscape';
-import { isPureContainer, removeChildRelation, addChildRelation } from "../../../../utils/nodeUtils";
-import { edgeHasLabel } from "../../../../utils/edgeUtils";
+import { isPureContainer, removeChildRelation, addChildRelation } from "../../../utils/nodeUtils";
+import { edgeHasLabel } from "../../../utils/edgeUtils";
 
 import {
   Box,
@@ -17,7 +17,7 @@ import {
   Checkbox,
   TextField,
 } from '@mui/material';
-import { EdgeLifter } from '../../../../core/EdgeLifter';
+import { EdgeLifter } from '../../../core/EdgeLifter';
 
 registerSemanticGridLayout(cytoscape);
 

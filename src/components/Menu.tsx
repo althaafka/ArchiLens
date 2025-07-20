@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
-import { edgesLabel } from '../../constants/constants';
+import { edgesLabel } from '../constants/constants';
 import {
   Box, Typography, Divider
 } from '@mui/material';
 import { Tabs, Tab } from '@mui/material';
-import { EdgeLifter } from '../../core/EdgeLifter';
-import { isSemanticGridEl } from '../../utils/graphUtils';
+import { EdgeLifter } from '../core/EdgeLifter';
+import { isSemanticGridEl } from '../utils/graphUtils';
 
 
 import TabGeneral from './Tabs/TabGeneral';

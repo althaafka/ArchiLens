@@ -1,6 +1,6 @@
 import { Box, Typography, FormGroup, Checkbox } from '@mui/material';
-import { edgeGradientColors } from '../../../../constants/colorConstants';
-import { edgesLabel } from '../../../../constants/constants';
+import { edgeGradientColors } from '../../../constants/colorConstants';
+import { edgesLabel } from '../../../constants/constants';
 
 const FilterEdges = ({ selectedEdges, handleEdgeFilterChange }) => {
   return (

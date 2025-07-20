@@ -1,9 +1,9 @@
-const fs = require('fs');
+import fs from "fs";
 
 //File paths
 
-const newFile = './integration/result/jpacman-v3-metric.json'
-const jhotFile = './integration/result/jpacman-v3-dim.json';
+const newFile = './integration/result/jpacman-test.json'
+const jhotFile = './integration/result/jpacman-dim-test.json';
 
 const graphs = JSON.parse(fs.readFileSync(jhotFile, 'utf-8')).elements;
 

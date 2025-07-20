@@ -16,6 +16,13 @@ export default class GraphPreProcessor {
     // Merge chained container, hide primitives, change node name
     processedElements = GraphPreProcessor.mergeChainedPackages(processedElements);
     processedElements = GraphPreProcessor.hidePrimitivesAndUpdateLabels(processedElements);
+    processedElements = GraphPreProcessor.mergeDuplicateEdgesByWeight(processedElements);
+
+    const edges = processedElements.edges.filter(e => 
+      e.data.label === "calls" &&
+      (e.data.source === "nl.tudelft.jpacman.Launcher" || e.data.target === "nl.tudelft.jpacman.Launcher")
+    );
+    console.log("launcher edges 2", edges);
 
     return processedElements;
   }
@@ -107,7 +114,43 @@ export default class GraphPreProcessor {
       const tgt = e.data.target;
       return !toRemoveEdgeIds.has(e.data.id) && !toRemoveNodeIds.has(src) && !toRemoveNodeIds.has(tgt);
     });
+
+    // const edges = elements.edges.filter(e => 
+    //   e.data.label === "calls" &&
+    //   (e.data.source === "nl.tudelft.jpacman.Launcher" || e.data.target === "nl.tudelft.jpacman.Launcher")
+    // );
+    // console.log("launcher edges", edges);
+
     
     return elements
   }   
+
+  private static mergeDuplicateEdgesByWeight(elements: any): any {
+  const edgeMap = new Map<string, any>();
+
+  for (const edge of elements.edges) {
+    const { source, target, label } = edge.data;
+    const key = `${source}||${target}||${label}`;
+
+    
+    if (!edgeMap.has(key)) {
+      edge.data.properties.weight = edge.data.properties.weight || 1;
+      edgeMap.set(key, edge);
+    } else {
+      // Tambahkan weight ke edge yang sudah ada
+      const existing = edgeMap.get(key);
+      existing.data.properties.weight += edge.data.properties.weight || 1;
+      if (edge.data.target == "nl.tudelft.jpacman.Launcher" || edge.data.source == "nl.tudelft.jpacman.Launcher") {
+        console.log("nambah")
+      }
+
+    }
+  }
+
+  // Replace edge list dengan yang sudah digabung
+  elements.edges = Array.from(edgeMap.values());
+
+  return elements;
+}
+
 }
