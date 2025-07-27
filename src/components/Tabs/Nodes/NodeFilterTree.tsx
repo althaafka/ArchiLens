@@ -88,6 +88,8 @@ const renderTree = (nodeData) => {
   const treeData = buildTreeData(cyInstance);
 
   return (
+    <>
+    <Typography variant="subtitle1">Node Visibility</Typography>
     <SimpleTreeView
       multiSelect
       sx={{
@@ -99,6 +101,7 @@ const renderTree = (nodeData) => {
     >
       {treeData.map(node => renderTree(node))}
     </SimpleTreeView>
+    </>
   );
 };
 

@@ -11,8 +11,8 @@ import cytoscapeDagre from 'cytoscape-dagre';
 import { StylesheetCSS } from "cytoscape";
 import styleData from "./cy-style.json";
 // import rawGraph from "./assets/jpacman-v4-metric.json";
-import rawGraph from "./assets/jpacman-test.json";
-// import rawGraph from "./assets/JHotDraw-5.1-output-v3c 3 (1).json";
+import rawGraph from "./assets/fix/jpacman-test.json";
+// import rawGraph from "./assets/fix/JHotDraw.json";
 
 import Menu from './components/Menu';
 import HeadlessProcessor from './core/HeadlessProcessor';
@@ -22,6 +22,8 @@ import GraphPreProcessor from './core/GraphPreprocessor';
 import { isSemanticGridEl } from './utils/graphUtils';
 
 import { Box, CssBaseline } from '@mui/material';
+import { IconButton, Stack, Tooltip } from "@mui/material";
+import ZoomOutMapIcon from '@mui/icons-material/ZoomOutMap';
 
 cytoscape.use(cytoscapeCola);
 cytoscape.use(cytoscapeKlay);
@@ -54,6 +56,7 @@ function App() {
         const hcyInstance = event.cy;
         setHCyInstance(hcyInstance);
         const analysisData = HeadlessProcessor.process(hcyInstance, showStructure, containerFocus);
+        console.log("analytic aspect: ", analysisData)
         
         setAnalyticAspect(analysisData);
 
@@ -70,6 +73,10 @@ function App() {
               visualizer.process();
             },
           } as any);
+
+          cy.layout({
+            name: 'klay'
+          }).run();
   
           cy.on('tap', 'node', (event) => {
             console.log("Node clicked:", event.target.data());
@@ -123,12 +130,37 @@ function App() {
         {/* Cytoscape Canvas */}
         <Box flex={1} overflow="hidden">
           <div ref={cyRef} className="w-full h-full" />
+{/* Tombol Fit dengan Icon */}
+<Stack direction="row" spacing={1} position="absolute" bottom={16} right={16}>
+  <Tooltip title="Fit Graph" arrow>
+    <IconButton
+      onClick={() => {
+        if (cyInstance) {
+          cyInstance.fit(undefined, 30); // padding 30
+        }
+      }}
+      color="primary"
+      sx={{
+        bgcolor: 'white',
+        border: '1px solid #ccc',
+        boxShadow: 2,
+        '&:hover': {
+          bgcolor: 'grey.100',
+        },
+      }}
+    >
+      <ZoomOutMapIcon />
+    </IconButton>
+  </Tooltip>
+</Stack>
+
         </Box>
 
         <ElementDrawer
           open={drawerOpen}
           onClose={() => setDrawerOpen(false)}
           elementData={selectedElement}
+          analyticAspect={analyticAspect}
         />
       </Box>
     </>

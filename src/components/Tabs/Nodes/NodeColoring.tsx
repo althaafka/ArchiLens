@@ -16,10 +16,11 @@ const NodeColoring = ({ cyInstance, analyticAspect, coloring, setColoring, categ
   useEffect(() => {
     if (!cyInstance) return;
 
-    if (!analyticAspect.metric?.find(m => m.id == coloring)) {
+    if (!analyticAspect?.metric?.find(m => m.id == coloring)) {
       let catVis = {};
       if (coloring != "none"){
-        catVis = Object?.keys(analyticAspect?.colorMap[coloring]).reduce((acc, key) => {
+        if (!catVis) return
+        catVis = Object.keys(analyticAspect?.colorMap[coloring]).reduce((acc, key) => {
           acc[key] = true;
           return acc;
         }, {})

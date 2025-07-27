@@ -23,7 +23,7 @@ const Menu = ({
 }) => {
 
   const [tabIndex, setTabIndex] = useState(0);
-  const [liftDepth, setLiftDepth] = useState(analyticAspect?.depth?.maxDepth);
+  const [liftDepth, setLiftDepth] = useState(2);
   const [currentLayout, setCurrentLayout] = useState('grid');
   const [hidePackages, setHidePackages] = useState(false);
   const [categoriesVisibility, setCategoriesVisibility] = useState({});
@@ -36,8 +36,6 @@ const Menu = ({
   const [coloring, setColoring] = useState("none");
   const [maxDepth, setMaxDepth] = useState(analyticAspect?.depth?.maxDepth ?? 2);
 
-  
-  
   const handleTabChange = (_event, newValue) => setTabIndex(newValue);
   const handleLayoutChange = (layout) => setCurrentLayout(layout);
   const handleHidePackagesChange = (hide) => setHidePackages(hide);
@@ -88,13 +86,16 @@ const Menu = ({
   };
   
   useEffect(() => {
+    // setLiftDepth(analyticAspect?.depth?.maxDepth)
+    setLiftDepth(2)
+    const edgelift = new EdgeLifter(cyInstance);
+    edgelift.lift(analyticAspect?.depth?.maxDepth, 3);
     filterEdgeDisplay();
-    setLiftDepth(analyticAspect?.depth?.maxDepth)
   }, [selectedEdges, cyInstance]);
   
   useEffect(() => {
     if (containerFocus == "") setLiftDepth(analyticAspect?.depth?.maxDepth)
-    }, [containerFocus])
+  }, [containerFocus])
   
   useEffect(() => {
     setMaxDepth(analyticAspect?.depth?.maxDepth ?? 2);

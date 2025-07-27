@@ -27,12 +27,14 @@ const TabGeneral = ({
         setShowStructure={setShowStructure}
       />
 
+      {showStructure &&
       <ContainerSelector
         cyInstance={cyInstance}
         analyticAspect={analyticAspect}
         selectedContainer={containerFocus}
         setSelectedContainer={setContainerFocus}
       />
+      }
 
       <Layout
         cyInstance={cyInstance}

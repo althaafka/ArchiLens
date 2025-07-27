@@ -11,9 +11,11 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ColoredBadge from "./ColoredBadge";
+import ComposedColorBar from "./ComposedColorBadge";
 
 
-const ElementDrawer = ({ open, onClose, elementData }) => {
+const ElementDrawer = ({ open, onClose, elementData, analyticAspect }) => {
 
   if (!elementData) return null;
 
@@ -173,7 +175,7 @@ const ElementDrawer = ({ open, onClose, elementData }) => {
 
           {elementData.properties && (
             <Accordion
-              defaultExpanded
+              defaultExpanded={false}
               disableGutters
               sx={{
                 boxShadow: "none",
@@ -209,11 +211,204 @@ const ElementDrawer = ({ open, onClose, elementData }) => {
                   <Typography variant="subtitle2">Properties:</Typography>
                 </Box>
               </AccordionSummary>    
-              <AccordionDetails sx={{ px: 0, pt: 1 }}>
+              <AccordionDetails sx={{ px: 0, pt: 1 , pb:0 }}>
                 {renderPropertyList(elementData.properties)}
               </AccordionDetails>
             </Accordion>
           )}
+
+          {!isEdge && elementData?.properties?.dimension && (
+            <Accordion
+              defaultExpanded={false}
+              disableGutters
+              sx={{
+                boxShadow: "none",
+                bgcolor: "transparent",
+                "&::before": { display: "none" },
+                // mt: 1,
+              }}
+            >
+              <AccordionSummary
+                expandIcon={null}
+                sx={{
+                  minHeight: 0,
+                  px: 0,
+                  '& .MuiAccordionSummary-content': {
+                    margin: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                  },
+                }}
+              >
+                <Box display="flex" alignItems="center" gap={1}>
+                  <ExpandMoreIcon
+                    fontSize="small"
+                    sx={{
+                      transform: 'rotate(-90deg)',
+                      transition: 'transform 0.2s',
+                      '.Mui-expanded &': {
+                        transform: 'rotate(0deg)',
+                      },
+                    }}
+                  />
+                  <Typography variant="subtitle2">Dimension:</Typography>
+                </Box>
+              </AccordionSummary>    
+              <AccordionDetails sx={{ px: 0, pt: 1, pb:0 }}>
+                <Box>
+                  {Object.entries(elementData?.properties?.dimension).map(([dimKey, dimVals]) => (
+                    <Box key={dimKey} sx={{ mt: 0.5 }}>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{dimKey.split(":")[1]}</Typography>
+                      <Box sx={{ display: "flex", flexWrap: "wrap", mt: 0.5 }}>
+                        {(dimVals as any).map((val: string, i: number) => (
+                          <ColoredBadge
+                            key={`${dimKey}-${val}-${i}`}
+                            label={val == "-"? "---" : val.split(":")[1]}
+                            color={val =="-"? "": analyticAspect?.colorMap?.[dimKey]?.[val]}
+                          />
+                        ))}
+                      </Box>
+                    </Box>
+                  ))}
+                </Box>
+              </AccordionDetails>
+            </Accordion>
+          )}
+
+          {!isEdge && elementData?.properties?.metric && (
+            <Accordion
+              defaultExpanded={false}
+              disableGutters
+              sx={{
+                boxShadow: "none",
+                bgcolor: "transparent",
+                "&::before": { display: "none" },
+                mt: 1,
+              }}
+            >
+              <AccordionSummary
+                expandIcon={null}
+                sx={{
+                  minHeight: 0,
+                  px: 0,
+                  '& .MuiAccordionSummary-content': {
+                    margin: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                  },
+                }}
+              >
+                <Box display="flex" alignItems="center" gap={1}>
+                  <ExpandMoreIcon
+                    fontSize="small"
+                    sx={{
+                      transform: 'rotate(-90deg)',
+                      transition: 'transform 0.2s',
+                      '.Mui-expanded &': {
+                        transform: 'rotate(0deg)',
+                      },
+                    }}
+                  />
+                  <Typography variant="subtitle2">Metrics:</Typography>
+                </Box>
+              </AccordionSummary>    
+              <AccordionDetails sx={{ px: 0, pt: 1 }}>
+                <Box mt={1}>
+                  <Box sx={{ display: "flex", flexWrap: "wrap", mt: 0.5 }}>
+                    {Object.entries(elementData?.properties?.metric).map(([metricKey, metricValue]: any) => (
+                      <ColoredBadge
+                        key={metricKey.split(":")[1]}
+                        label={`${metricKey.split(":")[1]}:     ${metricValue}`}
+                        color=""
+                      />
+                    ))}
+                  </Box>
+                </Box>
+              </AccordionDetails>
+            </Accordion>
+          )}
+
+          {!isEdge && elementData?.properties?.composedDimension && (
+            <Accordion
+              defaultExpanded={false}
+              disableGutters
+              sx={{
+                boxShadow: "none",
+                bgcolor: "transparent",
+                "&::before": { display: "none" },
+                mt: 1,
+              }}
+            >
+              <AccordionSummary
+                expandIcon={null}
+                sx={{
+                  minHeight: 0,
+                  px: 0,
+                  '& .MuiAccordionSummary-content': {
+                    margin: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                  },
+                }}
+              >
+                <Box display="flex" alignItems="center" gap={1}>
+                  <ExpandMoreIcon
+                    fontSize="small"
+                    sx={{
+                      transform: 'rotate(-90deg)',
+                      transition: 'transform 0.2s',
+                      '.Mui-expanded &': {
+                        transform: 'rotate(0deg)',
+                      },
+                    }}
+                  />
+                  <Typography variant="subtitle2">Composed Dimension:</Typography>
+                </Box>
+              </AccordionSummary>    
+              <AccordionDetails sx={{ px: 0, pt: 1 , pb:0 }}>
+    <Box mt={1}>
+      {Object.entries(elementData.properties.composedDimension).map(([dimKey, dimVals]: any) => {
+        const colorMap = analyticAspect?.colorMap?.[dimKey] || {};
+        const categoryOrder =
+          analyticAspect?.dimension.find((dim) => dim.id === dimKey)?.categories || [];
+
+        const sortedEntries = categoryOrder.length
+          ? Object.entries(dimVals).sort(
+              ([a], [b]) =>
+                categoryOrder.indexOf(a) - categoryOrder.indexOf(b)
+            )
+          : Object.entries(dimVals);
+
+        return (
+          <Box key={dimKey} sx={{ mt: 1 }}>
+            <Typography variant="body2" sx={{ fontWeight: 600 }}>{dimKey.split(":")[1]}</Typography>
+
+            <ComposedColorBar
+              distribution={dimVals}
+              colorMap={colorMap}
+              categoryOrder={categoryOrder}
+            />
+
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 0.3, mt: 0.5 }}>
+              {sortedEntries.map(([val, count]: any) => (
+                <ColoredBadge
+                  key={`${dimKey}-${val}`}
+                  label={`${val.split(":")[1]} (${count})`}
+                  color={colorMap[val]}
+                />
+              ))}
+            </Box>
+          </Box>
+        );
+      })}
+    </Box>
+              </AccordionDetails>
+            </Accordion>
+          )}
+
         </Box>
       </Box>
     </Drawer>

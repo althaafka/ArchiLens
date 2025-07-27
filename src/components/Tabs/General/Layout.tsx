@@ -23,7 +23,7 @@ registerSemanticGridLayout(cytoscape);
 
 
 const Layout = ({ cyInstance, showStructure, analyticAspect, onLayoutChange, onHidePackagesChange, onLiftEdgeChange }) => {
-  const [layout, setLayout] = useState(layoutTypes.grid);
+  const [layout, setLayout] = useState(layoutTypes.klay);
   const [xDimension, setXDimension] = useState('');
   const [yDimension, setYDimension] = useState('');
   const [hidePackages, setHidePackages] = useState(false);
@@ -81,7 +81,6 @@ const Layout = ({ cyInstance, showStructure, analyticAspect, onLayoutChange, onH
 
   const relayout = () => {
     if (!cyInstance) return;
-
     
     if (prevLayoutRef.current && typeof prevLayoutRef.current.destroy === 'function' && prevLayoutType == "semanticGrid") {
       prevLayoutRef.current.destroy();
@@ -152,10 +151,7 @@ const Layout = ({ cyInstance, showStructure, analyticAspect, onLayoutChange, onH
       }
     } else {
       cyInstance.layout({
-        name: layout,
-        animated: false,
-        avoidOverlap: true,
-        nodeSpacing: 10,
+        name: layout
       }).run();
     }
   };

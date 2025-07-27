@@ -13,8 +13,6 @@ export default class GraphAbstractor {
         const returns = this.mergeEdges(hasScriptMap, edgesMap.get("returnType"), "returns");
         const holds = this.mergeEdges(hasVariableMap, edgesMap.get("type"), "holds");
         const calls = this.mergeEdgesType2(hasScriptMap, edgesMap.get("invokes"), "calls");
-        const testedcalls = calls.filter(c => c.data.source == "nl.tudelft.jpacman.Launcher" || c.data.target == "nl.tudelft.jpacman.Launcher" )
-        console.log("CALLS:", testedcalls)
         const accepts = this.mergeEdgesType2(hasScriptMap, edgesMap.get("hasParameter"), "accepts", typeMap);
   
         const abstractEdges = [
@@ -25,6 +23,7 @@ export default class GraphAbstractor {
             ...(holds || []),
             ...(calls || []),
             ...(accepts || []),
+            ...(edgesMap.get("accesses") || []),
             ...(edgesMap.get("hasScript") || []),
             ...(edgesMap.get("implements") || []),
             ...(edgesMap.get("succeeds") || []),
@@ -73,7 +72,7 @@ export default class GraphAbstractor {
         return map;
     }
   
-    private static mergeEdges(
+    private static  mergeEdges(
         map: Map<string, Set<string>>, 
         edges: Set<any> | undefined, 
         newLabel: string
@@ -92,7 +91,7 @@ export default class GraphAbstractor {
                         target: edge.data.target,
                         label: newLabel,
                         properties: {
-                            "weight": 1
+                            weight: edge.data.properties.weight
                         }
                     }
                 });
@@ -123,7 +122,7 @@ export default class GraphAbstractor {
                             target: target,
                             label: newLabel,
                             properties: {
-                              weight: 1
+                              weight: edge.data.properties.weight
                             }
                         }
                     });
@@ -131,5 +130,6 @@ export default class GraphAbstractor {
             });
         });
         return newEdges;
-  }
+    }
+
 }
