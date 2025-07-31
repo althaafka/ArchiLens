@@ -150,18 +150,23 @@ export class ComposedDimensionEnricher {
     const composesEdges = getEdgesByLabel(edges, 'composes');
     const implementsEdges = getEdgesByLabel(edges, 'implements');
 
-    const composedDimIds = composesEdges
-      .filter(cEdge => {
-        const categoryId = cEdge.data('target');
-        const relatedImpls = edges.filter(edge =>
-          edgeHasLabel(edge, 'implements') && edge.data('target') === categoryId
-        );
-        return relatedImpls.some(iEdge => {
-          const sourceNode = cy.getElementById(iEdge.data('source'));
-          return nodeHasLabels(sourceNode, ['Scripts']) || nodeHasLabels(sourceNode, ['Operation']);
-        });
-      })
-      .map(cEdge => cEdge.data('source'));
+    const composedDimIds = [
+      ...new Set(
+        composesEdges
+          .filter(cEdge => {
+            const categoryId = cEdge.data('target');
+            const relatedImpls = edges.filter(edge =>
+              edgeHasLabel(edge, 'implements') && edge.data('target') === categoryId
+            );
+            return relatedImpls.some(iEdge => {
+              const sourceNode = cy.getElementById(iEdge.data('source'));
+              return nodeHasLabels(sourceNode, ['Scripts']) || nodeHasLabels(sourceNode, ['Operation']);
+            });
+          })
+          .map(cEdge => cEdge.data('source'))
+      )
+    ];
+
 
     const simpleDimIds = getNodesByLabel(nodes, 'Dimension').map(node => node.id());
     const dimensionIds = Array.from(new Set([...composedDimIds, ...simpleDimIds]));

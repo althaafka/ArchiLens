@@ -18,7 +18,6 @@ const NodeFilterTree = ({ cyInstance, categoriesVisibility }) => {
   }, [categoriesVisibility, cyInstance]);
 
   const handleToggle = (id, checked) => {
-    console.log(handleToggle)
     const node = cyInstance.getElementById(id);
     node.style({ display: checked ? 'element' : 'none' });
 

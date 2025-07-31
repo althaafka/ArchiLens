@@ -27,7 +27,6 @@ export default class VisualProcessor {
   }
   
   private setDefaultNodeStyle(): void {
-    console.log("YEAH")
     const nodes = this.cy.nodes();
     
     const structures = nodes.filter(node => 

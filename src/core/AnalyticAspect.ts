@@ -94,12 +94,11 @@ export default class AnalyticAspect {
   }
 
   public getNodeCategory(node, dimension: string, showStructure = true): string{
-    if (!node.data().labels.includes("Structure") && !node.data().labels.includes("Container")) {
+    if (!node.data()?.labels?.includes("Structure") && !node?.data()?.labels.includes("Container")) {
       return null
     }
     if (node.data().labels.includes("Container")){
       const hasVisibleChild = node.children().some(child => child.visible());
-      console.log("has visible child", hasVisibleChild)
       if (hasVisibleChild) return null
     }
     if (dimension == "Dimension:Container") {
@@ -116,7 +115,7 @@ export default class AnalyticAspect {
       return node?.data().properties?.metric?.[dimension]
     }
     const simpleDim = node?.data().properties?.dimension?.[dimension];
-    if (!simpleDim || simpleDim.length == 0){
+    if (!simpleDim || simpleDim.length == 0 || simpleDim.every(node => node == "-")){
         const composed = node.data('properties').composedDimension?.[dimension];
         if (!composed) return "-"
         const categoryName = getCategoryName(getMaxCategory(composed), dimension)

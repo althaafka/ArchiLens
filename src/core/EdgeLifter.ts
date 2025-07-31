@@ -27,7 +27,6 @@ export class EdgeLifter {
   }
 
   public unliftEdges(level) {
-    console.log("UNLIFTEDGES",level)
     const liftedEdges = this.cy.edges().filter(edge => 
       edge.data('properties')?.metaSrc === "lifting" &&
       edge.data('properties')?.level === level
@@ -59,7 +58,6 @@ export class EdgeLifter {
     const edges = nodes.connectedEdges()
     
     const edgesMap = this.groupEdgesByLabel(edges)
-    console.log("MAP:", edgesMap)
 
     const newEdges = {}
 

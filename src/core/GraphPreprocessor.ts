@@ -18,12 +18,6 @@ export default class GraphPreProcessor {
     processedElements = GraphPreProcessor.hidePrimitivesAndUpdateLabels(processedElements);
     processedElements = GraphPreProcessor.mergeDuplicateEdgesByWeight(processedElements);
 
-    const edges = processedElements.edges.filter(e => 
-      e.data.label === "calls" &&
-      (e.data.source === "nl.tudelft.jpacman.Launcher" || e.data.target === "nl.tudelft.jpacman.Launcher")
-    );
-    console.log("launcher edges 2", edges);
-
     return processedElements;
   }
 
@@ -115,11 +109,6 @@ export default class GraphPreProcessor {
       return !toRemoveEdgeIds.has(e.data.id) && !toRemoveNodeIds.has(src) && !toRemoveNodeIds.has(tgt);
     });
 
-    // const edges = elements.edges.filter(e => 
-    //   e.data.label === "calls" &&
-    //   (e.data.source === "nl.tudelft.jpacman.Launcher" || e.data.target === "nl.tudelft.jpacman.Launcher")
-    // );
-    // console.log("launcher edges", edges);
 
     
     return elements
@@ -140,9 +129,6 @@ export default class GraphPreProcessor {
       // Tambahkan weight ke edge yang sudah ada
       const existing = edgeMap.get(key);
       existing.data.properties.weight += edge.data.properties.weight || 1;
-      if (edge.data.target == "nl.tudelft.jpacman.Launcher" || edge.data.source == "nl.tudelft.jpacman.Launcher") {
-        console.log("nambah")
-      }
 
     }
   }

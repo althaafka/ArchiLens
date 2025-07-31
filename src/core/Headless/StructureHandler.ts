@@ -75,7 +75,6 @@ export class StructureHandler {
         if (!sourceContainer || !targetContainer || sourceContainer === targetContainer) return;
         const label = getEdgeLabel(edge)
         const key = `${sourceContainer}-${label}-${targetContainer}`;
-        console.log("LABEL", label)
         if (!redirectedEdges[key]) {
             redirectedEdges[key] = {
               group: "edges",
@@ -94,7 +93,6 @@ export class StructureHandler {
             redirectedEdges[key].data.properties.weight += 1;
         }
     })
-    console.log("CONTAINS MAP:", containsMap)
     this.cy.remove(structureNodes);
     this.cy.add(Object.values(redirectedEdges));
     return containsMap
@@ -131,18 +129,14 @@ export class StructureHandler {
   }
 
   public handleContainerFocus(containerId: string, depthData: any): void {
-    const containsMap = this.buildContainsMap()
-    console.log("CONTAINS MAP:", containsMap)
 
     const node = this.cy.getElementById(containerId);
     const level = node?.data("properties")?.depth;
 
     const edgeLifter = new EdgeLifter(this.cy)
-    console.log("Depth data:", depthData)
     edgeLifter.lift(depthData.maxDepth, level+1)
 
     const children = node.children().map(child => child.id());
-    console.log("CHILD:", children)
 
     const parents = this.getAllParent(node)
 
@@ -154,7 +148,6 @@ export class StructureHandler {
     })
 
     this.cy.remove(removedNodes);
-    this.cy.nodes().forEach(node => console.log(node.id()))
   }
 
   public getAllParent(node: cytoscape.NodeSingular): string[] {

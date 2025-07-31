@@ -12,7 +12,6 @@ export default class HeadlessProcessor {
       e.data('label') === "calls" &&
       (e.data('source') === "nl.tudelft.jpacman.Launcher" || e.data('target') === "nl.tudelft.jpacman.Launcher")
     );
-    console.log("launcher edges headless", edges);
 
     DimensionEnricher.enrich(cy);
     MetricEnricher.enrich(cy);
@@ -35,8 +34,6 @@ export default class HeadlessProcessor {
     analyticAspect.collectAnalyticAspect(cy, depthData, containsMap);
 
     new CleanUpProcessor(cy).clean();
-    // const edges = cy.edges().filter(e => e.data('label')=="calls" && (e.data('source') == "nl.​tudelft.​jpacman.​Launcher" || e.data('target') == "nl.​tudelft.​jpacman.​​Launcher"))
-    // console.log("launcher edges", edges)
 
     
     return analyticAspect;

@@ -134,10 +134,21 @@ const Layout = ({ cyInstance, showStructure, analyticAspect, onLayoutChange, onH
         }
       }
       
+      const start = performance.now();
       const layoutInstance = cyInstance.layout(layoutOptions);
       prevLayoutRef.current = layoutInstance;
       
       layoutInstance.run();
+      cyInstance.one('layoutstop', () => {
+  const end = performance.now();
+  const duration = end - start;
+  
+  const visibleNodes = cyInstance.nodes(':visible').length;
+  const visibleEdges = cyInstance.edges(':visible').length;
+
+  console.log(`[LayoutTime] SemanticGrid took ${duration.toFixed(2)} ms`);
+  console.log(`[RenderStats] Visible Nodes: ${visibleNodes}, Visible Edges: ${visibleEdges}`);
+});
       
       if (showStructure) {
         if (hidePackages) {
