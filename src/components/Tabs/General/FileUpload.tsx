@@ -16,6 +16,13 @@ const FileUpload = ({ setGraph }) => {
     reader.onload = (e) => {
       try {
         const jsonData = JSON.parse(e.target?.result as string);
+
+        if (!isValidGraphFormat(jsonData)) {
+          alert('File JSON tidak sesuai format knowledge graph yang diharapkan.');
+          setFileName(null);
+          return;
+        }
+
         setGraph(jsonData);
       } catch (error) {
         alert('Error parsing JSON file');
@@ -26,6 +33,21 @@ const FileUpload = ({ setGraph }) => {
     };
     reader.readAsText(file);
   };
+
+  function isValidGraphFormat(data: any): boolean {
+  if (!data) return false;
+  const elements = data.elements;
+  if (!elements || !Array.isArray(elements.nodes) || !Array.isArray(elements.edges)) {
+    return false;
+  }
+
+  // Optional: cek struktur minimal node dan edge
+  const hasNodeData = elements.nodes.every(node => node?.data?.id);
+  const hasEdgeData = elements.edges.every(edge => edge?.data?.source && edge?.data?.target);
+
+  return hasNodeData && hasEdgeData;
+}
+
 
   return (
     <Box 

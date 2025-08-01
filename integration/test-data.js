@@ -232,3 +232,161 @@ function countHasScriptForSpriteNodes() {
 }
 
 countHasScriptForSpriteNodes()
+
+function getArchitecturalCategoryForSpriteNodes() {
+  const spriteSimpleNames = [
+    "PacManSprites",
+    "SpriteStore",
+    "ImageSprite",
+    "AnimatedSprite",
+    "Sprite",
+    "Empty Sprite"
+  ];
+
+  const spriteNodes = nodes.filter(node =>
+    spriteSimpleNames.includes(node.data.properties?.simpleName)
+  );
+
+  const categoryNodes = nodes.filter(node =>
+    (node.data.labels || []).includes("Category") &&
+    node.data.id.startsWith("ArchitecturalLayer:")
+  );
+
+  const implementsEdges = edges.filter(edge => edge.data.label === "implements");
+
+  console.log("=== Final Architectural Category for Each Sprite Node ===");
+
+  for (const spriteNode of spriteNodes) {
+    // Step 1: Check simple dimension (direct 'implements')
+    const implEdge = implementsEdges.find(edge =>
+      edge.data.source === spriteNode.data.id &&
+      edge.data.target.startsWith("ArchitecturalLayer:")
+    );
+
+    if (implEdge) {
+      const categoryNode = categoryNodes.find(n => n.data.id === implEdge.data.target);
+      const categoryName = categoryNode?.data.properties?.name || implEdge.data.target;
+      console.log(`- ${spriteNode.data.properties.simpleName}: ${categoryName} (simple)`);
+      continue;
+    }
+
+    // Step 2: Fallback to composed dimension
+    const hasScriptEdges = edges.filter(e =>
+      e.data.label === "hasScript" && e.data.source === spriteNode.data.id
+    );
+    const scriptIds = hasScriptEdges.map(e => e.data.target);
+
+    const composedImplEdges = implementsEdges.filter(e =>
+      scriptIds.includes(e.data.source) &&
+      e.data.target.startsWith("ArchitecturalLayer:")
+    );
+
+    if (composedImplEdges.length === 0) {
+      console.log(`- ${spriteNode.data.properties.simpleName}: - (no category found)`);
+      continue;
+    }
+
+    // Count categories to find the most frequent (max)
+    const counter = {};
+    composedImplEdges.forEach(e => {
+      const categoryId = e.data.target;
+      counter[categoryId] = (counter[categoryId] || 0) + 1;
+    });
+
+    const maxCategoryId = Object.entries(counter).sort((a, b) => b[1] - a[1])[0][0];
+    const categoryNode = categoryNodes.find(n => n.data.id === maxCategoryId);
+    const categoryName = categoryNode?.data.properties?.name || maxCategoryId;
+
+    console.log(`- ${spriteNode.data.properties.simpleName}: ${categoryName} (composed)`);
+  }
+
+  console.log("----------------------------------------------\n");
+}
+
+getArchitecturalCategoryForSpriteNodes()
+
+function getSimpleArchitecturalLayerForSpriteNodes() {
+  const spriteSimpleNames = [
+    "PacManSprites",
+    "SpriteStore",
+    "ImageSprite",
+    "AnimatedSprite",
+    "Sprite",
+    "Empty Sprite"
+  ];
+
+  const spriteNodes = nodes.filter(node =>
+    spriteSimpleNames.includes(node.data.properties?.simpleName)
+  );
+
+  const categoryNodes = nodes.filter(node =>
+    (node.data.labels || []).includes("Category") &&
+    node.data.id.startsWith("ArchitecturalLayer:")
+  );
+
+  const implementsEdges = edges.filter(edge => edge.data.label === "implements");
+
+  console.log("=== Simple ArchitecturalLayer (direct implements) for Sprite Nodes ===");
+
+  for (const spriteNode of spriteNodes) {
+    const implEdge = implementsEdges.find(edge =>
+      edge.data.source === spriteNode.data.id &&
+      edge.data.target.startsWith("ArchitecturalLayer:")
+    );
+
+    if (implEdge) {
+      const categoryNode = categoryNodes.find(n => n.data.id === implEdge.data.target);
+      const categoryName = categoryNode?.data.properties?.name || implEdge.data.target;
+      console.log(`- ${spriteNode.data.properties.simpleName}: ${categoryName}`);
+    } else {
+      console.log(`- ${spriteNode.data.properties.simpleName}: -`);
+    }
+  }
+
+  console.log("----------------------------------------------\n");
+}
+
+getSimpleArchitecturalLayerForSpriteNodes();
+
+function getSimpleDPForSpriteNodes() {
+  const spriteSimpleNames = [
+    "PacManSprites",
+    "SpriteStore",
+    "ImageSprite",
+    "AnimatedSprite",
+    "Sprite",
+    "Empty Sprite"
+  ];
+
+  const spriteNodes = nodes.filter(node =>
+    spriteSimpleNames.includes(node.data.properties?.simpleName)
+  );
+
+  const categoryNodes = nodes.filter(node =>
+    (node.data.labels || []).includes("Category") &&
+    node.data.id.startsWith("DependencyProfile:")
+  );
+
+  const implementsEdges = edges.filter(edge => edge.data.label === "implements");
+
+  console.log("=== Simple DependencyProfile (direct implements) for Sprite Nodes ===");
+
+  for (const spriteNode of spriteNodes) {
+    const implEdge = implementsEdges.find(edge =>
+      edge.data.source === spriteNode.data.id &&
+      edge.data.target.startsWith("DependencyProfile:")
+    );
+
+    if (implEdge) {
+      const categoryNode = categoryNodes.find(n => n.data.id === implEdge.data.target);
+      const categoryName = categoryNode?.data.properties?.name || implEdge.data.target;
+      console.log(`- ${spriteNode.data.properties.simpleName}: ${categoryName}`);
+    } else {
+      console.log(`- ${spriteNode.data.properties.simpleName}: -`);
+    }
+  }
+
+  console.log("----------------------------------------------\n");
+}
+
+getSimpleDPForSpriteNodes();
