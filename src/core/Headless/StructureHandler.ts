@@ -85,12 +85,12 @@ export class StructureHandler {
                 label: label,
                 properties: {
                   ...edge.data("properties"),
-                  weight: 1,
+                  weight: edge.data("properties").weight,
                 }
               }
             };
         } else {
-            redirectedEdges[key].data.properties.weight += 1;
+            redirectedEdges[key].data.properties.weight += edge.data("properties").weight;
         }
     })
     this.cy.remove(structureNodes);
