@@ -14,13 +14,18 @@ import {
 const NodeColoring = ({ cyInstance, analyticAspect, coloring, setColoring, categoriesVisibility, setCategoriesVisibility}) => {
 
   useEffect(() => {
+    setColoring('none')
+  }, [cyInstance])
+
+  useEffect(() => {
     if (!cyInstance) return;
+    console.log("coloring:", coloring)
 
     if (!analyticAspect?.metric?.find(m => m.id == coloring)) {
       let catVis = {};
       if (coloring != "none"){
         if (!catVis) return
-        catVis = Object.keys(analyticAspect?.colorMap[coloring]).reduce((acc, key) => {
+        catVis = Object.keys(analyticAspect?.colorMap?.[coloring] || {}).reduce((acc, key) => {
           acc[key] = true;
           return acc;
         }, {})
@@ -43,18 +48,31 @@ const NodeColoring = ({ cyInstance, analyticAspect, coloring, setColoring, categ
   }, [coloring, cyInstance]);
 
   useEffect(() => {
-    if (!cyInstance || coloring === "none") return;
+    if (!cyInstance ) return;
+    if(coloring === "none") {
+      cyInstance.nodes(n => n.data("labels")?.includes("Structure") && n.id() != "java.lang.String").forEach((node) => {
+        node.style('display', 'element');
+      })
+      return;
+    }
     if (analyticAspect.metric.find(m => m.id == coloring)) return;
-    cyInstance.nodes(n => n.data("labels")?.includes("Structure")).forEach((node) => {
-      const categoriesIds = analyticAspect.composedDimension.includes(coloring)? Object.keys(node.data('properties').composedDimension?.[coloring] || {}) : (node?.data('properties')?.dimension?.[coloring] || []);
-      const isVisible = categoriesIds.some((id) => categoriesVisibility[id])
+    cyInstance.nodes(n => n.data("labels")?.includes("Structure") && n.id() != "java.lang.String").forEach((node) => {
+      let categoriesIds;
+      if (analyticAspect.composedDimension.includes(coloring)) {
+        categoriesIds = Object.keys(node.data('properties').composedDimension?.[coloring] || {})
+      } else {
+        categoriesIds = node?.data('properties')?.dimension?.[coloring];
+        if (categoriesIds?.length == 0) categoriesIds = ['-']
+      }
+
+      const isVisible = categoriesIds?.some((id) => categoriesVisibility[id])
       if (node.hasClass('hidden')) {
         node.style('display', 'none');
       } else {
         node.style('display', isVisible ? 'element' : 'none');
       }
     })
-  }, [categoriesVisibility, coloring, cyInstance]);
+  }, [categoriesVisibility]);
 
   return (
     <Box>

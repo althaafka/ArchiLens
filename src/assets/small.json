@@ -3,48 +3,467 @@
     "nodes": [
       {
         "data": {
-          "id": "node1",
+          "id": "container1",
+          "labels": [
+            "Container"
+          ],
+          "properties": {
+            "simpleName": "container1"
+          }
+        }
+      },
+      {
+        "data": {
+          "id": "container2",
+          "labels": [
+            "Container"
+          ],
+          "properties": {
+            "simpleName": "container2"
+          }
+        }
+      },
+      {
+        "data": {
+          "id": "container3",
+          "labels": [
+            "Container"
+          ],
+          "properties": {
+            "simpleName": "container3"
+          }
+        }
+      },
+      {
+        "data": {
+          "id": "container4",
+          "labels": [
+            "Container"
+          ],
+          "properties": {
+            "simpleName": "container4"
+          }
+        }
+      },
+      {
+        "data": {
+          "id": "nodeA",
           "labels": [
             "Structure"
           ],
           "properties": {
-            "simpleName": "ChangeConnectionHandle",
+            "simpleName": "nodeA",
             "kind": "abstract"
           }
         }
       },
       {
         "data": {
-          "id": "node2",
+          "id": "nodeB",
           "labels": [
             "Structure"
           ],
           "properties": {
-            "simpleName": "Figure",
-            "kind": "interface"
+            "simpleName": "nodeB"
+          }
+        }
+      },
+            {
+        "data": {
+          "id": "nodeC",
+          "labels": [
+            "Structure"
+          ],
+          "properties": {
+            "simpleName": "nodeC"
+          }
+        }
+      },
+      {
+        "data": {
+          "id": "nodeD",
+          "labels": [
+            "Structure"
+          ],
+          "properties": {
+            "simpleName": "nodeD"
+          }
+        }
+      },
+      {
+        "data": {
+          "id": "Dimension:TestRefines",
+          "labels": [
+            "Dimension"
+          ],
+          "properties": {
+            "simpleName": "D1"
+          }
+        }
+      },
+      {
+        "data": {
+          "id": "TestRefines:Cat1",
+          "labels": [
+            "Category"
+          ],
+          "properties": {
+            "simpleName": "Cat1"
+          }
+        }
+      },
+        {
+    "data": {
+      "id": "TestRefines:Cat3",
+      "labels": [
+        "Category"
+      ],
+      "properties": {
+        "simpleName": "Cat3"
+      }
+    }
+  },
+            {
+        "data": {
+          "id": "TestRefines:Cat2",
+          "labels": [
+            "Category"
+          ],
+          "properties": {
+            "simpleName": "Cat2"
+          }
+        }
+      },
+            {
+        "data": {
+          "id": "TestRefines:Cat4",
+          "labels": [
+            "Category"
+          ],
+          "properties": {
+            "simpleName": "Cat4"
+          }
+        }
+      },
+      {
+        "data": {
+        "id": "TestRefines:Cat2kedua",
+        "labels": [
+          "Category"
+        ],
+          "properties": {
+          "simpleName": "Cat2kedua"
+        }
+      }
+    },
+    {
+        "data": {
+          "id": "TestRefines:Cat2pertama",
+          "labels": [
+            "Category"
+          ],
+          "properties": {
+            "simpleName": "Cat2pertama"
+          }
+        }
+      },
+      {
+        "data": {
+          "id": "TestRefines:Cat2ketiga",
+          "labels": [
+            "Category"
+          ],
+          "properties": {
+            "simpleName": "Cat2ketiga"
+          }
+        }
+      },
+          {
+        "data": {
+          "id": "TestRefines:Cat2keduaA",
+          "labels": [
+            "Category"
+          ],
+          "properties": {
+            "simpleName": "Cat2keduaA"
           }
         }
       }
+
     ],
     "edges": [
       {
         "data": {
           "id": "edge1",
-          "label": "holds",
-          "source": "node1",
-          "target": "node2",
+          "label": "contains",
+          "source": "container1",
+          "target": "container2",
           "properties": {}
         }
       },
       {
         "data": {
-          "id": "edge2",
-          "label": "calls",
-          "source": "node1",
-          "target": "node2",
+          "id": "edge1a",
+          "label": "contains",
+          "source": "container2",
+          "target": "container3",
           "properties": {}
         }
+      },
+      {
+        "data": {
+          "id": "edge3",
+          "label": "contains",
+          "source": "container3",
+          "target": "container4",
+          "properties": {}
+        }
+      },
+      {
+        "data": {
+          "id": "edge5",
+          "label": "contains",
+          "source": "container4",
+          "target": "nodeD",
+          "properties": {}
+        }
+      },
+      {
+        "data": {
+          "id": "edge4",
+          "label": "contains",
+          "source": "container1",
+          "target": "nodeA",
+          "properties": {}
+        }
+      },
+      {
+        "data": {
+          "id": "edge9",
+          "label": "contains",
+          "source": "container2",
+          "target": "nodeB",
+          "properties": {}
+        }
+      },
+            {
+        "data": {
+          "id": "edge7",
+          "label": "contains",
+          "source": "container3",
+          "target": "nodeC",
+          "properties": {}
+        }
+      },
+                  {
+        "data": {
+          "id": "edge10",
+          "label": "calls",
+          "source": "nodeA",
+          "target": "nodeD",
+          "properties": {}
+        }
+      },
+     {
+        "data": {
+          "id": "TestRefines:Cat1-composes",
+          "label": "composes",
+          "source": "Dimension:TestRefines",
+          "target": "TestRefines:Cat1",
+          "properties": {
+            "weight": 1
+          }
+        }
+      },
+           {
+        "data": {
+          "id": "TestRefines:Cat2Ketiga-composes",
+          "label": "composes",
+          "source": "Dimension:TestRefines",
+          "target": "TestRefines:Cat2ketiga",
+          "properties": {
+            "weight": 1
+          }
+        }
+      },
+           {
+        "data": {
+          "id": "TestRefines:Cat2-composes",
+          "label": "composes",
+          "source": "Dimension:TestRefines",
+          "target": "TestRefines:Cat2",
+          "properties": {
+            "weight": 1
+          }
+        }
+      },
+                 {
+        "data": {
+          "id": "TestRefines:Cat2kedua-composes",
+          "label": "composes",
+          "source": "Dimension:TestRefines",
+          "target": "TestRefines:Cat2kedua",
+          "properties": {
+            "weight": 1
+          }
+        }
+      },
+                 {
+        "data": {
+          "id": "TestRefines:Cat2keduaA-composes",
+          "label": "composes",
+          "source": "Dimension:TestRefines",
+          "target": "TestRefines:Cat2keduaA",
+          "properties": {
+            "weight": 1
+          }
+        }
+      },
+           {
+        "data": {
+          "id": "TestRefines:Cat3-composes",
+          "label": "composes",
+          "source": "Dimension:TestRefines",
+          "target": "TestRefines:Cat3",
+          "properties": {
+            "weight": 1
+          }
+        }
+      },
+        {
+        "data": {
+          "id": "TestRefines:Cat4-composes",
+          "label": "composes",
+          "source": "Dimension:TestRefines",
+          "target": "TestRefines:Cat4",
+          "properties": {
+            "weight": 1
+          }
+        }
+      },
+              {
+        "data": {
+          "id": "TestRefines:Cat2pertama-composes",
+          "label": "composes",
+          "source": "Dimension:TestRefines",
+          "target": "TestRefines:Cat2pertama",
+          "properties": {
+            "weight": 1
+          }
+        }
+      },
+            {
+        "data": {
+          "id": "TestRefines:Cat3-TestRefines:Cat2",
+          "source": "TestRefines:Cat2",
+          "target": "TestRefines:Cat3",
+          "label": "succeeds",
+          "properties": {
+            "weight": 1
+          }
+        }
+      },
+                  {
+        "data": {
+          "id": "TestRefines:Cat2pertama-TestRefines:Cat2kedua",
+          "source": "TestRefines:Cat2pertama",
+          "target": "TestRefines:Cat2kedua",
+          "label": "succeeds",
+          "properties": {
+            "weight": 1
+          }
+        }
+      },
+                        {
+        "data": {
+          "id": "TestRefines:Cat2kedua-TestRefines:Cat2ketiga",
+          "source": "TestRefines:Cat2kedua",
+          "target": "TestRefines:Cat2ketiga",
+          "label": "succeeds",
+          "properties": {
+            "weight": 1
+          }
+        }
+      },
+                  {
+        "data": {
+          "id": "TestRefines:Cat2-TestRefines:Cat2keduaA",
+          "source": "TestRefines:Cat2kedua",
+          "target": "TestRefines:Cat2keduaA",
+          "label": "refines",
+          "properties": {
+            "weight": 1
+          }
+        }
+      },
+      {
+"data": {
+"id": "TestRefines:Cat2-TestRefines:Cat2kedua",
+"source": "TestRefines:Cat2",
+"target": "TestRefines:Cat2kedua",
+"label": "refines",
+"properties": {
+"weight": 1
+}
+}
+},
+{
+        "data": {
+          "id": "TestRefines:Cat2-TestRefines:Cat2pertama",
+          "source": "TestRefines:Cat2",
+          "target": "TestRefines:Cat2pertama",
+          "label": "refines",
+          "properties": {
+            "weight": 1
+          }
+        }
+      },
+      {
+        "data": {
+          "id": "TestRefines:Cat2-TestRefines:Cat2ketiga",
+          "source": "TestRefines:Cat2",
+          "target": "TestRefines:Cat2ketiga",
+          "label": "refines",
+          "properties": {
+            "weight": 1
+          }
+        }
+      },
+
+      {
+      "data": {
+        "id": "nodeB-implements-TestRefines:Cat2",
+        "label": "implements",
+        "source": "nodeB",
+        "target": "TestRefines:Cat2",
+        "properties": {
+          "weight": 1
+        }
+      }
+      },
+            {
+      "data": {
+        "id": "nodeB-implements-TestRefines:Cat2ketiga",
+        "label": "implements",
+        "source": "nodeB",
+        "target": "TestRefines:Cat2ketiga",
+        "properties": {
+          "weight": 1
+        }
+      }
+      },
+                  {
+      "data": {
+        "id": "nodeB-implements-TestRefines:Cat2pertama",
+        "label": "implements",
+        "source": "nodeB",
+        "target": "TestRefines:Cat1",
+        "properties": {
+          "weight": 1
+        }
+      }
       }
     ]
   }
+
 }

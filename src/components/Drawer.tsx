@@ -25,7 +25,7 @@ const ElementDrawer = ({ open, onClose, elementData, analyticAspect }) => {
   const renderPropertyList = (props: Record<string, any>) => (
     <Box className="space-y-3 text-sm text-stone-700">
       {Object.entries(props).map(([key, val]) => (
-        (key != "composedDimension" && key != 'dimension' && key != 'metric') &&
+        (key != "composedDimension" && key != 'dimension' && key != 'metric' && key!='bundle') &&
         <Box key={key}>
           <Typography
             variant="subtitle2"
@@ -260,7 +260,7 @@ const ElementDrawer = ({ open, onClose, elementData, analyticAspect }) => {
                   {Object.entries(elementData?.properties?.dimension).map(([dimKey, dimVals]) => (
                     <Box key={dimKey} sx={{ mt: 0.5 }}>
                       <Typography variant="body2" sx={{ fontWeight: 600 }}>{dimKey.split(":")[1]}</Typography>
-                      <Box sx={{ display: "flex", flexWrap: "wrap", mt: 0.5 }}>
+                      <Box sx={{ display: "flex",flexDirection: "column", gap: 0.5, flexWrap: "wrap", mt: 0.5 }}>
                         {(dimVals as any).map((val: string, i: number) => (
                           <ColoredBadge
                             key={`${dimKey}-${val}-${i}`}
@@ -396,7 +396,7 @@ const ElementDrawer = ({ open, onClose, elementData, analyticAspect }) => {
               {sortedEntries.map(([val, count]: any) => (
                 <ColoredBadge
                   key={`${dimKey}-${val}`}
-                  label={`${val.split(":")[1]} (${count})`}
+                  label={val != "-"? `${val.split(":")[1]} (${count})`: "---"}
                   color={colorMap[val]}
                 />
               ))}

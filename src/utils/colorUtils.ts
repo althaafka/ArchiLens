@@ -49,12 +49,14 @@ export function generateColorMetric(minVal, maxVal, val) {
 }
 
 
+
 const generateColor = (index, total) => {
   const hue = (index * (360 / total)) % 360;
   return `hsl(${hue}, 80%, 75%)`;
 };
 
 export const lightenHSL = (hsl, percent) => {
+  if (!hsl) return;
   const match = hsl.match(/hsl\((\d+(\.\d+)?), (\d+(\.\d+)?)%, (\d+(\.\d+)?)%\)/);
   if (!match) return hsl;
 

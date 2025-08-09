@@ -62,7 +62,7 @@ export default class AnalyticAspect {
     cy.remove(category);
     cy.remove(metric);
     cy.edges().filter(edge =>
-        ["composes", "implements", "succeeds", "measures"].includes(edge.data('label'))
+        ["composes", "implements", "succeeds","refines", "measures"].includes(edge.data('label'))
     ).remove();
 
     this.generateColorMapDimensions();
@@ -79,11 +79,35 @@ export default class AnalyticAspect {
   }
 
   private generateColorMapDimensions(): void {
-    this.colorMap = {};
-    this.dimension.forEach((dim: any) => {
-      this.colorMap[dim.id] = generateColorMap(dim.categories);
+  this.colorMap = {};
+
+  // bikin lookup cepat Category by id
+  const catById = new Map(this.category.map((c: any) => [c.id, c]));
+
+  this.dimension.forEach((dim: any) => {
+    // warna auto default (tetap dipakai untuk yang tidak override)
+    const autoMap = generateColorMap(dim.categories);
+
+    // hasil final per dim: { [categoryId]: color }
+    const finalMap: Record<string, string> = {};
+
+    dim.categories.forEach((catId: string) => {
+      const cat = catById.get(catId) as any;
+      const overrideColor = cat?.properties?.color; 
+      finalMap[catId] = overrideColor ?? autoMap[catId];
     });
-  }
+
+    this.colorMap[dim.id] = finalMap;
+  });
+}
+
+
+  // private generateColorMapDimensions(): void {
+  //   this.colorMap = {};
+  //   this.dimension.forEach((dim: any) => {
+  //     this.colorMap[dim.id] = generateColorMap(dim.categories);
+  //   });
+  // }
 
   public isComposedDimension(dimId) {
     return this.composedDimension.includes(dimId);

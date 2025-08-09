@@ -11,7 +11,8 @@ import cytoscapeDagre from 'cytoscape-dagre';
 import { StylesheetCSS } from "cytoscape";
 import styleData from "./cy-style.json";
 // import rawGraph from "./assets/jpacman-v4-metric.json";
-import rawGraph from "./assets/fix/jpacman-test.json";
+import rawGraph from "./assets/small.json";
+// import rawGraph from "./assets/fix/jpacman-test.json"
 // import rawGraph from "./assets/fix/JHotDraw.json";
 
 import Menu from './components/Menu';
@@ -64,12 +65,13 @@ function App() {
           const cy = cytoscape({
             container: cyRef.current,
             elements: (hcyInstance.json() as { elements: any }).elements,
+            textureOnViewport: true, 
             style: style,
-            wheelSensitivity: 0.25,
+            wheelSensitivity: 0.75,
             ready: (cyEvent) => {
               const cyInstance = cyEvent.cy;
               setCyInstance(cyInstance);
-              const visualizer = new VisualProcessor(cyInstance, analysisData);
+              const visualizer = new VisualProcessor(cyInstance, analysisData, showStructure);
               visualizer.process();
             },
           } as any);
@@ -153,9 +155,7 @@ function App() {
     </IconButton>
   </Tooltip>
 </Stack>
-
         </Box>
-
         <ElementDrawer
           open={drawerOpen}
           onClose={() => setDrawerOpen(false)}

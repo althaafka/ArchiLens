@@ -14869,50 +14869,47 @@
           }
         }
       },
-      {
-        "data": {
-          "id": "DependencyProfile:outbound",
-          "labels": [
-            "Category"
-          ],
-          "properties": {
-            "simpleName": "outbound"
-          }
-        }
-      },
-      {
-        "data": {
-          "id": "DependencyProfile:transit",
-          "labels": [
-            "Category"
-          ],
-          "properties": {
-            "simpleName": "transit"
-          }
-        }
-      },
-      {
-        "data": {
-          "id": "DependencyProfile:inbound",
-          "labels": [
-            "Category"
-          ],
-          "properties": {
-            "simpleName": "inbound"
-          }
-        }
-      },
-      {
-        "data": {
-          "id": "DependencyProfile:hidden",
-          "labels": [
-            "Category"
-          ],
-          "properties": {
-            "simpleName": "hidden"
-          }
-        }
-      },
+{
+  "data": {
+    "id": "DependencyProfile:outbound",
+    "labels": ["Category"],
+    "properties": {
+      "simpleName": "outbound",
+      "color": "#f98c74"
+    }
+  }
+},
+{
+  "data": {
+    "id": "DependencyProfile:transit",
+    "labels": ["Category"],
+    "properties": {
+      "simpleName": "transit",
+      "color": "hsl(38, 88%, 71%)"
+    }
+  }
+},
+{
+  "data": {
+    "id": "DependencyProfile:inbound",
+    "labels": ["Category"],
+    "properties": {
+      "simpleName": "inbound",
+      "color": "hsl(183, 45%, 60%)"
+    }
+  }
+},
+{
+  "data": {
+    "id": "DependencyProfile:hidden",
+    "labels": ["Category"],
+    "properties": {
+      "simpleName": "hidden",
+      "color": "hsl(0, 0%, 76%)"
+    }
+  }
+},
+
       {
         "data": {
           "id": "Metric:MethodCount",
@@ -14920,7 +14917,9 @@
             "Metric"
           ],
           "properties": {
-            "simpleName": "MethodCount"
+            "simpleName": "MethodCount",
+                  "minColor": "hsl(48, 90%, 92%)",
+      "maxColor": "hsl(210, 75%, 45%)"
           }
         }
       }

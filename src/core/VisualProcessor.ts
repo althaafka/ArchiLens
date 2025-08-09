@@ -12,10 +12,12 @@ import { lightenHSL, lightenHSLArray, generateColorMetric, interpolateHexColor }
 export default class VisualProcessor {
   constructor(
     private cy: cytoscape.Core,
-    private data: AnalysisAspect
+    private data: AnalysisAspect,
+    private showStructure: boolean
   ) {
     this.cy = cy;
     this.data = data;
+    this.showStructure = showStructure
   }
 
   public process(): void {
@@ -100,43 +102,113 @@ export default class VisualProcessor {
             const endPercentage = cumulativePercentage;
             return [`${startPercentage}%`, `${endPercentage}%`];
           });
+          // console.log("positions1:", positions, dim.id, node.id())
+          // console.log("colors1:", colors, dim.id, node.id())
           
           const isPureContainerNode = isPureContainer(node)
           const style = Object.keys(composedCategories).length === 1 ? {
-            'background-color': isPureContainerNode? lightenHSL(colors[0], 15) :colors[0],
+            'background-color': isPureContainerNode && this.showStructure? lightenHSL(colors[0], 15) :colors[0],
             'border-color': DEFAULT_BORDER_COLOR,
             'background-fill': 'solid'
           } : {
             'background-fill': 'linear-gradient',
-            'background-gradient-direction': isPureContainerNode ? 'to-bottom-right' : 'to-right',
-            'background-gradient-stop-colors': isPureContainerNode? lightenHSLArray(colors) : colors,
+            'background-gradient-direction': isPureContainerNode && this.showStructure ? 'to-bottom-right' : 'to-right',
+            'background-gradient-stop-colors': isPureContainerNode && this.showStructure? lightenHSLArray(colors) : colors,
             'background-gradient-stop-positions': positions,
             'border-color': DEFAULT_BORDER_COLOR,
           };
           
           addScratch(node, `style_${dim.id}`, style);
         } else {
-            let categoryIds = getNodeCategoryId(node, dim.id);
-            if (!categoryIds || categoryIds.length === 0) return;
-            const colors = categoryIds?.map(id =>
-              this.data.colorMap[dim.id]?.[id] || DEFAULT_STRUCTURE_COLOR
-            );
-            const positions = colors.map((_, index) => `${(index / (colors.length - 1)) * 100}%`);
+  const categoryIdsRaw = getNodeCategoryId(node, dim.id);
+  if (!categoryIdsRaw || categoryIdsRaw.length === 0) return;
+
+  // Urutkan sesuai dim.categories supaya konsisten
+  // console.log(dim.categories)
+  const orderedIds = dim.categories.filter(id => categoryIdsRaw.includes(id));
+  const n = orderedIds.length;
+  // console.log("orderedIds", orderedIds)
+
+  const isPureContainerNode = isPureContainer(node);
+
+  // Single color: solid
+  if (n === 1) {
+    const base = this.data.colorMap[dim.id]?.[orderedIds[0]] || DEFAULT_STRUCTURE_COLOR;
+    const color = isPureContainerNode && this.showStructure? lightenHSL(base, 15) : base;
+    addScratch(node, `style_${dim.id}`, {
+      'background-color': color,
+      'border-color': DEFAULT_BORDER_COLOR,
+      'background-fill': 'solid',
+    });
+    return;
+  }
+
+  const colors = orderedIds.flatMap(id => {
+    const base = this.data.colorMap[dim.id]?.[id] || DEFAULT_STRUCTURE_COLOR;
+    const color = isPureContainerNode && this.showStructure ? lightenHSL(base, 15) : base;
+    return [color, color];
+  });
+
+  const step = 100 / n;
+  let acc = 0;
+  const positions: string[] = [];
+  for (let i = 0; i < n; i++) {
+    const start = acc;
+    acc += step;
+    if (acc > 100) acc = 100;
+    if (100 - acc < 0.00001) acc = 100;
+    positions.push(`${start}%`, `${acc}%`);
+  }
+
+
+
+  addScratch(node, `style_${dim.id}`, {
+    'background-fill': 'linear-gradient',
+    'background-gradient-direction': 'to-right',
+    'background-gradient-stop-colors': isPureContainerNode && this.showStructure? lightenHSLArray(colors) : colors,
+    'background-gradient-stop-positions': positions,
+    'border-color': DEFAULT_BORDER_COLOR,
+  });
+}
+
+        // } else {
+        //     let categoryIds = getNodeCategoryId(node, dim.id);
+        //     if (!categoryIds || categoryIds.length === 0) return;
+        //     const colors = categoryIds?.map(id =>
+        //       this.data.colorMap[dim.id]?.[id] || DEFAULT_STRUCTURE_COLOR
+        //     );
+
+        //     const n = categoryIds.length;
+        //       let cumulative = 0;
+        //       const step = 100 / n;
+        //       const positions: string[] = [];
+        //       for (let i = 0; i < n; i++) {
+        //         const start = cumulative;
+        //         cumulative += step;
+        //         if (cumulative > 100) cumulative = 100;
+        //         if (100 - cumulative < 0.00001) cumulative = 100;
+              
+        //         positions.push(`${start}%`, `${cumulative}%`);
+        //       }
+
+        //     // const positions = colors.map((_, index) => `${(index / (colors.length - 1)) * 100}%`);
+        //     console.log("colors", colors, dim.id, node.id())
+        //     console.log("positions", positions, dim.id, node.id())
   
-            const style = categoryIds.length === 1 ? {
-              'background-color': colors[0],
-              'border-color': DEFAULT_BORDER_COLOR,
-              'background-fill': 'solid',
-            } : {
-              'background-fill': 'linear-gradient',
-              'background-gradient-direction': 'to-right',
-              'background-gradient-stop-colors': colors,
-              'background-gradient-stop-positions': positions,
-              'border-color': DEFAULT_BORDER_COLOR,
-            };
+        //     const style = categoryIds.length === 1 ? {
+        //       'background-color': colors[0],
+        //       'border-color': DEFAULT_BORDER_COLOR,
+        //       'background-fill': 'solid',
+        //     } : {
+        //       'background-fill': 'linear-gradient',
+        //       'background-gradient-direction': 'to-right',
+        //       'background-gradient-stop-colors': colors,
+        //       'background-gradient-stop-positions': positions,
+        //       'border-color': DEFAULT_BORDER_COLOR,
+        //     };
   
-            addScratch(node, `style_${dim.id}`, style);
-          }
+        //     addScratch(node, `style_${dim.id}`, style);
+        //   }
         });
     })
   }

@@ -28,7 +28,8 @@ export default class GraphAbstractor {
             ...(edgesMap.get("implements") || []),
             ...(edgesMap.get("succeeds") || []),
             ...(edgesMap.get("composes") || []),
-            ...(edgesMap.get("measures") || [])
+            ...(edgesMap.get("measures") || []),
+            ...(edgesMap.get('refines') || [])
         ];
   
         return { nodes: nodes, edges: abstractEdges };
