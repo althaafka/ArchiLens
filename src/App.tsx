@@ -11,8 +11,8 @@ import cytoscapeDagre from 'cytoscape-dagre';
 import { StylesheetCSS } from "cytoscape";
 import styleData from "./cy-style.json";
 // import rawGraph from "./assets/jpacman-v4-metric.json";
-import rawGraph from "./assets/small.json";
-// import rawGraph from "./assets/fix/jpacman-test.json"
+// import rawGraph from "./assets/small.json";
+import rawGraph from "./assets/fix/jpacman-test.json"
 // import rawGraph from "./assets/fix/JHotDraw.json";
 
 import Menu from './components/Menu';
@@ -57,7 +57,7 @@ function App() {
         const hcyInstance = event.cy;
         setHCyInstance(hcyInstance);
         const analysisData = HeadlessProcessor.process(hcyInstance, showStructure, containerFocus);
-        console.log("analytic aspect: ", analysisData)
+        // console.log("analytic aspect: ", analysisData)
         
         setAnalyticAspect(analysisData);
 
@@ -81,14 +81,14 @@ function App() {
           }).run();
   
           cy.on('tap', 'node', (event) => {
-            console.log("Node clicked:", event.target.data());
+            // console.log("Node clicked:", event.target.data());
             if (isSemanticGridEl(event.target)) return;
             setSelectedElement(event.target.data());
             setDrawerOpen(true);
           });
   
           cy.on('tap', 'edge', (event) => {
-            console.log("Edge clicked:", event.target.data());
+            // console.log("Edge clicked:", event.target.data());
             if (isSemanticGridEl(event.target)) return;
             setSelectedElement(event.target.data());
             setDrawerOpen(true);

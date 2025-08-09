@@ -58,7 +58,7 @@ export class DimensionEnricher {
                              ordered: string[],
                              seen: Set<string>) {
       if (seen.has(current)) return; // cegah siklus
-      console.log("------current-----",current)
+      // console.log("------current-----",current)
       seen.add(current);
       ordered.push(current);
 
@@ -67,9 +67,9 @@ export class DimensionEnricher {
         .filter(e => e.data('source') === current &&
                      scopeSet.has(e.data('target')))
         .map(e => e.data('target'));
-      console.log("children:", children)
+      // console.log("children:", children)
       const sortedChildren = sortBySucceeds(children, allSucceeds);
-      console.log("sortedChildren:",sortedChildren)
+      // console.log("sortedChildren:",sortedChildren)
       sortedChildren.forEach(child => traverseRefines(child, allRefines, allSucceeds, scopeSet, ordered, seen));
     }
 

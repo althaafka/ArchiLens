@@ -11,7 +11,7 @@ import {
   MenuItem,
 } from '@mui/material';
 
-const NodeColoring = ({ cyInstance, analyticAspect, coloring, setColoring, categoriesVisibility, setCategoriesVisibility}) => {
+const NodeColoring = ({ cyInstance, analyticAspect, coloring, setColoring, categoriesVisibility, setCategoriesVisibility, showStructure}) => {
 
   useEffect(() => {
     setColoring('none')
@@ -19,7 +19,6 @@ const NodeColoring = ({ cyInstance, analyticAspect, coloring, setColoring, categ
 
   useEffect(() => {
     if (!cyInstance) return;
-    console.log("coloring:", coloring)
 
     if (!analyticAspect?.metric?.find(m => m.id == coloring)) {
       let catVis = {};
@@ -49,14 +48,33 @@ const NodeColoring = ({ cyInstance, analyticAspect, coloring, setColoring, categ
 
   useEffect(() => {
     if (!cyInstance ) return;
-    if(coloring === "none") {
-      cyInstance.nodes(n => n.data("labels")?.includes("Structure") && n.id() != "java.lang.String").forEach((node) => {
+    console.log("--", coloring)
+    const test = cyInstance.nodes(n => 
+        showStructure ? 
+          n.data("labels")?.includes("Structure") && n.id() != "java.lang.String" :
+          n.data('labels')?.includes("Container") && !n.data("labels")?.includes("Structure") 
+        )
+
+    test.forEach(node => {
+      console.log(node.id())
+    })
+    
+    if(coloring === "none" || analyticAspect.metric.find(m => m.id == coloring)) {
+      cyInstance.nodes(n => 
+        showStructure ? 
+          n.data("labels")?.includes("Structure") && n.id() != "java.lang.String" :
+          n.data('labels')?.includes("Container") && !n.data("labels")?.includes("Structure") 
+        ).forEach((node) => {
         node.style('display', 'element');
       })
       return;
     }
-    if (analyticAspect.metric.find(m => m.id == coloring)) return;
-    cyInstance.nodes(n => n.data("labels")?.includes("Structure") && n.id() != "java.lang.String").forEach((node) => {
+    // if (analyticAspect.metric.find(m => m.id == coloring)) return;
+    cyInstance.nodes(n => 
+      showStructure? 
+        n.data("labels")?.includes("Structure") && n.id() != "java.lang.String": 
+        n.data("labels")?.includes("Container") && !n.data("labels")?.includes("Structure"))
+    .forEach((node) => {
       let categoriesIds;
       if (analyticAspect.composedDimension.includes(coloring)) {
         categoriesIds = Object.keys(node.data('properties').composedDimension?.[coloring] || {})
@@ -64,6 +82,10 @@ const NodeColoring = ({ cyInstance, analyticAspect, coloring, setColoring, categ
         categoriesIds = node?.data('properties')?.dimension?.[coloring];
         if (categoriesIds?.length == 0) categoriesIds = ['-']
       }
+      if(!showStructure && !categoriesIds) {
+        categoriesIds = Object.keys(node.data('properties').composedDimension?.[coloring] || {})
+      }
+      console.log("-", node.id(), categoriesIds)
 
       const isVisible = categoriesIds?.some((id) => categoriesVisibility[id])
       if (node.hasClass('hidden')) {

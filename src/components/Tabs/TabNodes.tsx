@@ -10,7 +10,8 @@ const TabNodes = ({
   coloring,
   setColoring,
   categoriesVisibility,
-  setCategoriesVisibility
+  setCategoriesVisibility,
+  showStructure
 }) => {
   return (
     <Box hidden={hidden} className="space-y-2 p-4">
@@ -23,6 +24,7 @@ const TabNodes = ({
         setColoring={setColoring}
         categoriesVisibility={categoriesVisibility}
         setCategoriesVisibility={setCategoriesVisibility}
+        showStructure={showStructure}
       />
       
       <NodeFilterTree

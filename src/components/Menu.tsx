@@ -151,6 +151,7 @@ const Menu = ({
         setColoring={setColoring}
         categoriesVisibility={categoriesVisibility}
         setCategoriesVisibility={setCategoriesVisibility}
+        showStructure={showStructure}
       />
 
       <TabEdges
