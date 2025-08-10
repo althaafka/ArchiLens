@@ -49,11 +49,6 @@ const NodeColoring = ({ cyInstance, analyticAspect, coloring, setColoring, categ
   useEffect(() => {
     if (!cyInstance ) return;
     // console.log("--", coloring)
-    const test = cyInstance.nodes(n => 
-        showStructure ? 
-          n.data("labels")?.includes("Structure") && n.id() != "java.lang.String" :
-          n.data('labels')?.includes("Container") && !n.data("labels")?.includes("Structure") 
-        )
     
     if(coloring === "none" || analyticAspect.metric.find(m => m.id == coloring)) {
       cyInstance.nodes(n => 

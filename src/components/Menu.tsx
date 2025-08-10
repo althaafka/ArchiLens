@@ -87,9 +87,14 @@ const Menu = ({
   
   useEffect(() => {
     // setLiftDepth(analyticAspect?.depth?.maxDepth)
-    setLiftDepth(2)
-    const edgelift = new EdgeLifter(cyInstance);
-    edgelift.lift(analyticAspect?.depth?.maxDepth, 3);
+    let initialLiftLevel = liftDepth;
+    try {
+      setLiftDepth(2)
+      const edgelift = new EdgeLifter(cyInstance);
+      edgelift.lift(analyticAspect?.depth?.maxDepth, 3);
+    } catch (_){
+      setLiftDepth(initialLiftLevel)
+    }
     filterEdgeDisplay();
   }, [selectedEdges, cyInstance]);
   
