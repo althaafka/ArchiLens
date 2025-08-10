@@ -16,7 +16,8 @@ const TabGeneral = ({
   setContainerFocus,
   handleLayoutChange,
   handleHidePackagesChange,
-  handleLiftChange
+  handleLiftChange,
+  filterEdgeDisplay
 }) => {
   return (
     <Box hidden={hidden} className="space-y-2 p-4">
@@ -43,6 +44,7 @@ const TabGeneral = ({
         onLayoutChange={handleLayoutChange}
         onHidePackagesChange={handleHidePackagesChange}
         onLiftEdgeChange={handleLiftChange}
+        filterEdgeDisplay={filterEdgeDisplay}
       />
 
       <DownloadGraph cyInstance={cyInstance} />

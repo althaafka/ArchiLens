@@ -141,6 +141,7 @@ const Menu = ({
         handleLayoutChange={handleLayoutChange}
         handleHidePackagesChange={handleHidePackagesChange}
         handleLiftChange={handleLiftChange}
+        filterEdgeDisplay={filterEdgeDisplay}
       />
 
       <TabNodes

@@ -22,7 +22,7 @@ import { EdgeLifter } from '../../../core/EdgeLifter';
 registerSemanticGridLayout(cytoscape);
 
 
-const Layout = ({ cyInstance, showStructure, analyticAspect, onLayoutChange, onHidePackagesChange, onLiftEdgeChange }) => {
+const Layout = ({ cyInstance, showStructure, analyticAspect, onLayoutChange, onHidePackagesChange, onLiftEdgeChange, filterEdgeDisplay }) => {
   const [layout, setLayout] = useState(layoutTypes.klay);
   const [xDimension, setXDimension] = useState('');
   const [yDimension, setYDimension] = useState('');
@@ -156,6 +156,7 @@ const Layout = ({ cyInstance, showStructure, analyticAspect, onLayoutChange, onH
           edgelifter.unlift(analyticAspect?.depth?.maxDepth)
           hidePackage()
           onLiftEdgeChange?.(analyticAspect?.depth?.maxDepth)
+          filterEdgeDisplay()
         } else {
           unhidePackage()
         }
